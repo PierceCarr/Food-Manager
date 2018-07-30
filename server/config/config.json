@@ -1,0 +1,15 @@
+{
+  "development": {
+    "use_env_variable": "DB_PASS",
+    "use_env_variable": "DB_USER",
+    "use_env_variable": "DB_NAME",
+    "username": "DB_USER",
+    "password": "DB_PASS",
+    "database": "DB_NAME",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {},
+  "production": {}
+}
