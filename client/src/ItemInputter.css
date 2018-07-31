@@ -1,0 +1,16 @@
+ @import "~@blueprintjs/core/lib/css/blueprint.css";
+ @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+
+ .theComponent {
+ 	width: 450px;
+ 	margin: auto;
+ 	text-align: left;
+ }
+
+#nameInput {
+	width: 290px;
+}
+
+/*.nameCheckButton {
+	width
+}*/
