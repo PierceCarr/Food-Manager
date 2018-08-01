@@ -19,6 +19,7 @@ class App extends Component {
       <div className="App">
           <h1 className="App-title">{this.state.message}</h1>
           <ItemInputter/>
+          <p/>
       </div>
     );
   }

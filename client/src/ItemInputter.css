@@ -7,8 +7,20 @@
  	text-align: left;
  }
 
-#nameInput {
-	width: 290px;
+ .bp3-dark {
+ 	width: 450px;
+ 	margin: auto;
+ 	text-align: left;
+ }
+
+#name-input {
+	width: 325px;
+}
+
+.submit {
+	margin: auto;
+	text-align: center;
+	width:410px;
 }
 
 /*.nameCheckButton {

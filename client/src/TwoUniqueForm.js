@@ -7,55 +7,80 @@ class TwoUniqueForm extends Component {
 		super();
 
 		this.state = {
-			needsWarning: false
+			validCombo: null
 		}
+	}
+
+	validateCombo() {
+		const newValidity = !this.state.validCombo;
+		this.setState({validCombo: newValidity},
+			this.props.validateNameUnitCombo(newValidity));
 	}
 
 	render(){
 		const labelOneTitle = "Name:";
-		const labelOnePlaceholder = "ex. Snow Peas";
+		const labelOnePlaceholder = "ex. Pumpkin";
 
 		const labelTwoTitle = "Unit of Measurement:";
-		const labelTwoPlaceholder = "ex. 3200g Bag";
+		const labelTwoPlaceholder = "ex. Slice";
 
 		const validationButtonText = "Check if Name/UOM Combo Exists";
-		const warningMessage = "You need to check if the item exists before you can submit it";
+		const warningMessage = "This Item already exists with given UOM";
 
 
 		let message = <div/>
-		if(this.state.needsWarning){
+		if(this.state.validCombo === false){
 			message = 
-			<p style={{color: "red"}}>
-				{warningMessage}
-			</p>
+			<div>
+				<br/>
+				<em style={{color: "red"}}>
+					{warningMessage}
+				</em>
+			</div>;
+			
+		}
+
+		let validationButtonIcon = "circle";
+		if(this.state.validCombo !== null){
+			if(this.state.validCombo){
+					validationButtonIcon = "confirm";
+				} else {
+					validationButtonIcon = "repeat";
+				}
 		}
 
 		return(
 			<div>
 		    	<div className="thisComponent">
 		    		<Card elevation={Elevation.TWO}>
+
 			    		<FormGroup
 			    			label={labelOneTitle}
 			    			labelFor="first-input"
-			    		>
+			    			labelInfo="(required)">
 			    			<InputGroup 
 			    				id="first-input" 
-			    				placeholder= {labelOnePlaceholder}
-			    				
-								/>
+			    				placeholder= {labelOnePlaceholder}/>
 			    		</FormGroup>
+
 			    		<FormGroup
 			    			label={labelTwoTitle}
 			    			labelFor="second-input"
-			    		>
+			    			labelInfo="(required)">
 			    			<InputGroup 
 			    				id="second-input" 
-			    				placeholder={labelTwoPlaceholder}
-								/>
+			    				placeholder={labelTwoPlaceholder}/>
 			    		</FormGroup>
+
 			    		<div className="validCheck">
-				    		<Button>{validationButtonText}</Button>
+				    		<Button 
+				    			icon={validationButtonIcon} 
+				    			onClick={() => this.validateCombo()}>
+				    			{validationButtonText}
+				    		</Button>
+
 				    		{message}
+				    		
 				    	</div>
 		    		</Card>
 		      </div>

@@ -9,3 +9,11 @@
  .validCheck {
  	text-align: center;
  }
+
+ #category-input {
+ 	width: 325px;
+ }
+
+ #nameInput {
+ 	width: 325px;
+ }
