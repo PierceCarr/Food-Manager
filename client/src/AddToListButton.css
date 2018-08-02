@@ -1,0 +1,6 @@
+ @import "~@blueprintjs/core/lib/css/blueprint.css";
+
+ .popWrapper {
+ 	max-width: auto;
+ 	width: 300px;
+ }

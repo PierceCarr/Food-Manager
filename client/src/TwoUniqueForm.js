@@ -3,46 +3,57 @@ import {Button, FormGroup, InputGroup, Card, Elevation} from "@blueprintjs/core"
 import './TwoUniqueForm.css';
 
 class TwoUniqueForm extends Component {
-	constructor(){
-		super();
+	constructor(props) {
+		super(props);
 
 		this.state = {
-			validCombo: null
+
+			submitted: false,
+			warningMessage: ""
 		}
 	}
 
 	validateCombo() {
-		const newValidity = !this.state.validCombo;
-		this.setState({validCombo: newValidity},
-			this.props.validateNameUnitCombo(newValidity));
+		let bothFieldsEntered = true;
+		if(this.props.formOneText.length === 0 ||
+		   this.props.formTwoText.length === 0) {
+			bothFieldsEntered = false;
+		}
+
+		let isValid = true;
+		if(bothFieldsEntered){
+
+			this.props.validateNameUnitCombo(isValid);
+
+			this.setState({warningMessage: ""});
+		} else {
+			isValid = false;
+
+			
+			this.props.validateNameUnitCombo(isValid);
+			this.setState({warningMessage: "Please fill in both fields"})
+		}
+
+		this.setState({submitted: true});
 	}
 
 	render(){
-		const labelOneTitle = "Name:";
-		const labelOnePlaceholder = "ex. Pumpkin";
 
-		const labelTwoTitle = "Unit of Measurement:";
-		const labelTwoPlaceholder = "ex. Slice";
+		let message = <div/>;
 
-		const validationButtonText = "Check if Name/UOM Combo Exists";
-		const warningMessage = "This Item already exists with given UOM";
-
-
-		let message = <div/>
-		if(this.state.validCombo === false){
+		if(this.state.warningMessage.length > 0){
 			message = 
 			<div>
 				<br/>
-				<em style={{color: "red"}}>
-					{warningMessage}
-				</em>
+				<b style={{color: "red"}}>
+					{this.state.warningMessage}
+				</b>
 			</div>;
-			
 		}
-
+			
 		let validationButtonIcon = "circle";
-		if(this.state.validCombo !== null){
-			if(this.state.validCombo){
+		if(this.state.submitted === true){
+			if(this.props.validCombo){
 					validationButtonIcon = "confirm";
 				} else {
 					validationButtonIcon = "repeat";
@@ -55,28 +66,36 @@ class TwoUniqueForm extends Component {
 		    		<Card elevation={Elevation.TWO}>
 
 			    		<FormGroup
-			    			label={labelOneTitle}
+			    			label={this.props.labelOneTitle}
 			    			labelFor="first-input"
-			    			labelInfo="(required)">
+			    			labelInfo={this.props.labelOneInfo}>
 			    			<InputGroup 
 			    				id="first-input" 
-			    				placeholder= {labelOnePlaceholder}/>
+			    				placeholder= {this.props.labelOnePlaceholder}
+			    				onChange={(event) => {
+			    					this.props.handleFirstInput(event);
+			    				}}
+			    				value={this.props.formOneText}/>
 			    		</FormGroup>
 
 			    		<FormGroup
-			    			label={labelTwoTitle}
+			    			label={this.props.labelTwoTitle}
 			    			labelFor="second-input"
-			    			labelInfo="(required)">
+			    			labelInfo={this.props.labelTwoInfo}>
 			    			<InputGroup 
 			    				id="second-input" 
-			    				placeholder={labelTwoPlaceholder}/>
+			    				placeholder={this.props.labelTwoPlaceholder}
+			    				onChange={(event) => {
+			    					this.props.handleSecondInput(event);
+			    				}}
+			    				value={this.props.formTwoText}/>
 			    		</FormGroup>
 
 			    		<div className="validCheck">
 				    		<Button 
 				    			icon={validationButtonIcon} 
 				    			onClick={() => this.validateCombo()}>
-				    			{validationButtonText}
+				    			{this.props.validationButtonText}
 				    		</Button>
 
 				    		{message}
