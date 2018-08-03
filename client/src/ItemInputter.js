@@ -1,15 +1,40 @@
 import React, { Component } from 'react';
-import { Button, FormGroup, ControlGroup, Collapse, InputGroup, Card, Elevation, Switch, Menu, MenuItem, Popover } from "@blueprintjs/core";
+import currencyFormatter from 'currency-formatter';
 import AddToListButton from './AddToListButton.js';
-// import { Select, ItemRenderer } from "@blueprintjs/select";
 import "./ItemInputter.css";
 import TwoUniqueForm from "./TwoUniqueForm.js";
+import { 
+	Button, 
+	Card,
+	Collapse,
+	ControlGroup,
+	Elevation,
+	FormGroup, 
+	InputGroup, 
+	Menu,
+	MenuItem, 
+	Popover,
+	Position,   
+	Switch,    
+	Toaster,  
+} from "@blueprintjs/core";
+
 
 let pretendCategoryObjects = [
 	{name: "Entre", tags: ["Steak", "Duck", "Really big salad"]},
 	{name: "Sauce", tags: ["Mustard", "Vinegar", "BBQ"]},
 	{name: "Dessert", tags: ["Cheesecake", "Ice Cream", "Treacle"]}
 ];
+
+//Known Bugs:
+//>Selecting a tag after inputting the item name doesn't update
+//the displayed item name. (Minor)
+//>Toast has no message (Moderate)
+
+//Pain points:
+//>If a user accidently selects a tag when they want no tag,
+//they must somehow refresh the entire component and start over to
+//clear the tag slot.
 
 class ItemInputter extends Component {
   constructor() {
@@ -18,29 +43,44 @@ class ItemInputter extends Component {
     this.defaultMenuText = "Click Here to Select";
 
     this.state = {
-    //Item data to submit
+    	//Item data to submit
     	itemName: "",
     	unitOfMeasurement: "",
     	category: null,
     	tag: null,
-    	itemPrice: 0.00,
-    	initialQuantity: 0,
+    	itemPrice: "",
+    	initialQuantity: "",
     	isItemActive: true,
 
     	//Visual state
+    	nameUnitChecked: false,
+    	formattedItemName: "",
+    	displayItemName: "",
     	categoryItems: pretendCategoryObjects,
+    	displayPrice: currencyFormatter.format(0.00, {code: 'USD'}),
     	tagsFromCategory: [],
     	isCategoryChosen: false,
     	isNameComboValid: false,
     	categoryMenuText: this.defaultMenuText,
-    	tagMenuText: this.defaultMenuText 
+    	tagMenuText: this.defaultMenuText,
+    	inputKey: new Date()
     }
+
+    this.priceInput = React.createRef();
 
     this.onCategoryMenuItemClick = this.onCategoryMenuItemClick.bind(this);
     this.handleNameInput = this.handleNameInput.bind(this);
     this.handleUnitInput = this.handleUnitInput.bind(this);
     this.handlePriceInput = this.handlePriceInput.bind(this);
     this.handleQuantityInput = this.handleQuantityInput.bind(this);
+  }
+
+  displayFormattedItemName() {
+  	this.setState({displayItemName: this.state.formattedItemName});
+  }
+
+  displayFormattedPrice() {
+  	this.setState({itemPrice: this.state.displayPrice});
   }
 
   resetComponent() {
@@ -50,17 +90,22 @@ class ItemInputter extends Component {
     	unitOfMeasurement: "",
     	category: null,
     	tag: null,
-    	itemPrice: 0.00,
-    	initialQuantity: 0,
+    	itemPrice: "",
+    	initialQuantity: "",
     	isItemActive: true,
 
     	//Visual state
+    	nameUnitChecked: false,
+    	formattedItemName: "",
+    	displayItemName: "",
     	categoryItems: pretendCategoryObjects,
+    	displayPrice: currencyFormatter.format(0.00, {code: 'USD'}),
     	tagsFromCategory: [],
     	isCategoryChosen: false,
     	isNameComboValid: false,
     	categoryMenuText: this.defaultMenuText,
-    	tagMenuText: this.defaultMenuText
+    	tagMenuText: this.defaultMenuText,
+    	inputKey: new Date()
   	});
   }
 
@@ -71,14 +116,16 @@ class ItemInputter extends Component {
 	  	this.setState({tagsFromCategory: tagsInCategory});
   	}
 
-  	this.setState({categoryMenuText: chosenCategory.name});
-  	this.setState({isCategoryChosen: true});
-
-  	this.setState({category: chosenCategory}, updateTags());
-
-  	this.setState({chosenTag: null});
-  	this.setState({tagMenuText: "Click Here to Select"});
+  	this.setState({
+  		categoryMenuText: chosenCategory.name,
+  		isCategoryChosen: true,
+  		category: chosenCategory,
+  		chosenTag: null,
+  		tagMenuText: "Click Here to Select"
+  	}, updateTags());
   }
+
+
 
   onTagMenuItemClick(chosenTag) {
   	this.setState({tag: chosenTag});
@@ -86,8 +133,15 @@ class ItemInputter extends Component {
   }
 
   handleNameInput(event) {
-  	this.setState({itemName: event.target.value});
-  	this.setState({isNameComboValid: false});
+  	let trueName = event.target.value;
+  	let formattedName = this.state.tag + ' - ' + trueName;
+  	if(this.state.tag === null) formattedName = trueName;
+  	
+  	this.setState({
+  		itemName: trueName,
+  		displayItemName: formattedName,
+  		isNameComboValid: false
+  	});
   }
 
   handleUnitInput(event) {
@@ -100,7 +154,10 @@ class ItemInputter extends Component {
   }
 
   validateNameUnitCombo(isValid) {
-  	this.setState({isNameComboValid: isValid});
+  	this.setState({
+  		isNameComboValid: isValid,
+  		nameUnitChecked: true
+  	});
   }
 
   addNewCategory(newCategory) {
@@ -130,7 +187,13 @@ class ItemInputter extends Component {
   }
 
   handlePriceInput(event) {
-  	this.setState({itemPrice: event.target.value});
+  	const formattedPrice = 
+  		currencyFormatter.format(event.target.value, {code: 'USD'});
+  	this.setState({
+  		itemPrice: event.target.value,
+  		displayPrice: formattedPrice,
+  		isPriceFormatted: false
+  	});
   }
 
   handleQuantityInput(event) {
@@ -156,8 +219,14 @@ class ItemInputter extends Component {
   		isActive: this.state.isItemActive
   	}
 
-  	console.log(newItem);
+  	console.log(newItem); //Send to server here, and toast on 200
 
+  	let prettyTag = newItem.tag + " - ";
+  	if(newItem.tag === null) prettyTag = "";
+  	const toastMessage = 
+  		prettyTag + newItem.name + " was added to " + newItem.category.name;
+  	const toaster = Toaster.create({position: Position.TOP});
+  	toaster.show({message: toastMessage, intent: "success"});
   	//return state to its default form
   	this.resetComponent();
   }
@@ -258,6 +327,8 @@ class ItemInputter extends Component {
 				</FormGroup>
 			</Collapse>;
 
+		
+
 		const hiddenPriceSubmitPanel = 
 			<div>
 				<Collapse isOpen={this.state.isNameComboValid}>
@@ -269,7 +340,10 @@ class ItemInputter extends Component {
 						<InputGroup 
 							id="price-input" 
 							placeholder="$0.00" 
-							onChange={(event) => this.handlePriceInput(event)}/>
+							ref={this.priceInput}
+							onChange={(event) => this.handlePriceInput(event)}
+							onBlur={() => this.displayFormattedPrice()}
+							value={this.state.itemPrice}/>
 					</FormGroup>
 
 					<FormGroup
@@ -279,7 +353,8 @@ class ItemInputter extends Component {
 						<InputGroup 
 							id="quantity-input" 
 							placeholder="0" 
-							onChange={(event) => this.handleQuantityInput(event)}/>
+							onChange={(event) => this.handleQuantityInput(event)}
+							value={this.state.initialQuantity}/>
 					</FormGroup>
 
 						<Switch 
@@ -287,9 +362,9 @@ class ItemInputter extends Component {
 							checked={this.state.isItemActive} 
 							onChange={() => this.toggleIsItemActive()}/>
 					<Button 
-					className="submit" 
-					onClick={() => this.handleSubmit()}
-					disabled={!isSubmitAvailable}>
+						className="submit" 
+						onClick={() => this.handleSubmit()}
+						disabled={!isSubmitAvailable}>
 						{submitText}
 					</Button>
 
@@ -307,18 +382,21 @@ class ItemInputter extends Component {
 
 		    		<p/>
 			    		<TwoUniqueForm 
+			    			key={this.state.inputKey}
 			    			labelOneTitle="Name:"
 			    			labelOneInfo={requiredText}
 			    			labelOnePlaceholder="ex. Pumpkin"
 			    			labelTwoTitle="Unit of Measurement:"
 			    			labelTwoInfo={requiredText}
 			    			labelTwoPlaceholder="ex. Slice"
-			    			formOneText={this.state.itemName}
+			    			formOneFocusValue={this.state.itemName}
+			    			formOneBlurValue={this.state.displayItemName}
 			    			formTwoText={this.state.unitOfMeasurement}
 			    			validationButtonText="Check if Name/UOM Combo Exists"
 			    			warningMessage="This Item already exists with given UOM"
 			    			handleFirstInput={(event) => this.handleNameInput(event)}
 			    			handleSecondInput={(event) => this.handleUnitInput(event)}
+			    			submitted={this.state.nameUnitChecked}
 			    			validCombo={this.state.isNameComboValid}
 			    			validateNameUnitCombo=
 			    				{(isValid, name, unit) => this.validateNameUnitCombo(isValid, name, unit)}

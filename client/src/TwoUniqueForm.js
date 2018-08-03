@@ -7,34 +7,42 @@ class TwoUniqueForm extends Component {
 		super(props);
 
 		this.state = {
-
-			submitted: false,
-			warningMessage: ""
+			warningMessage: "",
+			formOneValue: ""
 		}
 	}
 
 	validateCombo() {
 		let bothFieldsEntered = true;
-		if(this.props.formOneText.length === 0 ||
+		if(this.props.formOneFocusValue.length === 0 ||
 		   this.props.formTwoText.length === 0) {
 			bothFieldsEntered = false;
 		}
 
 		let isValid = true;
 		if(bothFieldsEntered){
-
 			this.props.validateNameUnitCombo(isValid);
-
 			this.setState({warningMessage: ""});
 		} else {
 			isValid = false;
-
-			
 			this.props.validateNameUnitCombo(isValid);
 			this.setState({warningMessage: "Please fill in both fields"})
 		}
 
 		this.setState({submitted: true});
+	}
+
+	onFormOneFocus() {
+		this.setState({formOneValue: this.props.formOneFocusValue});
+	}
+
+	onFormOneBlur() {
+		this.setState({formOneValue: this.props.formOneBlurValue});
+	}
+
+	onFormOneChange(event) {
+		this.setState({formOneValue: event.target.value});
+		this.props.handleFirstInput(event);
 	}
 
 	render(){
@@ -52,12 +60,12 @@ class TwoUniqueForm extends Component {
 		}
 			
 		let validationButtonIcon = "circle";
-		if(this.state.submitted === true){
+		if(this.props.submitted === true){
 			if(this.props.validCombo){
-					validationButtonIcon = "confirm";
-				} else {
-					validationButtonIcon = "repeat";
-				}
+				validationButtonIcon = "confirm";
+			} else {
+				validationButtonIcon = "repeat";
+			}
 		}
 
 		return(
@@ -73,9 +81,11 @@ class TwoUniqueForm extends Component {
 			    				id="first-input" 
 			    				placeholder= {this.props.labelOnePlaceholder}
 			    				onChange={(event) => {
-			    					this.props.handleFirstInput(event);
+			    					this.onFormOneChange(event);
 			    				}}
-			    				value={this.props.formOneText}/>
+			    				value={this.state.formOneValue}
+			    				onFocus={() => this.onFormOneFocus()}
+			    				onBlur={() => this.onFormOneBlur()}/>
 			    		</FormGroup>
 
 			    		<FormGroup
