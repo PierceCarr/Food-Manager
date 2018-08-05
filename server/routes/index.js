@@ -6,42 +6,59 @@ const Sequelize = require('sequelize');
 //For local use:
 const sequelize = new Sequelize(
 	process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
-  dialect: 'postgres'
+ 	dialect: 'postgres'
 });
 
 sequelize.authenticate().then(() => {
-  console.log("Connected to Postgres");
+	console.log("Connected to Postgres");
 }).catch((err) => {
 	console.log('Unable to connect to database:');
-  console.log(err);
+  	console.log(err);
 });
 
 const Item = sequelize.define('item', {
 	name: {
 		type: Sequelize.STRING,
 		allowNull: false,
-		unique: 'nameQtyIndex'
-	},
-	qty: {
-		type: Sequelize.FLOAT,
-		defaultValue: 0,
-		unique: 'nameQtyIndex'
+		unique: 'nameUnitIndex'
 	},
 	unitOfMeasure: {
 		type: Sequelize.STRING,
-		allowNull: false
-	},
-	price: {
-		type: Sequelize.FLOAT,
-		defaultValue: 0
+		allowNull: false,
+		unique: 'nameUnitIndex'
 	},
 	category: {
 		type: Sequelize.STRING,
 		allowNull: false
 	},
+	tag: {
+		type: Sequelize.STRING,
+		allowNull: true,
+		defaultValue: null
+	}
+	price: {
+		type: Sequelize.FLOAT,
+		defaultValue: 0
+	},
+	qty: {
+		type: Sequelize.FLOAT,
+		defaultValue: 0,
+	},
 	isActive: {
 		type: Sequelize.BOOLEAN,
 		defaultValue: true
+	}
+});
+
+const Category = sequelize.define('category', {
+	name: {
+		type: Sequelize.String,
+		allowNull: false,
+		unique: true
+	},
+	tags: {
+		type: Sequelize.ARRAY(Sequelize.STRING),
+		unique: true
 	}
 });
 
