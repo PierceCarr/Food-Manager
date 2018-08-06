@@ -72,7 +72,6 @@ class TwoUniqueForm extends Component {
 			<div>
 		    	<div className="thisComponent">
 		    		<Card elevation={Elevation.TWO}>
-
 			    		<FormGroup
 			    			label={this.props.labelOneTitle}
 			    			labelFor="first-input"

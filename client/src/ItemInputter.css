@@ -6,9 +6,12 @@
  	margin: auto;
  	text-align: left;
  }
-
+/*
+.bp3-card.bp3-dark{
+	background-color: #000000 !important;
+}
+*/
  .bp3-dark {
- 	
  	margin: auto;
  	text-align: left;
  }

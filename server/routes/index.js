@@ -3,6 +3,8 @@ var router = express.Router();
 const bodyParser = require('body-parser');
 const Sequelize = require('sequelize');
 
+router.use(bodyParser.json());
+
 //For local use:
 const sequelize = new Sequelize(
 	process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
@@ -16,55 +18,105 @@ sequelize.authenticate().then(() => {
   	console.log(err);
 });
 
-const Item = sequelize.define('item', {
+const Category = sequelize.define('categories', {
 	name: {
 		type: Sequelize.STRING,
 		allowNull: false,
-		unique: 'nameUnitIndex'
+		unique: true,
+		primaryKey: true
 	},
-	unitOfMeasure: {
-		type: Sequelize.STRING,
-		allowNull: false,
-		unique: 'nameUnitIndex'
-	},
-	category: {
-		type: Sequelize.STRING,
-		allowNull: false
-	},
-	tag: {
-		type: Sequelize.STRING,
-		allowNull: true,
-		defaultValue: null
-	}
-	price: {
-		type: Sequelize.FLOAT,
-		defaultValue: 0
-	},
-	qty: {
-		type: Sequelize.FLOAT,
-		defaultValue: 0,
+	tags: {
+		type: Sequelize.ARRAY({
+			type: Sequelize.STRING,
+			unique: true
+		}),
 	},
 	isActive: {
-		type: Sequelize.BOOLEAN,
-		defaultValue: true
+	    type: Sequelize.BOOLEAN,
+	    default: true
 	}
 });
 
-const Category = sequelize.define('category', {
+const Item = sequelize.define('items', {
 	name: {
-		type: Sequelize.String,
-		allowNull: false,
-		unique: true
-	},
-	tags: {
-		type: Sequelize.ARRAY(Sequelize.STRING),
-		unique: true
-	}
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: "nameUnitConstraint",
+        // primaryKey: true
+      },
+      unitOfMeasure: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: "nameUnitConstraint"
+        // primaryKey: true
+      },
+      category: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        references: {model: 'categories', key: 'name'}
+      },
+      tag: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      quantity: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0.0,
+      },
+      price: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0
+      },
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
+      }
 });
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.route('/')
+.get((req, res, next) => {
+	res.statusCode = 200;
+	res.json({message: "Transmission recieved loud and clear m80 p0t80"});
+})
+.post((req, res, next) => {
+	if(req.body.isReceive === true){
+		res.statusCode = 200;
+		console.log('Recieved the recieve');
+		if(req.body.isItemInputterMounting === true){
+				Category.findAll().then((results) => {
+					res.json(results);
+				})
+			}
+
+	} else { //Inserting a record
+		if(res.body.newCategory === true){
+			//Insert new category
+
+		} 
+		//Insert new item here
+		res.statusCode = 201;
+		Item.sync().then(() => {
+			return Item.create ({
+				name: req.body.name,
+				unitOfMeasure: req.body.unitOfMeasure,
+				category: req.body.category,
+				tag: req.body.tag,
+				quantity: req.body.quantity,
+				price: req.body.price,
+				isActive: req.body.isActive
+			})
+		})
+	}
+})
+.patch((req, res, next) => {
+	res.statusCode = 200;
+	res.json({message: "Rodger, making the change."});
+})
+.delete((req, res, next) => {
+	res.statusCode = 200;
+  	res.json({message: "Right, deleting."});
 });
 
 module.exports = router;

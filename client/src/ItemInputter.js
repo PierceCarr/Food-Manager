@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import currencyFormatter from 'currency-formatter';
+import axios from 'axios';
 import AddToListButton from './AddToListButton.js';
 import "./ItemInputter.css";
 import TwoUniqueForm from "./TwoUniqueForm.js";
@@ -21,9 +22,9 @@ import {
 
 
 let pretendCategoryObjects = [
-	{name: "Entre", tags: ["Steak", "Duck", "Really big salad"]},
-	{name: "Sauce", tags: ["Mustard", "Vinegar", "BBQ"]},
-	{name: "Dessert", tags: ["Cheesecake", "Ice Cream", "Treacle"]}
+	{name: "Meats", tags: ["Steak", "Duck", "Burgers"]},
+	{name: "Sauces", tags: ["Mustard", "Vinegar", "BBQ"]},
+	{name: "Desserts", tags: ["Cheesecake", "Ice Cream", "Galette"]}
 ];
 
 //Known Bugs:
@@ -73,6 +74,34 @@ class ItemInputter extends Component {
     this.handleUnitInput = this.handleUnitInput.bind(this);
     this.handlePriceInput = this.handlePriceInput.bind(this);
     this.handleQuantityInput = this.handleQuantityInput.bind(this);
+  }
+
+  componentDidMount() {
+  	let categories = [];
+
+  	axios({
+  		method: 'post',
+  		url: 'http://localhost:3001',
+  		headers: {
+  			'Content-Type': 'application/json'
+  		},
+  		data: {
+  			isReceive: true,
+  			isItemInputterMounting: true
+  		}
+  	})
+  	.then((response) => {
+  		response.data.forEach((category) => categories.push(category));
+  	})
+  	.then(() => {
+  		this.setState({categoryItems: categories});
+  	})
+  	.catch((error) => {
+  		console.log(error);
+  	});
+
+  	//Hand state the categories
+  	// console.log(categories);
   }
 
   displayFormattedItemName() {
@@ -208,7 +237,28 @@ class ItemInputter extends Component {
   	});
 
   	if(isTagNew) this.state.category.tags.push(this.state.tag);
-  		
+  	
+  	axios({
+  		method: 'post',
+  		url: 'localhost:3001',
+  		headers: {
+  			'Content-Type': 'application/json'
+  		},
+  		data: {
+  			isRecieve: false,
+  			newCategory: false,
+
+  			name: this.state.itemName,
+	  		unitOfMeasurement: this.state.unitOfMeasurement,
+	  		category: this.state.category,
+	  		tag: this.state.tag,
+	  		price: this.state.itemPrice,
+	  		quantity: this.state.initialQuantity,
+	  		isActive: this.state.isItemActive
+  		}
+  	});
+
+
   	const newItem = {
   		name: this.state.itemName,
   		unitOfMeasurement: this.state.unitOfMeasurement,
@@ -219,7 +269,7 @@ class ItemInputter extends Component {
   		isActive: this.state.isItemActive
   	}
 
-  	console.log(newItem); //Send to server here, and toast on 200
+  	console.log(newItem); //Send to server here, and toast on response 200
 
   	let prettyTag = newItem.tag + " - ";
   	if(newItem.tag === null) prettyTag = "";
