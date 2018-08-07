@@ -28,9 +28,7 @@ let pretendCategoryObjects = [
 ];
 
 //Known Bugs:
-//>Selecting a tag after inputting the item name doesn't update
-//the displayed item name. (Minor)
-//>Toast has no message (Moderate)
+//None, they clever and hiding from my wrath
 
 //Pain points:
 //>If a user accidently selects a tag when they want no tag,
@@ -54,6 +52,7 @@ class ItemInputter extends Component {
     	isItemActive: true,
 
     	//Visual state
+      title: "Add new ingredients here:",
     	nameUnitChecked: false,
     	formattedItemName: "",
     	displayItemName: "",
@@ -61,10 +60,12 @@ class ItemInputter extends Component {
     	displayPrice: currencyFormatter.format(0.00, {code: 'USD'}),
     	tagsFromCategory: [],
     	isCategoryChosen: false,
+      hasCategoryMenuLoaded: false,
     	isNameComboValid: false,
     	categoryMenuText: this.defaultMenuText,
     	tagMenuText: this.defaultMenuText,
-    	inputKey: new Date()
+    	inputKey: new Date(),
+      updateFormOneFormat: false
     }
 
     this.priceInput = React.createRef();
@@ -94,14 +95,14 @@ class ItemInputter extends Component {
   		response.data.forEach((category) => categories.push(category));
   	})
   	.then(() => {
-  		this.setState({categoryItems: categories});
+  		this.setState({
+        categoryItems: categories,
+        hasCategoryMenuLoaded: true,
+      });
   	})
   	.catch((error) => {
   		console.log(error);
   	});
-
-  	//Hand state the categories
-  	// console.log(categories);
   }
 
   displayFormattedItemName() {
@@ -127,9 +128,7 @@ class ItemInputter extends Component {
     	nameUnitChecked: false,
     	formattedItemName: "",
     	displayItemName: "",
-    	categoryItems: pretendCategoryObjects,
     	displayPrice: currencyFormatter.format(0.00, {code: 'USD'}),
-    	tagsFromCategory: [],
     	isCategoryChosen: false,
     	isNameComboValid: false,
     	categoryMenuText: this.defaultMenuText,
@@ -157,8 +156,26 @@ class ItemInputter extends Component {
 
 
   onTagMenuItemClick(chosenTag) {
-  	this.setState({tag: chosenTag});
-  	this.setState({tagMenuText: chosenTag});
+    // let displayItemName = "";
+    // if(this.state.itemName !== null) {
+    //   displayItemName = chosenTag + " - " + this.state.itemName;
+    // }
+    
+  	this.setState({
+      tag: chosenTag,
+      tagMenuText: chosenTag,
+      itemName: "",
+      nameUnitChecked: false,
+      isNameComboValid: false,
+      displayItemName: "",
+      updateFormOneFormat: true,
+      unitOfMeasurement: ""
+    }
+    ,() => {
+
+      this.setState({updateFormOneFormat: false}, () => console.log('Cleared form'));
+    }
+    );
   }
 
   handleNameInput(event) {
@@ -229,6 +246,38 @@ class ItemInputter extends Component {
   	this.setState({initialQuantity: event.target.value});
   }
 
+  onTestClick() {
+    // itemName: "",
+    //   unitOfMeasurement: "",
+    //   category: null,
+    //   tag: null,
+    //   itemPrice: "",
+    //   initialQuantity: "",
+    //   isItemActive: true,
+
+    //   //Visual state
+    //   nameUnitChecked: false,
+    //   formattedItemName: "",
+    //   displayItemName: "",
+    //   categoryItems: pretendCategoryObjects,
+    //   displayPrice: currencyFormatter.format(0.00, {code: 'USD'}),
+    //   tagsFromCategory: [],
+    //   isCategoryChosen: false,
+    //   hasCategoryMenuLoaded: false,
+    //   isNameComboValid: false,
+    //   categoryMenuText: this.defaultMenuText,
+    //   tagMenuText: this.defaultMenuText,
+
+    this.setState({
+      itemName: "Chili",
+      category: "Produce",
+      tag: "Peppers",
+      itemPrice: "2.98",
+      initialQuantity: 88,
+      isItemActive: true
+    })
+  }
+
   handleSubmit() {
   	//Add tag to category if it's newly inputted
   	let isTagNew = true;
@@ -237,10 +286,17 @@ class ItemInputter extends Component {
   	});
 
   	if(isTagNew) this.state.category.tags.push(this.state.tag);
+
+    let priceCatch;
+    if(this.state.itemPrice === ""){
+      priceCatch = 0.00;
+    } else {
+      priceCatch = currencyFormatter.unformat(this.state.itemPrice, {code: 'USD'});
+    }
   	
   	axios({
   		method: 'post',
-  		url: 'localhost:3001',
+  		url: 'http://localhost:3001',
   		headers: {
   			'Content-Type': 'application/json'
   		},
@@ -250,13 +306,16 @@ class ItemInputter extends Component {
 
   			name: this.state.itemName,
 	  		unitOfMeasurement: this.state.unitOfMeasurement,
-	  		category: this.state.category,
+	  		category: this.state.category.name,
 	  		tag: this.state.tag,
-	  		price: this.state.itemPrice,
+	  		price: priceCatch,
 	  		quantity: this.state.initialQuantity,
 	  		isActive: this.state.isItemActive
   		}
-  	});
+  	})
+    .then((response) => {
+      console.log(response);
+    });
 
 
   	const newItem = {
@@ -264,12 +323,12 @@ class ItemInputter extends Component {
   		unitOfMeasurement: this.state.unitOfMeasurement,
   		category: this.state.category,
   		tag: this.state.tag,
-  		price: this.state.itemPrice,
+  		price: currencyFormatter.unformat(this.state.itemPrice, {code: 'USD'}),
   		quantity: this.state.initialQuantity,
   		isActive: this.state.isItemActive
   	}
 
-  	console.log(newItem); //Send to server here, and toast on response 200
+  	console.log(newItem);
 
   	let prettyTag = newItem.tag + " - ";
   	if(newItem.tag === null) prettyTag = "";
@@ -277,7 +336,8 @@ class ItemInputter extends Component {
   		prettyTag + newItem.name + " was added to " + newItem.category.name;
   	const toaster = Toaster.create({position: Position.TOP});
   	toaster.show({message: toastMessage, intent: "success"});
-  	//return state to its default form
+  	
+    //return state to its default form
   	this.resetComponent();
   }
 
@@ -421,11 +481,14 @@ class ItemInputter extends Component {
 				</Collapse>
 			</div>;
 
-			
+			let itemInputterClass = 'bp3-skeleton';
+      if(this.state.hasCategoryMenuLoaded) itemInputterClass = 'bp3-dark';
+
 
     return(
     		<div className="theComponent">
-		    	<Card elevation={Elevation.TWO} className="bp3-dark ">
+          <h1 style={{"textAlign": "center"}}>{this.state.title}</h1>
+		    	<Card elevation={Elevation.TWO} className={itemInputterClass}>
 
 		    		{categorySelection}
 		    		{itemTagSelection}
@@ -441,6 +504,7 @@ class ItemInputter extends Component {
 			    			labelTwoPlaceholder="ex. Slice"
 			    			formOneFocusValue={this.state.itemName}
 			    			formOneBlurValue={this.state.displayItemName}
+                updateFormOneFormat={this.state.updateFormOneFormat}
 			    			formTwoText={this.state.unitOfMeasurement}
 			    			validationButtonText="Check if Name/UOM Combo Exists"
 			    			warningMessage="This Item already exists with given UOM"
@@ -456,6 +520,7 @@ class ItemInputter extends Component {
 		    		{hiddenPriceSubmitPanel}
 
 		  		</Card>
+          <Button onClick={() => this.onTestClick()}>Get Chilis</Button>
 	  		</div>
     );
   }

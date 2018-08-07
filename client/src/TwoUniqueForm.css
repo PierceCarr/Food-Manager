@@ -3,7 +3,7 @@
 
 .thisComponent {
  	text-align: left;
- 	width: 400px;
+ 	width: 300px;
  }
 
  .validCheck {
@@ -11,9 +11,9 @@
  }
 
  #category-input {
- 	width: 325px;
+ 	width: 225px;
  }
 
  #nameInput {
- 	width: 325px;
+ 	width: 225px;
  }

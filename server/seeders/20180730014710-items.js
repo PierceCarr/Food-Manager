@@ -1,5 +1,7 @@
 'use strict';
-
+//Max $100,000.00 per ingredient price
+const CURRENCY_PRECISION = 8; //Significant digits on either side of .
+const CURRENCY_SCALE = 2; //Allowable digits to the right of .
 module.exports = {
 
   up: (queryInterface, Sequelize) => {
@@ -61,13 +63,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
         primaryKey: true
-        // unique: "nameUnitConstraint"
       },
-      unitOfMeasure: {
+      unitOfMeasurement: {
         type: Sequelize.STRING,
         allowNull: false,
         primaryKey: true
-        // unique: "nameUnitConstraint"
       },
       category: {
         type: Sequelize.STRING,
@@ -84,7 +84,7 @@ module.exports = {
         defaultValue: 0.0,
       },
       price: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(CURRENCY_PRECISION, CURRENCY_SCALE),
         defaultValue: 0
       },
       isActive: {
@@ -98,7 +98,7 @@ module.exports = {
         type: Sequelize.DATE
       },
     }))
-    .then(() => queryInterface.addConstraint('items', ['name', "unitOfMeasure"], 
+    .then(() => queryInterface.addConstraint('items', ['name', "unitOfMeasurement"], 
     {
       type: 'unique',
       name: 'nameUnitConstraint'
@@ -106,7 +106,7 @@ module.exports = {
     .then(() => queryInterface.bulkInsert('items', [
       {
         name: "Pumpkin",
-        unitOfMeasure: "Slice",
+        unitOfMeasurement: "Slice",
         category: "Desserts",
         tag: "Cheesecake",
         quantity: 0.0,
@@ -117,7 +117,7 @@ module.exports = {
       },
       {
         name: "Chocolate",
-        unitOfMeasure: "Slice",
+        unitOfMeasurement: "Slice",
         category: "Desserts",
         tag: "Cheesecake",
         quantity: 0.0,

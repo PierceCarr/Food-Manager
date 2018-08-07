@@ -2,7 +2,7 @@
  @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
 
  .theComponent {
- 	width: 450px;
+ 	width: 350px;
  	margin: auto;
  	text-align: left;
  }
@@ -17,13 +17,13 @@
  }
 
 #name-input {
-	width: 325px;
+	width: 225px;
 }
 
 .submit {
 	margin: auto;
 	text-align: center;
-	width:410px;
+	width: 310px;
 }
 
 /*.nameCheckButton {

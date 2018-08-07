@@ -8,7 +8,13 @@ class TwoUniqueForm extends Component {
 
 		this.state = {
 			warningMessage: "",
-			formOneValue: ""
+			formOneValue: "",
+		}
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if(this.props.updateFormOneFormat){
+			this.setState({formOneValue: ""});
 		}
 	}
 

@@ -37,18 +37,20 @@ const Category = sequelize.define('categories', {
 	}
 });
 
+const CURRENCY_PRECISION = 8; //Significant digits on either side of .
+const CURRENCY_SCALE = 2; //Allowable digits to the right of .
 const Item = sequelize.define('items', {
 	name: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: "nameUnitConstraint",
-        // primaryKey: true
+        primaryKey: true
       },
-      unitOfMeasure: {
+      unitOfMeasurement: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: "nameUnitConstraint"
-        // primaryKey: true
+        unique: "nameUnitConstraint",
+        primaryKey: true
       },
       category: {
         type: Sequelize.STRING,
@@ -65,7 +67,7 @@ const Item = sequelize.define('items', {
         defaultValue: 0.0,
       },
       price: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(CURRENCY_PRECISION, CURRENCY_SCALE),
         defaultValue: 0
       },
       isActive: {
@@ -74,7 +76,7 @@ const Item = sequelize.define('items', {
       }
 });
 
-/* GET home page. */
+//ROUTES
 router.route('/')
 .get((req, res, next) => {
 	res.statusCode = 200;
@@ -91,16 +93,18 @@ router.route('/')
 			}
 
 	} else { //Inserting a record
-		if(res.body.newCategory === true){
+		console.log("In else");
+		if(req.body.newCategory === true){
 			//Insert new category
-
+			console.log("In new category insertion");
 		} 
 		//Insert new item here
+		console.log("Inseting item");
 		res.statusCode = 201;
 		Item.sync().then(() => {
 			return Item.create ({
 				name: req.body.name,
-				unitOfMeasure: req.body.unitOfMeasure,
+				unitOfMeasurement: req.body.unitOfMeasurement,
 				category: req.body.category,
 				tag: req.body.tag,
 				quantity: req.body.quantity,
@@ -108,6 +112,7 @@ router.route('/')
 				isActive: req.body.isActive
 			})
 		})
+		res.json();
 	}
 })
 .patch((req, res, next) => {
