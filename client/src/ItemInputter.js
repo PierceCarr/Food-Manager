@@ -28,7 +28,7 @@ let pretendCategoryObjects = [
 ];
 
 //Known Bugs:
-//None, they clever and hiding from my wrath
+//None, they're clever and hiding from my wrath
 
 //Pain points:
 //>If a user accidently selects a tag when they want no tag,
@@ -36,8 +36,8 @@ let pretendCategoryObjects = [
 //clear the tag slot.
 
 class ItemInputter extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.defaultMenuText = "Click Here to Select";
 
@@ -56,7 +56,7 @@ class ItemInputter extends Component {
     	nameUnitChecked: false,
     	formattedItemName: "",
     	displayItemName: "",
-    	categoryItems: pretendCategoryObjects,
+    	categoryItems: this.props.categoryItems,
     	displayPrice: currencyFormatter.format(0.00, {code: 'USD'}),
     	tagsFromCategory: [],
     	isCategoryChosen: false,
@@ -77,32 +77,10 @@ class ItemInputter extends Component {
     this.handleQuantityInput = this.handleQuantityInput.bind(this);
   }
 
-  componentDidMount() {
-  	let categories = [];
-
-  	axios({
-  		method: 'post',
-  		url: 'http://localhost:3001',
-  		headers: {
-  			'Content-Type': 'application/json'
-  		},
-  		data: {
-  			isReceive: true,
-  			isItemInputterMounting: true
-  		}
-  	})
-  	.then((response) => {
-  		response.data.forEach((category) => categories.push(category));
-  	})
-  	.then(() => {
-  		this.setState({
-        categoryItems: categories,
-        hasCategoryMenuLoaded: true,
-      });
-  	})
-  	.catch((error) => {
-  		console.log(error);
-  	});
+  componentDidUpdate() {
+    if(this.state.categoryItems !== this.props.categoryItems){
+      this.setState({categoryItems: this.props.categoryItems});
+    }
   }
 
   displayFormattedItemName() {
@@ -246,38 +224,6 @@ class ItemInputter extends Component {
   	this.setState({initialQuantity: event.target.value});
   }
 
-  onTestClick() {
-    // itemName: "",
-    //   unitOfMeasurement: "",
-    //   category: null,
-    //   tag: null,
-    //   itemPrice: "",
-    //   initialQuantity: "",
-    //   isItemActive: true,
-
-    //   //Visual state
-    //   nameUnitChecked: false,
-    //   formattedItemName: "",
-    //   displayItemName: "",
-    //   categoryItems: pretendCategoryObjects,
-    //   displayPrice: currencyFormatter.format(0.00, {code: 'USD'}),
-    //   tagsFromCategory: [],
-    //   isCategoryChosen: false,
-    //   hasCategoryMenuLoaded: false,
-    //   isNameComboValid: false,
-    //   categoryMenuText: this.defaultMenuText,
-    //   tagMenuText: this.defaultMenuText,
-
-    this.setState({
-      itemName: "Chili",
-      category: "Produce",
-      tag: "Peppers",
-      itemPrice: "2.98",
-      initialQuantity: 88,
-      isItemActive: true
-    })
-  }
-
   handleSubmit() {
   	//Add tag to category if it's newly inputted
   	let isTagNew = true;
@@ -352,6 +298,8 @@ class ItemInputter extends Component {
   	const isSubmitAvailable = this.state.isCategoryChosen;
   	if(!isSubmitAvailable) submitText = "Select a category to submit";
 
+
+
   	const tagsDontExist = 
   		this.state.category !== null && 
   		this.state.tagsFromCategory.length === 0 &&
@@ -401,8 +349,8 @@ class ItemInputter extends Component {
   			labelFor="category-input"
   			labelInfo={requiredText}>
     		<ControlGroup vertical={false} >
-					<Popover content={categoryMenu} position={"auto"} >
-							<Button id="category-input" icon="share" text={this.state.categoryMenuText} />
+					<Popover content={categoryMenu} position={Position.RIGHT} >
+						<Button id="category-input" icon="share" text={this.state.categoryMenuText} />
 					</Popover>
 					<AddToListButton 
 						text="Add New"
@@ -418,9 +366,9 @@ class ItemInputter extends Component {
   			<FormGroup 
   				label="Item Tag:" 
   				labelFor="name-input" 
-  				labelInfo={optionalText+"(recommended)"}>
+  				labelInfo={optionalText + "(recommended)"}>
 	    		<ControlGroup  vertical={false}>
-				    <Popover content={tagMenu} position={"auto"} >
+				    <Popover content={tagMenu} position={Position.RIGHT} >
 							<Button 
 								id="name-input" 
 								icon="share" 
@@ -482,7 +430,7 @@ class ItemInputter extends Component {
 			</div>;
 
 			let itemInputterClass = 'bp3-skeleton';
-      if(this.state.hasCategoryMenuLoaded) itemInputterClass = 'bp3-dark';
+      if(this.props.isReadyToLoad === true) itemInputterClass = 'bp3-dark';
 
 
     return(
@@ -520,7 +468,6 @@ class ItemInputter extends Component {
 		    		{hiddenPriceSubmitPanel}
 
 		  		</Card>
-          <Button onClick={() => this.onTestClick()}>Get Chilis</Button>
 	  		</div>
     );
   }

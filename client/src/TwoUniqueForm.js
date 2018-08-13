@@ -12,6 +12,7 @@ class TwoUniqueForm extends Component {
 		}
 	}
 
+	//CHANGE TO componentDidUpdate()!!!
 	componentWillReceiveProps(nextProps) {
 		if(this.props.updateFormOneFormat){
 			this.setState({formOneValue: ""});

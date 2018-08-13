@@ -1,8 +1,95 @@
  @import "~@blueprintjs/core/lib/css/blueprint.css";
  @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
 
-
-.App {
-  text-align: center;
+body {
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	display: flex;
+	box-sizing: border-box;
+	background-color: red;
 }
 
+html {
+	height: 100%;
+}
+
+#root {
+	height: 100%;
+	width:100%;
+}
+
+.app {
+	height: 100%;	
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+}
+
+.content {
+	height: 80%;
+	background-color: purple;
+}
+
+.content-panel {
+	background-color: white;
+	flex-direction: column;
+	width: 100%;
+}
+
+.header {
+	width: 100%;
+	flex-direction: column;
+	background-color: #cda153; /*cactus club gold*/
+/*	color: white;*/
+}
+
+.item-panel {
+	height: 100%;
+	margin: 0;
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	background-color: #cda153; /*cactus club gold*/
+
+}
+
+.panel-card {
+	height: 100%;
+	background-color: #cda153; /*cactus club gold*/
+	overflow-y: auto;
+}
+
+.period-panel {
+	padding-top: 3px;
+	width: 100%;
+	background-color: #262626; /*cactus club grey*/
+/*	flex-direction: column;
+	display: flex;*/
+}
+
+.period-selector {
+	/*font-size: 2em;
+	color: white;*/
+
+	display: flex;
+	justify-content: center;
+}
+
+
+
+/*Blueprintjs classes
+*/
+.bp3-tabs {
+	height: auto;
+	display: flex;
+	justify-content: center;
+
+}
+
+.bp3-tab {
+	color: white;
+	font-size: 2em;
+	height: 1.5em;
+}

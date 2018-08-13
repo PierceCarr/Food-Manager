@@ -1,31 +1,32 @@
- @import "~@blueprintjs/core/lib/css/blueprint.css";
- @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+.theComponent {
+  width: 350px;
+  text-align: left;
+}
 
- .theComponent {
- 	width: 350px;
- 	margin: auto;
- 	text-align: left;
- }
 /*
 .bp3-card.bp3-dark{
 	background-color: #000000 !important;
 }
 */
- .bp3-dark {
- 	margin: auto;
- 	text-align: left;
- }
+.bp3-dark {
+  margin: auto;
+  text-align: left;
+}
 
 #name-input {
-	width: 225px;
+  width: 200px;
 }
 
 .submit {
-	margin: auto;
-	text-align: center;
-	width: 310px;
+  margin: auto;
+  text-align: center;
+  width: 310px;
 }
 
 /*.nameCheckButton {
 	width
 }*/
+
+/*# sourceMappingURL=ItemInputter.css.map */

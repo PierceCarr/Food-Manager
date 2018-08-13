@@ -1,0 +1,33 @@
+ @import "~@blueprintjs/core/lib/css/blueprint.css";
+ @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+
+ $input-width: 200px;
+
+ .theComponent {
+ 	width: $input-width + 150px;
+ 	// margin: auto;
+ 	text-align: left;
+ }
+/*
+.bp3-card.bp3-dark{
+	background-color: #000000 !important;
+}
+*/
+ .bp3-dark {
+ 	margin: auto;
+ 	text-align: left;
+ }
+
+#name-input {
+	width: $input-width;
+}
+
+.submit {
+	margin: auto;
+	text-align: center;
+	width: $input-width + 110px;
+}
+
+/*.nameCheckButton {
+	width
+}*/

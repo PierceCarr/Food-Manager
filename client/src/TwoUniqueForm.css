@@ -1,19 +1,21 @@
- @import "~@blueprintjs/core/lib/css/blueprint.css";
- @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
 
 .thisComponent {
- 	text-align: left;
- 	width: 300px;
- }
+  text-align: left;
+  width: 300px;
+}
 
- .validCheck {
- 	text-align: center;
- }
+.validCheck {
+  text-align: center;
+}
 
- #category-input {
- 	width: 225px;
- }
+#category-input {
+  width: 225px;
+}
 
- #nameInput {
- 	width: 225px;
- }
+#nameInput {
+  width: 225px;
+}
+
+/*# sourceMappingURL=TwoUniqueForm.css.map */

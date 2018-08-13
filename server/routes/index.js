@@ -83,10 +83,9 @@ router.route('/')
 	res.json({message: "Transmission recieved loud and clear m80 p0t80"});
 })
 .post((req, res, next) => {
-	if(req.body.isReceive === true){
+	if(req.body.isReceive){
 		res.statusCode = 200;
-		console.log('Recieved the recieve');
-		if(req.body.isItemInputterMounting === true){
+		if(req.body.isReceivingCategories){
 				Category.findAll().then((results) => {
 					res.json(results);
 				})
