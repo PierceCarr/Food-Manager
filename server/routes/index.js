@@ -1,7 +1,11 @@
+// var babel = require("babel-core");
+// import React from 'react';
+// import {Button} from "@blueprintjs/core";
 var express = require('express');
 var router = express.Router();
 const bodyParser = require('body-parser');
 const Sequelize = require('sequelize');
+
 
 router.use(bodyParser.json());
 
@@ -18,63 +22,11 @@ sequelize.authenticate().then(() => {
   	console.log(err);
 });
 
-const Category = sequelize.define('categories', {
-	name: {
-		type: Sequelize.STRING,
-		allowNull: false,
-		unique: true,
-		primaryKey: true
-	},
-	tags: {
-		type: Sequelize.ARRAY({
-			type: Sequelize.STRING,
-			unique: true
-		}),
-	},
-	isActive: {
-	    type: Sequelize.BOOLEAN,
-	    default: true
-	}
-});
+const Category = sequelize.import("../models/category.js");
+const Item = sequelize.import("../models/item.js");
+const Period = sequelize.import("../models/period.js");
+const PeriodItem = sequelize.import("../models/periodItem.js");
 
-const CURRENCY_PRECISION = 8; //Significant digits on either side of .
-const CURRENCY_SCALE = 2; //Allowable digits to the right of .
-const Item = sequelize.define('items', {
-	name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: "nameUnitConstraint",
-        primaryKey: true
-      },
-      unitOfMeasurement: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: "nameUnitConstraint",
-        primaryKey: true
-      },
-      category: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        references: {model: 'categories', key: 'name'}
-      },
-      tag: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        defaultValue: null
-      },
-      quantity: {
-        type: Sequelize.FLOAT,
-        defaultValue: 0.0,
-      },
-      price: {
-        type: Sequelize.DECIMAL(CURRENCY_PRECISION, CURRENCY_SCALE),
-        defaultValue: 0
-      },
-      isActive: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: true
-      }
-});
 
 //ROUTES
 router.route('/')
@@ -85,11 +37,37 @@ router.route('/')
 .post((req, res, next) => {
 	if(req.body.isReceive){
 		res.statusCode = 200;
-		if(req.body.isReceivingCategories){
-				Category.findAll().then((results) => {
-					res.json(results);
-				})
-			}
+		if(req.body.isReceivingCategoriesAndPeriods){
+			const categoriesAndPeriods = {};
+			const categories = [];
+			const periods = [];
+
+			const categoryPromise = Category.findAll({}, {raw: true})
+			.then((results) => results.forEach((result) => {
+				categories.push(result);
+			}))
+			.then(() => {
+				categoriesAndPeriods.categories = categories;
+			});
+
+			const periodPromise = Period.findAll({}, {raw: true})
+			.then((results) => results.forEach((result) => {
+				periods.push(result);
+			}))
+			.then(() => {
+				categoriesAndPeriods.periods = periods;
+			});
+
+			Promise.all([categoryPromise, periodPromise])
+			.then(() => res.json(categoriesAndPeriods));
+
+		} else if(req.body.isRecievingPeriodItems) {
+			// PeriodItem.findAll({
+			// 	where: {
+			// 		day: req.body.day
+			// 	}
+			// })
+		}
 
 	} else { //Inserting a record
 		console.log("In else");
@@ -98,7 +76,7 @@ router.route('/')
 			console.log("In new category insertion");
 		} 
 		//Insert new item here
-		console.log("Inseting item");
+		console.log("Inserting item");
 		res.statusCode = 201;
 		Item.sync().then(() => {
 			return Item.create ({

@@ -10,6 +10,8 @@ import {
   MenuItem,
   Popover,
   Position, 
+  RadioGroup,
+  Radio,
   Tabs, 
   Tab
 } from "@blueprintjs/core";
@@ -24,24 +26,29 @@ class App extends Component {
   super();
 
   this.state = {
-    selectedWeekday: "monday",
-    categoryList: [],
     categoryHashAccess: null,
+    categoryList: [],
+    contentFromServer: "I am content",
+    isAM: true,
     isCategoryListPopulated: false,
     isItemInputterReadyToLoad: false,
-    isItemInputterUpToDate: false
-    
+    isItemInputterUpToDate: false,
+    periodHashAccess: null,
+    periodList: [],
+    selectedPeriod: null,
+    selectedPeriodMenuText: "Select a Period",
+    selectedWeekday: "1"
   }
 
+  this.onPeriodMenuClick = this.onPeriodMenuClick.bind(this);
  }
 
  componentDidMount() {
-  this.loadCategories();
+  this.loadCategoriesAndPeriods();
 
   const timeToLoadItemInputter = 
     this.state.isCategoryListPopulated === true && 
     this.state.isItemInputterUpToDate === false;
-
 
   if(timeToLoadItemInputter){
     this.setState({
@@ -64,11 +71,53 @@ class App extends Component {
   }
  }
 
- loadCategories() {
+ async loadCategoriesAndPeriods() {
   console.log("Loading categories");
-  let categoryList = [];
+  const categoryList = [];
+  const periodList = [];
   const CategoryHashAccess = {};
-  let i = -1;
+  const PeriodHashAccess = {};
+
+  let dataFromServer = await axios({
+    method: 'post',
+    url: 'http://localhost:3001',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: {
+      isReceive: true,
+      isReceivingCategoriesAndPeriods: true
+    }
+  });
+
+  console.log("Server response: " + JSON.stringify(dataFromServer.data));
+
+  dataFromServer.data.categories.forEach((category) => {
+    categoryList.push(category);
+    CategoryHashAccess[category.name] = category;
+  });
+
+  dataFromServer.data.periods.forEach((period) => {
+    periodList.push(period);
+    PeriodHashAccess[period.id] = period;
+  })
+
+  this.setState({
+    categoryHashAccess: CategoryHashAccess,
+    categoryList: categoryList, 
+    isCategoryListPopulated: true,
+    isItemInputterUpToDate: false,
+    periodHashAccess: PeriodHashAccess,
+    periodList: periodList
+  });
+  
+  // .catch((error) => {
+  //   console.log(error);
+  // });
+ }
+
+ generateWasteForm() {
+  const cardList = [];
 
   axios({
     method: 'post',
@@ -77,41 +126,33 @@ class App extends Component {
       'Content-Type': 'application/json'
     },
     data: {
+      day: this.state.selectedWeekday,
+      isAM: this.state.isAM,
       isReceive: true,
-      isReceivingCategories: true
+      isReceivingPeriodItems: true,
     }
   })
   .then((response) => {
-
-    response.data.forEach((category) => {
-      i++;
-      categoryList.push(category);
-      CategoryHashAccess[category.name] = category;
-      console.log("Added " + CategoryHashAccess[categoryList[i].name].name);
-
-    });
-
+    console.log(response);
   })
-  .then(() => {
-    this.setState({
-      categoryList: categoryList, 
-      categoryHashAccess: CategoryHashAccess,
-      isCategoryListPopulated: true,
-      isItemInputterUpToDate: false
-    });
-  })
-  .catch((error) => {
-    console.log(error);
-  });
- }
-
- // generateWasteForm() {
   
- // }
+ }
 
  setWeekday(newId) {
   console.log("Changed to: " + newId);
   this.setState({selectedWeekday: newId});
+ }
+
+ changeAMPM() {
+  const toggledState = !this.state.isAM;
+  this.setState({isAM: toggledState});
+ }
+
+ onPeriodMenuClick(period) {
+  this.setState({
+    selectedPeriod: period,
+    selectedPeriodMenuText: "Selected Period: " + period.month + "." + period.week
+  });
  }
 
   render() {
@@ -138,7 +179,15 @@ class App extends Component {
 
     const periodMenu =
       <Menu>
-        <MenuItem text="Test Period" key="test"/>
+        {
+          this.state.periodList.map((period) => 
+            <MenuItem
+            text={period.month + "." + period.week}
+            key={period.id}
+            onClick={() => this.onPeriodMenuClick(period)}
+            />
+          )
+        }
       </Menu>;
 
     const periodSelector =
@@ -146,9 +195,17 @@ class App extends Component {
       <ControlGroup >
 
         <Popover content={periodMenu} position={Position.BOTTOM}>
-          <Button icon="share" text="Select Period"/>
+          <Button icon="share" text={this.state.selectedPeriodMenuText}/>
         </Popover>
         <Button text="Add Period"/>
+        <RadioGroup
+        inline="true"
+        onChange={() => this.changeAMPM()}
+        selectedValue={this.state.isAM}
+        >
+          <Radio label="AM" value={true}/>
+          <Radio label="PM" value={false}/>
+        </RadioGroup>
       </ControlGroup>
       </div>;
 
@@ -157,16 +214,15 @@ class App extends Component {
       id="weekTabs" 
       onChange={(TabId) => this.setWeekday(TabId)} 
       className="bp3-tabs">
-        <Tab id="monday" title="Monday" className="singleTab"/>
-        <Tab id="tuesday" title="Tuesday" className="singleTab"/>
-        <Tab id="wednesday" title="Wednesday" className="singleTab"/>
-        <Tab id="thursday" title="Thursday" className="singleTab"/>
-        <Tab id="friday" title="Friday" className="singleTab"/>
-        <Tab id="saturday" title="Saturday" className="singleTab"/>
-        <Tab id="sunday" title="Sunday" className="singleTab"/>
+        <Tab id="1" title="Monday" className="singleTab"/>
+        <Tab id="2" title="Tuesday" className="singleTab"/>
+        <Tab id="3" title="Wednesday" className="singleTab"/>
+        <Tab id="4" title="Thursday" className="singleTab"/>
+        <Tab id="5" title="Friday" className="singleTab"/>
+        <Tab id="6" title="Saturday" className="singleTab"/>
+        <Tab id="7" title="Sunday" className="singleTab"/>
       </Tabs>;
 
-    
     const contentPanel =
       <div className="content-panel">
         <div className="header">
@@ -176,10 +232,9 @@ class App extends Component {
           {periodSelector}
           {weekTabs}
         </div>
-        {"I am content."}
+        {this.state.contentFromServer}
       </div>;
       
-
     return (
       <div className="app">
         {itemPanel}{contentPanel}

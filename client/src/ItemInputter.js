@@ -20,13 +20,6 @@ import {
 	Toaster,  
 } from "@blueprintjs/core";
 
-
-let pretendCategoryObjects = [
-	{name: "Meats", tags: ["Steak", "Duck", "Burgers"]},
-	{name: "Sauces", tags: ["Mustard", "Vinegar", "BBQ"]},
-	{name: "Desserts", tags: ["Cheesecake", "Ice Cream", "Galette"]}
-];
-
 //Known Bugs:
 //None, they're clever and hiding from my wrath
 
@@ -134,10 +127,6 @@ class ItemInputter extends Component {
 
 
   onTagMenuItemClick(chosenTag) {
-    // let displayItemName = "";
-    // if(this.state.itemName !== null) {
-    //   displayItemName = chosenTag + " - " + this.state.itemName;
-    // }
     
   	this.setState({
       tag: chosenTag,
@@ -150,7 +139,6 @@ class ItemInputter extends Component {
       unitOfMeasurement: ""
     }
     ,() => {
-
       this.setState({updateFormOneFormat: false}, () => console.log('Cleared form'));
     }
     );
@@ -288,7 +276,7 @@ class ItemInputter extends Component {
   }
 
   render() {
-  	const categoryLabel = "Category:"
+  	const categoryLabel = "Category:";
   	const optionalText = "(optional)";
   	const requiredText = "(required)";
   	const inUseExplaination = "Currently in use? If toggled off, the item will be removed from lists but saved for later.";
@@ -392,7 +380,7 @@ class ItemInputter extends Component {
 				<Collapse isOpen={this.state.isNameComboValid}>
 
 					<FormGroup 
-						label={`Price Per ${this.state.unitOfMeasurement}:`} 
+						label={`Default Price Per ${this.state.unitOfMeasurement}:`} 
 						labelFor="price-input"
 						labelInfo={optionalText}>
 						<InputGroup 
@@ -405,7 +393,7 @@ class ItemInputter extends Component {
 					</FormGroup>
 
 					<FormGroup
-						label="Initial Quantity:"
+						label="Default Quantity:"
 						labelFor="quantity-input"
 						labelInfo={optionalText}>
 						<InputGroup 
