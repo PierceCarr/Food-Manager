@@ -214,6 +214,12 @@ module.exports = {
     ], {});
 
     await queryInterface.createTable('periodItems', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        unique: true
+      },
       periodId: {
         type: Sequelize.INTEGER,
         references: {model: 'periods', key: 'id'}

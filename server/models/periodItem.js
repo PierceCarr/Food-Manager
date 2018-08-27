@@ -3,8 +3,14 @@ const CURRENCY_PRECISION = 8; //Significant digits on either side of .
 const CURRENCY_SCALE = 2; //Allowable digits to the right of .
 
 module.exports = (sequelize, DataTypes) => {
-	const PeriodItem = sequelize.define('periodItems', {
-		periodId: {
+	return sequelize.define('periodItems', {
+	  id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        unique: true
+      },
+	  periodId: {
         type: DataTypes.INTEGER,
         references: {model: 'periods', key: 'id'}
       },
@@ -43,7 +49,5 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: {
         type: DataTypes.DATE
       }
-	})
-
-	return PeriodItem;
+	});
 }

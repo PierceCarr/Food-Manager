@@ -15,11 +15,17 @@ import {
   Tabs, 
   Tab
 } from "@blueprintjs/core";
-
+import ContainerOfUpdatableItemSets from './ContainerOfUpdatableItemSets.js';
 import ItemInputter from './ItemInputter.js';
 import './App.css';
 
 FocusStyleManager.onlyShowFocusOnTabs();
+
+//Todo:
+//-Display period items
+//-Allow period items to be updated
+//-Display period menu skeleton before it's populated
+//-Grey out impossible weekday tabs depending on the period
 
 class App extends Component {
  constructor() {
@@ -28,23 +34,27 @@ class App extends Component {
   this.state = {
     categoryHashAccess: null,
     categoryList: [],
-    contentFromServer: "I am content",
+    wasteForm: "I am content",
     isAM: true,
     isCategoryListPopulated: false,
+    isDisplayingPeriodItems: false,
     isItemInputterReadyToLoad: false,
     isItemInputterUpToDate: false,
+    itemHashAccess: null,
+    itemList: [],
+    periodItemList: [],
     periodHashAccess: null,
     periodList: [],
     selectedPeriod: null,
     selectedPeriodMenuText: "Select a Period",
-    selectedWeekday: "1"
+    selectedWeekday: 1,
   }
 
   this.onPeriodMenuClick = this.onPeriodMenuClick.bind(this);
  }
 
  componentDidMount() {
-  this.loadCategoriesAndPeriods();
+  this.loadCategoriesPeriodsAndItems();
 
   const timeToLoadItemInputter = 
     this.state.isCategoryListPopulated === true && 
@@ -69,16 +79,29 @@ class App extends Component {
       isItemInputterUpToDate: true
     });
   }
+
+  // if(!this.state.isDisplayingPeriodItems){
+  //   const isTimeToDisplayPeriodItems =
+  //     this.state.selectedPeriod !== null;
+
+  //     if(isTimeToDisplayPeriodItems){
+  //       this.generateWasteForm();
+  //       this.setState({isDisplayingPeriodItems: true});
+  //     }
+  // }
  }
 
- async loadCategoriesAndPeriods() {
-  console.log("Loading categories");
-  const categoryList = [];
-  const periodList = [];
+ async loadCategoriesPeriodsAndItems() {
   const CategoryHashAccess = {};
-  const PeriodHashAccess = {};
+  const categoryList = [];
 
-  let dataFromServer = await axios({
+  const ItemHashAccess = {};
+  const itemList = [];
+
+  const PeriodHashAccess = {};
+  const periodList = [];
+
+  const dataFromServer = await axios({
     method: 'post',
     url: 'http://localhost:3001',
     headers: {
@@ -86,38 +109,40 @@ class App extends Component {
     },
     data: {
       isReceive: true,
-      isReceivingCategoriesAndPeriods: true
+      isReceivingCategoriesPeriodsAndItems: true
     }
   });
 
-  console.log("Server response: " + JSON.stringify(dataFromServer.data));
-
   dataFromServer.data.categories.forEach((category) => {
-    categoryList.push(category);
     CategoryHashAccess[category.name] = category;
+    categoryList.push(category);
+  });
+
+  dataFromServer.data.items.forEach((item) => {
+    ItemHashAccess[item.id] = item; 
+    itemList.push(item);
   });
 
   dataFromServer.data.periods.forEach((period) => {
-    periodList.push(period);
     PeriodHashAccess[period.id] = period;
-  })
+    periodList.push(period);
+  });
 
   this.setState({
     categoryHashAccess: CategoryHashAccess,
     categoryList: categoryList, 
     isCategoryListPopulated: true,
     isItemInputterUpToDate: false,
+    itemHashAccess: ItemHashAccess,
+    itemList: itemList,
     periodHashAccess: PeriodHashAccess,
     periodList: periodList
   });
   
-  // .catch((error) => {
-  //   console.log(error);
-  // });
  }
 
  generateWasteForm() {
-  const cardList = [];
+  let wasteForm = "";
 
   axios({
     method: 'post',
@@ -130,12 +155,29 @@ class App extends Component {
       isAM: this.state.isAM,
       isReceive: true,
       isReceivingPeriodItems: true,
+      periodId: this.state.selectedPeriod.id
     }
   })
   .then((response) => {
-    console.log(response);
-  })
-  
+    console.log("Received period items: " + JSON.stringify(response));
+    console.log("Number of period items: " + response.data.length);
+
+    if(response.status === 200 && response.data.length > 0) {
+      wasteForm =
+      <ContainerOfUpdatableItemSets 
+        genericItemHashAccess={this.state.itemHashAccess}
+        genericItemSetKey="category"
+        instanceItemGenericKey="itemId"
+        instanceItemList={response.data}
+        title="Desserts"
+      />;
+
+      this.setState({wasteForm: wasteForm});
+    } else {
+      this.setState({wasteForm: "No items found for that period."});
+    }
+    
+  });
  }
 
  setWeekday(newId) {
@@ -152,7 +194,7 @@ class App extends Component {
   this.setState({
     selectedPeriod: period,
     selectedPeriodMenuText: "Selected Period: " + period.month + "." + period.week
-  });
+  }, () => this.generateWasteForm());
  }
 
   render() {
@@ -232,7 +274,7 @@ class App extends Component {
           {periodSelector}
           {weekTabs}
         </div>
-        {this.state.contentFromServer}
+        {this.state.wasteForm}
       </div>;
       
     return (

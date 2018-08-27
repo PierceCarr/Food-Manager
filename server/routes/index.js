@@ -37,9 +37,11 @@ router.route('/')
 .post((req, res, next) => {
 	if(req.body.isReceive){
 		res.statusCode = 200;
-		if(req.body.isReceivingCategoriesAndPeriods){
-			const categoriesAndPeriods = {};
+
+		if(req.body.isReceivingCategoriesPeriodsAndItems){
+			const categoriesPeriodsAndItems = {};
 			const categories = [];
+			const items = [];
 			const periods = [];
 
 			const categoryPromise = Category.findAll({}, {raw: true})
@@ -47,31 +49,43 @@ router.route('/')
 				categories.push(result);
 			}))
 			.then(() => {
-				categoriesAndPeriods.categories = categories;
+				categoriesPeriodsAndItems.categories = categories;
 			});
+
+			const itemPromise = Item.findAll({}, {raw: true})
+			.then((results) => results.forEach((result) => {
+				items.push(result);
+			}))
+			.then(() => {
+				categoriesPeriodsAndItems.items = items;
+			})
 
 			const periodPromise = Period.findAll({}, {raw: true})
 			.then((results) => results.forEach((result) => {
 				periods.push(result);
 			}))
 			.then(() => {
-				categoriesAndPeriods.periods = periods;
+				categoriesPeriodsAndItems.periods = periods;
 			});
 
-			Promise.all([categoryPromise, periodPromise])
-			.then(() => res.json(categoriesAndPeriods));
+			Promise.all([categoryPromise, itemPromise, periodPromise])
+			.then(() => res.json(categoriesPeriodsAndItems));
 
-		} else if(req.body.isRecievingPeriodItems) {
-			// PeriodItem.findAll({
-			// 	where: {
-			// 		day: req.body.day
-			// 	}
-			// })
+		} else if (req.body.isReceivingPeriodItems) {
+
+			PeriodItem.findAll({
+				where: {
+					day: req.body.day,
+					isAM: req.body.isAM,
+					periodId: req.body.periodId
+				}
+			})
+			.then((results) => res.json(results));
 		}
 
 	} else { //Inserting a record
 		console.log("In else");
-		if(req.body.newCategory === true){
+		if(req.body.newCategory === true) {
 			//Insert new category
 			console.log("In new category insertion");
 		} 
