@@ -48,10 +48,25 @@ class ContainerOfUpdatableItemSets extends Component {
 			</h1>
 		</button>;
 
-		const content = this.props.setList.map(function(set) {
+		const content = this.props.setList.map((set) => {
+			const itemsInThisSet = [];
+
+			this.props.instanceItemList.forEach((instanceItem) => {
+				const genericReference = instanceItem[this.props.instanceItemGenericKey]
+				const generic = this.props.genericItemHashAccess[genericReference];
+				const setOfInstanceItem = generic[this.props.setIdentifier];
+				
+				if(setOfInstanceItem === set) itemsInThisSet.push(instanceItem);
+			})
+
 			return React.createElement(UpdatableItemSet, {
+				genericItemHashAccess: this.props.genericItemHashAccess,
+				genericItemTitleIdentifier: this.props.genericItemTitleIdentifier,
+				instanceItemGenericKey: this.props.instanceItemGenericKey,
+				itemsToUpdate: itemsInThisSet,
+				itemsToUpdateTimestamp: this.props.instanceItemUpdateTimestampIdentifier,
+				key: set,
 				setName: set,
-				key: set
 			});
 		})
 
@@ -71,10 +86,12 @@ ContainerOfUpdatableItemSets.propTypes = {
 	genericItemHashAccess: PropTypes.object,
 	// genericItemList: PropTypes.arrayOf(PropTypes.object),
 	genericItemSetKey: PropTypes.node,
+	genericItemTitleIdentifier: PropTypes.node,
 	instanceItemGenericKey: PropTypes.node,
 	// instanceItemIdentifier: PropTypes.node,
 	instanceItemList: PropTypes.arrayOf(PropTypes.object),
-	// setIdentifier: PropTypes.node,
+	instanceItemUpdateTimestampIdentifier: PropTypes.node,
+	setIdentifier: PropTypes.node,
 	setList: PropTypes.arrayOf(PropTypes.string),
 	title: PropTypes.string,
 }

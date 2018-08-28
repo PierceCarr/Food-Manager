@@ -150,16 +150,21 @@ class App extends Component {
     }
   })
   .then((response) => {
-    console.log("Received period items: " + JSON.stringify(response));
-    console.log("Number of period items: " + response.data.length);
 
     if(response.status === 200 && response.data.length > 0) {
+      let arbitraryIndex = 0;
       wasteForm = this.state.categoryList.map((set) => {
+        arbitraryIndex++;
         return React.createElement(ContainerOfUpdatableItemSets, {
           genericItemHashAccess: this.state.itemHashAccess,
           genericItemSetKey: "category",
+          genericItemTitleIdentifier: "name",
+          instanceItemGenericIdentifier: "itemId",
           instanceItemGenericKey: "itemId",
           instanceItemList: response.data,
+          instanceItemUpdateTimestampIdentifier: "updatedAt",
+          key: arbitraryIndex,
+          setIdentifier: "tag",
           setList: set.tags,
           title: set.name
         }) 

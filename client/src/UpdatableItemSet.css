@@ -1,0 +1,15 @@
+.itemBars-container {
+	display: flex;
+	flex-direction: column;
+}
+
+.set {
+	display: flex;
+	flex-direction: row;
+}
+
+.setName-container {
+	display: flex;
+	background-color: green;
+	height: 100%;
+}
