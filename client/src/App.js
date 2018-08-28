@@ -48,6 +48,7 @@ class App extends Component {
     selectedPeriod: null,
     selectedPeriodMenuText: "Select a Period",
     selectedWeekday: 1,
+    selectedWeekdayMenuText: "Select a Weekday",
   }
 
   this.onPeriodMenuClick = this.onPeriodMenuClick.bind(this);
@@ -79,16 +80,6 @@ class App extends Component {
       isItemInputterUpToDate: true
     });
   }
-
-  // if(!this.state.isDisplayingPeriodItems){
-  //   const isTimeToDisplayPeriodItems =
-  //     this.state.selectedPeriod !== null;
-
-  //     if(isTimeToDisplayPeriodItems){
-  //       this.generateWasteForm();
-  //       this.setState({isDisplayingPeriodItems: true});
-  //     }
-  // }
  }
 
  async loadCategoriesPeriodsAndItems() {
@@ -163,14 +154,16 @@ class App extends Component {
     console.log("Number of period items: " + response.data.length);
 
     if(response.status === 200 && response.data.length > 0) {
-      wasteForm =
-      <ContainerOfUpdatableItemSets 
-        genericItemHashAccess={this.state.itemHashAccess}
-        genericItemSetKey="category"
-        instanceItemGenericKey="itemId"
-        instanceItemList={response.data}
-        title="Desserts"
-      />;
+      wasteForm = this.state.categoryList.map((set) => {
+        return React.createElement(ContainerOfUpdatableItemSets, {
+          genericItemHashAccess: this.state.itemHashAccess,
+          genericItemSetKey: "category",
+          instanceItemGenericKey: "itemId",
+          instanceItemList: response.data,
+          setList: set.tags,
+          title: set.name
+        }) 
+      });
 
       this.setState({wasteForm: wasteForm});
     } else {
@@ -197,6 +190,25 @@ class App extends Component {
   }, () => this.generateWasteForm());
  }
 
+ onWeekdayMenuClick(weekday) {
+  const weekdayEnums = {
+    "Monday": 1,
+    "Tuesday": 2,
+    "Wednesday": 3,
+    "Thursday": 4,
+    "Friday": 5,
+    "Saturday": 6,
+    "Sunday": 7
+  }
+
+  const menuText = "Selected Weekday: " + weekday;
+
+  this.setState({
+    selectedWeekday: weekdayEnums[weekday],
+    selectedWeekdayMenuText: menuText
+  });
+ }
+
   render() {
 
     const itemPanel = 
@@ -218,6 +230,38 @@ class App extends Component {
         <Tab id="reports" title="Reports" className="singleTab"/>
         <Tab id="admin" title="Admin" className="singleTab"/>
       </Tabs> ;
+
+    const weekdayMenu =
+      <Menu>
+        <MenuItem 
+          text="Monday" key="Monday" 
+          onClick={() => this.onWeekdayMenuClick("Monday")} />
+        <MenuItem 
+          text="Tuesday" key="Tuesday" 
+          onClick={() => this.onWeekdayMenuClick("Tuesday")} />
+        <MenuItem 
+          text="Wednesday" key="Wednesday" 
+          onClick={() => this.onWeekdayMenuClick("Wednesday")} />
+        <MenuItem 
+          text="Thursday" key="Thursday" 
+          onClick={() => this.onWeekdayMenuClick("Thursday")} />
+        <MenuItem 
+          text="Friday" key="Friday" 
+          onClick={() => this.onWeekdayMenuClick("Friday")} />
+        <MenuItem 
+          text="Saturday" key="Saturday" 
+          onClick={() => this.onWeekdayMenuClick("Saturday")} />
+        <MenuItem 
+          text="Sunday" key="Sunday" 
+          onClick={() => this.onWeekdayMenuClick("Sunday")} />
+      </Menu>;
+
+    const weekdayMenuButton = 
+      <Popover content={weekdayMenu} position={Position.BOTTOM}>
+        <Button icon="share">
+          {this.state.selectedWeekdayMenuText}
+        </Button>
+      </Popover>;
 
     const periodMenu =
       <Menu>
@@ -248,23 +292,25 @@ class App extends Component {
           <Radio label="AM" value={true}/>
           <Radio label="PM" value={false}/>
         </RadioGroup>
+        {weekdayMenuButton}
       </ControlGroup>
       </div>;
 
-    const weekTabs =
-      <Tabs 
-      id="weekTabs" 
-      onChange={(TabId) => this.setWeekday(TabId)} 
-      className="bp3-tabs">
-        <Tab id="1" title="Monday" className="singleTab"/>
-        <Tab id="2" title="Tuesday" className="singleTab"/>
-        <Tab id="3" title="Wednesday" className="singleTab"/>
-        <Tab id="4" title="Thursday" className="singleTab"/>
-        <Tab id="5" title="Friday" className="singleTab"/>
-        <Tab id="6" title="Saturday" className="singleTab"/>
-        <Tab id="7" title="Sunday" className="singleTab"/>
-      </Tabs>;
+    // const weekTabs =
+    //   <Tabs 
+    //   id="weekTabs" 
+    //   onChange={(TabId) => this.setWeekday(TabId)} 
+    //   className="bp3-tabs">
+    //     <Tab id="1" title="Monday" className="singleTab"/>
+    //     <Tab id="2" title="Tuesday" className="singleTab"/>
+    //     <Tab id="3" title="Wednesday" className="singleTab"/>
+    //     <Tab id="4" title="Thursday" className="singleTab"/>
+    //     <Tab id="5" title="Friday" className="singleTab"/>
+    //     <Tab id="6" title="Saturday" className="singleTab"/>
+    //     <Tab id="7" title="Sunday" className="singleTab"/>
+    //   </Tabs>;
 
+    //weekTabs were under periodSelector
     const contentPanel =
       <div className="content-panel">
         <div className="header">
@@ -272,7 +318,6 @@ class App extends Component {
         </div>
         <div className="period-panel">
           {periodSelector}
-          {weekTabs}
         </div>
         {this.state.wasteForm}
       </div>;

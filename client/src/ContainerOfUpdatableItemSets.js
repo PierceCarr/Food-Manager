@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {Card} from "@blueprintjs/core";
+import {Collapse, Icon} from "@blueprintjs/core";
+
+import "./ContainerOfUpdatableItemSets.css";
+import UpdatableItemSet from './UpdatableItemSet.js';
 
 class ContainerOfUpdatableItemSets extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-
-			title: this.props.title,
+			isSetListDisplayed: false,
 			numberOfItems: 0,
 			numberOfUpdatedItems: 0,
-
+			title: this.props.title,
 		}
 	}
 
@@ -29,13 +31,39 @@ class ContainerOfUpdatableItemSets extends Component {
 		this.setState({numberOfItems: numberOfItems});
 	}
 
-	render() {
-		const title = 
-		<h1>
-			{"> " + this.state.title + " " + this.state.numberOfUpdatedItems + "/" + this.state.numberOfItems}
-		</h1>;
+	onTitleClick() {
+		const toggleDisplay = !this.state.isSetListDisplayed;
+		this.setState({isSetListDisplayed: toggleDisplay});
+	}
 
-		return title;
+	render() {
+		const chevronSize = 50;
+		const titleChevron = this.state.isSetListDisplayed ? 
+			<Icon icon="chevron-down" iconSize={chevronSize}/> : 
+			<Icon icon="chevron-right" iconSize={chevronSize}/>;
+		const title = 
+		<button className="headerButton" onClick={() => this.onTitleClick()}>
+			<h1>
+				{titleChevron}{this.state.title + " " + this.state.numberOfUpdatedItems + "/" + this.state.numberOfItems}
+			</h1>
+		</button>;
+
+		const content = this.props.setList.map(function(set) {
+			return React.createElement(UpdatableItemSet, {
+				setName: set,
+				key: set
+			});
+		})
+
+		const component = 
+		<div>
+		{title}
+		<Collapse isOpen={this.state.isSetListDisplayed}>
+			{content}
+		</Collapse>
+		</div>;
+
+		return component;
 	}
 }
 
@@ -47,7 +75,7 @@ ContainerOfUpdatableItemSets.propTypes = {
 	// instanceItemIdentifier: PropTypes.node,
 	instanceItemList: PropTypes.arrayOf(PropTypes.object),
 	// setIdentifier: PropTypes.node,
-	// setList: PropTypes.arrayOf(PropTypes.string),
+	setList: PropTypes.arrayOf(PropTypes.string),
 	title: PropTypes.string,
 }
 
