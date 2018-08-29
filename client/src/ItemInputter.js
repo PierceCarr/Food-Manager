@@ -339,7 +339,10 @@ class ItemInputter extends Component {
   			labelInfo={requiredText}>
     		<ControlGroup vertical={false} >
 					<Popover content={categoryMenu} position={Position.RIGHT} >
-						<Button id="category-input" icon="share" text={this.state.categoryMenuText} />
+						<Button 
+              id="category-input" 
+              icon="share" 
+              text={this.state.categoryMenuText} />
 					</Popover>
 					<AddToListButton 
 						text="Add New"
@@ -351,28 +354,28 @@ class ItemInputter extends Component {
   		</FormGroup>;
 
   	let itemTagSelection = 
-  		<Collapse isOpen={this.state.isCategoryChosen} >
   			<FormGroup 
   				label="Item Tag:" 
   				labelFor="name-input" 
-  				labelInfo={optionalText + "(recommended)"}>
-	    		<ControlGroup  vertical={false}>
+  				labelInfo={optionalText + "(recommended)"} >
+	    		<ControlGroup  vertical={false} >
 				    <Popover content={tagMenu} position={Position.RIGHT} >
 							<Button 
+                className="selection-button"
 								id="name-input" 
 								icon="share" 
-								disabled={isTagListDisabled}
+								disabled={!this.state.isCategoryChosen}
 								text={tagMenuText} />
 						</Popover>
 				    <AddToListButton 
+              disabled={!this.state.isCategoryChosen}
 				    	text="Add New"
 				    	label="New Tag: "
 							labelInfo="(unused tags will be deleted on item submission)"
 							placeholder="ex. Cheesecake"
 							onSubmit={(newTag) => this.addNewTag(newTag)}/>
 					</ControlGroup>
-				</FormGroup>
-			</Collapse>;
+				</FormGroup>;
 
 		
 

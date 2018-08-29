@@ -1,15 +1,19 @@
 .itemBars-container {
 	display: flex;
 	flex-direction: column;
+/*	background-color: DodgerBlue;*/
 }
 
 .set {
+	margin-top: 2px;
 	display: flex;
 	flex-direction: row;
+	align-items: center;
 }
 
 .setName-container {
 	display: flex;
-	background-color: green;
-	height: 100%;
+	flex-direction: row;
+/*	background-color: green;*/
+	align-items: center;
 }

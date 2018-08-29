@@ -53,7 +53,7 @@ class AddToListButton extends Component {
 				<Popover 
 					content={popoverContent} 
 					popoverClassName="bp3-popover-content-sizing">
-					<Button >
+					<Button disabled={this.props.disabled}>
 						{this.props.text}
 					</Button>
 				</Popover>

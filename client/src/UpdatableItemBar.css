@@ -1,0 +1,10 @@
+.bar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.form {
+	width: 80px;
+	margin-right: 5px;
+}

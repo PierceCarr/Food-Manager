@@ -60,6 +60,7 @@ class ContainerOfUpdatableItemSets extends Component {
 			})
 
 			return React.createElement(UpdatableItemSet, {
+				additionalItemTitle: this.props.additionalItemTitle,
 				genericItemHashAccess: this.props.genericItemHashAccess,
 				genericItemTitleIdentifier: this.props.genericItemTitleIdentifier,
 				instanceItemGenericKey: this.props.instanceItemGenericKey,
@@ -67,6 +68,7 @@ class ContainerOfUpdatableItemSets extends Component {
 				itemsToUpdateTimestamp: this.props.instanceItemUpdateTimestampIdentifier,
 				key: set,
 				setName: set,
+				updatableProperties: this.props.updatableInstanceItemProperties
 			});
 		})
 
@@ -83,6 +85,7 @@ class ContainerOfUpdatableItemSets extends Component {
 }
 
 ContainerOfUpdatableItemSets.propTypes = {
+	additionalItemTitle: PropTypes.object,
 	genericItemHashAccess: PropTypes.object,
 	// genericItemList: PropTypes.arrayOf(PropTypes.object),
 	genericItemSetKey: PropTypes.node,
@@ -94,6 +97,7 @@ ContainerOfUpdatableItemSets.propTypes = {
 	setIdentifier: PropTypes.node,
 	setList: PropTypes.arrayOf(PropTypes.string),
 	title: PropTypes.string,
+	updatableInstanceItemProperties: PropTypes.arrayOf(PropTypes.node)
 }
 
 export default ContainerOfUpdatableItemSets;

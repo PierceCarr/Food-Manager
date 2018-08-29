@@ -156,17 +156,37 @@ class App extends Component {
       wasteForm = this.state.categoryList.map((set) => {
         arbitraryIndex++;
         return React.createElement(ContainerOfUpdatableItemSets, {
-          genericItemHashAccess: this.state.itemHashAccess,
-          genericItemSetKey: "category",
-          genericItemTitleIdentifier: "name",
-          instanceItemGenericIdentifier: "itemId",
-          instanceItemGenericKey: "itemId",
-          instanceItemList: response.data,
-          instanceItemUpdateTimestampIdentifier: "updatedAt",
-          key: arbitraryIndex,
-          setIdentifier: "tag",
-          setList: set.tags,
-          title: set.name
+          additionalItemTitle: 
+          	{
+          		use: true, 
+          		titleAdditions: [
+	          		{
+	          			type: "string", 
+	          			content: "; per "
+	          		}, 
+	          		{
+	          			type: "node", 
+	          			isGenericProperty: true, 
+	          			node: "unitOfMeasurement"
+	          		},
+	          		{
+	          			type: "string", 
+	          			content: ": "
+	          		}, 
+          		]
+          	},
+	          genericItemHashAccess: this.state.itemHashAccess,
+	          genericItemSetKey: "category",
+	          genericItemTitleIdentifier: "name",
+	          instanceItemGenericIdentifier: "itemId",
+	          instanceItemGenericKey: "itemId",
+	          instanceItemList: response.data,
+	          instanceItemUpdateTimestampIdentifier: "updatedAt",
+	          key: arbitraryIndex,
+	          setIdentifier: "tag",
+	          setList: set.tags,
+	          title: set.name,
+	          updatableInstanceItemProperties: ["quantity", "price"]
         }) 
       });
 

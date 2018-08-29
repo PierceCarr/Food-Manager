@@ -3,23 +3,24 @@
 
  $input-width: 200px;
 
- .theComponent {
- 	width: $input-width + 150px;
- 	// margin: auto;
- 	text-align: left;
- }
-/*
-.bp3-card.bp3-dark{
-	background-color: #000000 !important;
+.theComponent {
+	width: $input-width + 150px;
+	// margin: auto;
+	text-align: left;
 }
-*/
- .bp3-dark {
- 	margin: auto;
- 	text-align: left;
- }
+
+.bp3-dark {
+	margin: auto;
+	text-align: left;
+}
 
 #name-input {
 	width: $input-width;
+}
+
+.selection-button {
+	margin: 0;
+	width: $input-width + 25px !important;
 }
 
 .submit {
