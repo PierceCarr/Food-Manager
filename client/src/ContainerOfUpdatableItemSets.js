@@ -31,6 +31,12 @@ class ContainerOfUpdatableItemSets extends Component {
 		this.setState({numberOfItems: numberOfItems});
 	}
 
+	updateContainerUpdateCount(setSize) {
+		this.setState(prevState => ({
+			numberOfUpdatedItems: prevState.numberOfUpdatedItems + setSize
+		}));
+	}
+
 	onTitleClick() {
 		const toggleDisplay = !this.state.isSetListDisplayed;
 		this.setState({isSetListDisplayed: toggleDisplay});
@@ -38,9 +44,11 @@ class ContainerOfUpdatableItemSets extends Component {
 
 	render() {
 		const chevronSize = 50;
-		const titleChevron = this.state.isSetListDisplayed ? 
-			<Icon icon="chevron-down" iconSize={chevronSize}/> : 
-			<Icon icon="chevron-right" iconSize={chevronSize}/>;
+		const chevronDirection = 
+			this.state.isSetListDisplayed ? "chevron-down" : "chevron-right";
+		const titleChevron = 
+			<Icon icon={chevronDirection} iconSize={chevronSize}/>;
+
 		const title = 
 		<button className="headerButton" onClick={() => this.onTitleClick()}>
 			<h1>
@@ -68,6 +76,7 @@ class ContainerOfUpdatableItemSets extends Component {
 				itemsToUpdateTimestamp: this.props.instanceItemUpdateTimestampIdentifier,
 				key: set,
 				setName: set,
+				updateContainerUpdateCount: this.updateContainerUpdateCount,
 				updatableProperties: this.props.updatableInstanceItemProperties
 			});
 		})

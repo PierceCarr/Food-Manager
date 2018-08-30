@@ -5,6 +5,7 @@ var express = require('express');
 var router = express.Router();
 const bodyParser = require('body-parser');
 const Sequelize = require('sequelize');
+const currencyFormatter = require('currency-formatter');
 
 
 router.use(bodyParser.json());
@@ -107,8 +108,37 @@ router.route('/')
 	}
 })
 .patch((req, res, next) => {
-	res.statusCode = 200;
-	res.json({message: "Rodger, making the change."});
+	
+	if(req.body.isUpdateSinglePeriodItem === true) {
+		
+		console.log("Request to update: " + req.body.originalItem.id);
+		console.log("Properties to update: " + JSON.stringify(req.body.propertiesToUpdate));
+
+		if(req.body.propertiesToUpdate.price !== undefined){
+			let price = req.body.propertiesToUpdate.price;
+			price = currencyFormatter.format(price, {code: 'USD'});
+			price = currencyFormatter.unformat(price, {code: 'USD'});
+			req.body.propertiesToUpdate.price = price;
+			console.log("Price to update: " + price);
+		}
+
+		console.log("About to update");
+		PeriodItem.update(req.body.propertiesToUpdate,{
+			returning: true,
+			where: {
+				id: req.body.originalItem.id,
+			}
+		}).then(([rowsUpdate, [updatedItem]]) => {
+			console.log("Sending back results");
+			res.statusCode = 200;
+			res.json(updatedItem);
+		})
+		.catch(next);
+
+	} else {
+		res.statusCode = 404;
+		res.json("Got a bad patch request");
+	}
 })
 .delete((req, res, next) => {
 	res.statusCode = 200;

@@ -327,7 +327,7 @@ class ItemInputter extends Component {
   							key={tag}
   							onClick={() => this.onTagMenuItemClick(tag)} 
               />
-  						)
+  					)
   				}
   			</Menu>
   	}

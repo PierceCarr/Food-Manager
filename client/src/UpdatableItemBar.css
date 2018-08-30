@@ -2,6 +2,38 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	width: 100%;
+	min-width: 330px;
+	max-width: 600px
+}
+
+.button-bar {
+	margin-top: 7px;
+	min-width: 55px;
+}
+
+.container {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.container-title {
+	display: flex;
+	flex-direction: row;
+	justify-content: left;
+	align-items: center;
+	width: 30%;
+}
+
+.container-ui {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 70%;
+	min-width: 215px;
 }
 
 .form {

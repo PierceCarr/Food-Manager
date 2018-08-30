@@ -10,8 +10,29 @@ class UpdatableItemSet extends Component {
 		super(props);
 
 		this.state = {
-
+			isEveryItemUpdated: false,
 		}
+	}
+
+	askItemsIfTheyHaveUpdated() {
+		let updatedItems = 0;
+
+		this.props.itemsToUpdate.forEach((item) => {
+			if(item[this.props.itemsToUpdateTimestamp] !== null) updatedItems++;
+		})
+
+		if(updatedItems === this.props.itemsToUpdate.length){
+			this.setState({isEveryItemUpdated: true});
+			() => this.props.updateContainerUpdateCount(this.props.itemsToUpdate.length);
+		} 
+	}
+
+	componentDidMount() {
+		this.askItemsIfTheyHaveUpdated();
+	}
+
+	componentDidUpdate() {
+		if(this.state.isEveryItemUpdated === false) this.askItemsIfTheyHaveUpdated();
 	}
 
 	render() {
@@ -20,7 +41,7 @@ class UpdatableItemSet extends Component {
 		const setName = 
 		<div className="setName-container">
 			<Icon icon="cross" color="red" iconSize={crossCheckSize}/>
-			<h3>{this.props.setName}</h3>
+			<h3><span title={this.props.setName}>{this.props.setName}</span></h3>
 		</div>;
 
 		let arbitraryKey = 0;
@@ -63,7 +84,7 @@ class UpdatableItemSet extends Component {
 		})
 
 		const itemBarContainer =
-		<div className="itemBars-container" >
+		<div  className="itemBars-container">
 			{itemBars}
 		</div>
 
@@ -84,6 +105,7 @@ UpdatableItemSet.propTypes = {
 	itemsToUpdate: PropTypes.arrayOf(PropTypes.object),
 	itemsToUpdateTimestamp: PropTypes.node,
 	setName: PropTypes.string,
+	updateContainerUpdateCount: PropTypes.func,
 	updatableProperties: PropTypes.arrayOf(PropTypes.node),
 }
 
