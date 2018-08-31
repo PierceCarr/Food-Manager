@@ -48,7 +48,7 @@ class App extends Component {
     selectedWeekday: 1,
     selectedWeekdayMenuText: "Select a Weekday",
   }
-
+  this.keySeed = 0;
   this.generateWasteForm = this.generateWasteForm.bind(this);
   this.onPeriodMenuClick = this.onPeriodMenuClick.bind(this);
   this.updatePeriodItemLists = this.updatePeriodItemLists.bind(this);
@@ -155,8 +155,9 @@ class App extends Component {
 
     if(response.status === 200 && response.data.length > 0) {
       let arbitraryIndex = 0;
+      let containerKey = this.keySeed;
       const wasteForm = this.state.categoryList.map((set) => {
-        arbitraryIndex++;
+        containerKey++;
         return React.createElement(ContainerOfUpdatableItemSets, {
           additionalItemTitle: 
           	{
@@ -184,7 +185,7 @@ class App extends Component {
 	          instanceItemGenericKey: "itemId",
 	          instanceItemList: response.data,
 	          instanceItemSubmissionIndicator: "isSubmitted",
-	          key: arbitraryIndex,
+	          key: containerKey,
 	          setIdentifier: "tag",
 	          setList: set.tags,
 	          title: set.name,
@@ -201,23 +202,22 @@ class App extends Component {
   });
  }
 
- setWeekday(newId) {
-  console.log("Changed to: " + newId);
-  this.setState({selectedWeekday: newId},
-  	() => this.generateWasteForm());
+ generateNewPeriodWasteForm() {
+ 	this.keySeed += this.state.categoryList.length;
+ 	this.generateWasteForm();
  }
 
  changeAMPM() {
   const toggledState = !this.state.isAM;
   this.setState({isAM: toggledState}, 
-  	() => this.generateWasteForm());
+  	() => this.generateNewPeriodWasteForm());
  }
 
  onPeriodMenuClick(period) {
   this.setState({
     selectedPeriod: period,
     selectedPeriodMenuText: "Selected Period: " + period.month + "." + period.week
-  }, () => this.generateWasteForm());
+  }, () => this.generateNewPeriodWasteForm());
  }
 
  onWeekdayMenuClick(weekday) {
@@ -236,15 +236,14 @@ class App extends Component {
   this.setState({
     selectedWeekday: weekdayEnums[weekday],
     selectedWeekdayMenuText: menuText
-  });
+  }, () => this.generateNewPeriodWasteForm());
  }
 
  updatePeriodItemLists(updatedItem) {
  	let newPeriodItemHashAccess = this.state.periodHashAccess;
  	newPeriodItemHashAccess[updatedItem.id] = updatedItem;
  	this.setState({newPeriodItemHashAccess: newPeriodItemHashAccess},
- 		this.generateWasteForm());
- 	console.log("Called in: " + this);
+ 		() => this.generateWasteForm());
  }
 
   render() {

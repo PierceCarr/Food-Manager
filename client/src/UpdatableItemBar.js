@@ -8,16 +8,13 @@ class UpdatableItemBar extends Component {
 	constructor(props){
 		super(props);
 
-		this.state = {
-			// isSubmitted: false,
-		}
+		this.state = {}
 	}
 
 	componentDidMount() {
-		this.props.updatableProperties.forEach((property) => {
-			this.setState({[property]: this.props.item[property]});
-		});
-
+		// this.props.updatableProperties.forEach((property) => {
+		// 	this.setState({[property]: this.props.item[property]});
+		// });
 	}
 
 	async onUpdateButtonClick() {
@@ -83,10 +80,12 @@ class UpdatableItemBar extends Component {
 					labelFor={label}
 					key={label}
 				>
-					<InputGroup className="form"
+					<InputGroup 
+						className="form"
+						defaultValue={this.props.item[property]}
 						id={label}
 						onChange={(event) => handleFormUpdate(event)}
-						value={this.state[property]}
+						// value={this.state[property]}
 					/>
 				</FormGroup>;
 

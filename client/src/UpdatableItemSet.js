@@ -9,9 +9,7 @@ class UpdatableItemSet extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			// isEveryItemUpdated: false,
-		}
+		this.state = {}
 	}
 
 	isEveryItemUpdated() {
@@ -27,16 +25,7 @@ class UpdatableItemSet extends Component {
 		} 
 
 		return answer;
-
 	}
-
-	// componentDidMount() {
-	// 	this.askItemsIfTheyHaveUpdated();
-	// }
-
-	// componentDidUpdate() {
-	// 	if(this.state.isEveryItemUpdated === false) this.askItemsIfTheyHaveUpdated();
-	// }
 
 	render() {
 		const isEveryItemUpdated = this.isEveryItemUpdated();

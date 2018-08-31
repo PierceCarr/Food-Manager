@@ -69,7 +69,6 @@ class ContainerOfUpdatableItemSets extends Component {
 					itemsToUpdate: itemsInThisSet,
 					key: set,
 					setName: set,
-					// incrementContainerUpdateCount: this.incrementContainerUpdateCount,
 					updatableProperties: this.props.updatableInstanceItemProperties,
 					updateInstanceItemLists: this.props.updateInstanceItemLists
 				});
@@ -91,11 +90,9 @@ class ContainerOfUpdatableItemSets extends Component {
 ContainerOfUpdatableItemSets.propTypes = {
 	additionalItemTitle: PropTypes.object,
 	genericItemHashAccess: PropTypes.object,
-	// genericItemList: PropTypes.arrayOf(PropTypes.object),
 	genericItemSetKey: PropTypes.node,
 	genericItemTitleIdentifier: PropTypes.node,
 	instanceItemGenericKey: PropTypes.node,
-	// instanceItemIdentifier: PropTypes.node,
 	instanceItemList: PropTypes.arrayOf(PropTypes.object),
 	instanceItemSubmissionIndicator: PropTypes.node,
 	setIdentifier: PropTypes.node,
