@@ -8,12 +8,8 @@ class UpdatableItemBar extends Component {
 	constructor(props){
 		super(props);
 
-		this.initialUpdateState = 
-			(this.props.item[this.props.updateTimestamp] !== null);
-
 		this.state = {
-			isUpdated: this.initialUpdateState,
-			isWaitingToUpdate: false
+			// isSubmitted: false,
 		}
 	}
 
@@ -21,12 +17,14 @@ class UpdatableItemBar extends Component {
 		this.props.updatableProperties.forEach((property) => {
 			this.setState({[property]: this.props.item[property]});
 		});
+
 	}
 
 	async onUpdateButtonClick() {
-
+		console.log("Property passed: " + this.props.instanceItemSubmissionIndicator);
+    console.log("Is submitted: " + this.props.item[this.props.instanceItemSubmissionIndicator]);
 		const shallowCopy = JSON.parse(JSON.stringify(this.props.item));
-		let propertiesToUpdate = {};
+		let propertiesToUpdate = {isSubmitted: true};
 		let newProperties = 0;
 
 		this.props.updatableProperties.forEach((property) => {
@@ -36,41 +34,40 @@ class UpdatableItemBar extends Component {
 				newProperties++;
 			}
 		})
+		
+		const updatedShallowItem = Object.assign(shallowCopy, propertiesToUpdate);
 
-		if(newProperties > 0){
-			const updatedShallowItem = Object.assign(shallowCopy, propertiesToUpdate);
+		console.log("Old item: " + JSON.stringify(this.props.item));
+		console.log("Shallow updated item: " + JSON.stringify(updatedShallowItem));
+		console.log("propertiesToUpdate: " + JSON.stringify(propertiesToUpdate));
 
-			console.log("Old item: " + JSON.stringify(this.props.item));
-			console.log("Shallow updated item: " + JSON.stringify(updatedShallowItem));
-			console.log("propertiesToUpdate: " + JSON.stringify(propertiesToUpdate));
+		const response = await axios({
+			method: 'patch',
+			url: 'http://localhost:3001',
+	    headers: {
+	      'Content-Type': 'application/json'
+	    },
+	    data: {
+	    	isUpdateSinglePeriodItem: true,
+	    	originalItem: this.props.item,
+	    	propertiesToUpdate: propertiesToUpdate,
+	    }
+		})
 
-			const response = await axios({
-				method: 'patch',
-				url: 'http://localhost:3001',
-		    headers: {
-		      'Content-Type': 'application/json'
-		    },
-		    data: {
-		    	isUpdateSinglePeriodItem: true,
-		    	originalItem: this.props.item,
-		    	propertiesToUpdate: propertiesToUpdate,
-		    }
-			})
-
-			// console.log(JSON.stringify(response));
-
-			if(response.status === 200) {
-				console.log("worked");
-				this.props.item = response.data;
-			}
+		if(response.status === 200) {
+			console.log("worked");
+			this.props.updateInstanceItemLists(response.data);
 		} else {
-			console.log("No new properties");
+			console.log("Problem with submission from UpdatableItemBar");
 		}
+		 
 	}
 
 	render() {
-		const crossCheck = (this.state.isUpdated) ? "check" : "cross";
-		const crossCheckColor = (this.state.isUpdated) ? "green" : "red";
+		const isSubmitted = this.props.item[this.props.instanceItemSubmissionIndicator];
+		console.log("Is item " + this.props.item["id"] + " submitted: " + this.props.item["isSubmitted"]);
+		const crossTick = (isSubmitted) ? "tick" : "cross";
+		const crossTickColor = (isSubmitted) ? "green" : "red";
 
 		const propertyFields = this.props.updatableProperties.map((property) => {
 			const label = property + ": ";
@@ -78,7 +75,6 @@ class UpdatableItemBar extends Component {
 
 			const handleFormUpdate = (event) => {
 				this.setState({[property]: event.target.value});
-				this.setState({isWaitingToUpdate: true});
 			}
 
 			const form = 
@@ -109,7 +105,7 @@ class UpdatableItemBar extends Component {
 
 		const titlePortion =
 		<div className="container container-title">
-			<Icon icon={crossCheck} color={crossCheckColor}/>
+			<Icon icon={crossTick} color={crossTickColor}/>
 			<h4>{this.props.title}</h4>
 		</div>;
 
@@ -129,9 +125,10 @@ class UpdatableItemBar extends Component {
 
 UpdatableItemBar.propTypes = {
 	item: PropTypes.object,
+	instanceItemSubmissionIndicator: PropTypes.node,
 	title: PropTypes.string,
 	updatableProperties: PropTypes.arrayOf(PropTypes.node),
-	updateTimestamp: PropTypes.node
+	updateInstanceItemLists: PropTypes.func
 }
 
 export default UpdatableItemBar;

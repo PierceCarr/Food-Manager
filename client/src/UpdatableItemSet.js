@@ -10,37 +10,43 @@ class UpdatableItemSet extends Component {
 		super(props);
 
 		this.state = {
-			isEveryItemUpdated: false,
+			// isEveryItemUpdated: false,
 		}
 	}
 
-	askItemsIfTheyHaveUpdated() {
-		let updatedItems = 0;
+	isEveryItemUpdated() {
+		let answer = false;
 
+		let updatedItems = 0;
 		this.props.itemsToUpdate.forEach((item) => {
-			if(item[this.props.itemsToUpdateTimestamp] !== null) updatedItems++;
+			if(item[this.props.instanceItemSubmissionIndicator]) updatedItems++;
 		})
 
 		if(updatedItems === this.props.itemsToUpdate.length){
-			this.setState({isEveryItemUpdated: true});
-			() => this.props.updateContainerUpdateCount(this.props.itemsToUpdate.length);
+			answer = true;
 		} 
+
+		return answer;
+
 	}
 
-	componentDidMount() {
-		this.askItemsIfTheyHaveUpdated();
-	}
+	// componentDidMount() {
+	// 	this.askItemsIfTheyHaveUpdated();
+	// }
 
-	componentDidUpdate() {
-		if(this.state.isEveryItemUpdated === false) this.askItemsIfTheyHaveUpdated();
-	}
+	// componentDidUpdate() {
+	// 	if(this.state.isEveryItemUpdated === false) this.askItemsIfTheyHaveUpdated();
+	// }
 
 	render() {
-		const crossCheckSize = 35;
+		const isEveryItemUpdated = this.isEveryItemUpdated();
+		const crossTickSize = 35;
+		const crossTick = (isEveryItemUpdated) ? "tick" : "cross";
+		const crossTickColor = (isEveryItemUpdated) ? "green" : "red";
 
 		const setName = 
 		<div className="setName-container">
-			<Icon icon="cross" color="red" iconSize={crossCheckSize}/>
+			<Icon icon={crossTick} color={crossTickColor} iconSize={crossTickSize}/>
 			<h3><span title={this.props.setName}>{this.props.setName}</span></h3>
 		</div>;
 
@@ -72,14 +78,15 @@ class UpdatableItemSet extends Component {
 				})
 			}
 
-			console.log("New item bar title: " + itemTitle);
 			arbitraryKey++;
 			return React.createElement(UpdatableItemBar, {
 				item: item,
+				incrementContainerUpdateCount: this.props.incrementContainerUpdateCount,
+				instanceItemSubmissionIndicator: this.props.instanceItemSubmissionIndicator,
 				key: arbitraryKey,
 				title: itemTitle,
 				updatableProperties: this.props.updatableProperties,
-				updateTimestamp: this.props.itemsToUpdateTimestamp,	
+				updateInstanceItemLists: this.props.updateInstanceItemLists
 			})
 		})
 
@@ -102,11 +109,11 @@ UpdatableItemSet.propTypes = {
 	genericItemHashAccess: PropTypes.object,
 	genericItemTitleIdentifier: PropTypes.node,
 	instanceItemGenericKey: PropTypes.node,
+	instanceItemSubmissionIndicator: PropTypes.node,
 	itemsToUpdate: PropTypes.arrayOf(PropTypes.object),
-	itemsToUpdateTimestamp: PropTypes.node,
 	setName: PropTypes.string,
-	updateContainerUpdateCount: PropTypes.func,
 	updatableProperties: PropTypes.arrayOf(PropTypes.node),
+	updateInstanceItemLists: PropTypes.func
 }
 
 export default UpdatableItemSet;

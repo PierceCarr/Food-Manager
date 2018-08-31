@@ -1,6 +1,3 @@
-// var babel = require("babel-core");
-// import React from 'react';
-// import {Button} from "@blueprintjs/core";
 var express = require('express');
 var router = express.Router();
 const bodyParser = require('body-parser');

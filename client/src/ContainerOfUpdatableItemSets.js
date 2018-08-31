@@ -11,30 +11,7 @@ class ContainerOfUpdatableItemSets extends Component {
 
 		this.state = {
 			isSetListDisplayed: false,
-			numberOfItems: 0,
-			numberOfUpdatedItems: 0,
-			title: this.props.title,
 		}
-	}
-
-	componentDidMount() {
-		let numberOfItems = 0;
-		this.props.instanceItemList.forEach((instanceItem) => {
-			const genericItem = this.props.genericItemHashAccess[instanceItem[this.props.instanceItemGenericKey]];
-			const set = genericItem[this.props.genericItemSetKey];
-	
-			if(set === this.state.title){
-				numberOfItems++;
-			}
-		});
-
-		this.setState({numberOfItems: numberOfItems});
-	}
-
-	updateContainerUpdateCount(setSize) {
-		this.setState(prevState => ({
-			numberOfUpdatedItems: prevState.numberOfUpdatedItems + setSize
-		}));
 	}
 
 	onTitleClick() {
@@ -43,6 +20,21 @@ class ContainerOfUpdatableItemSets extends Component {
 	}
 
 	render() {
+		let numberOfItems = 0;
+		let numberOfSubmittedItems = 0;
+		this.props.instanceItemList.forEach((instanceItem) => {
+			const genericItem = this.props.genericItemHashAccess[instanceItem[this.props.instanceItemGenericKey]];
+			const set = genericItem[this.props.genericItemSetKey];
+	
+			if(set === this.props.title){
+				numberOfItems++;
+
+				if(instanceItem[this.props.instanceItemSubmissionIndicator]){
+					numberOfSubmittedItems++;
+				}
+			}
+		});
+
 		const chevronSize = 50;
 		const chevronDirection = 
 			this.state.isSetListDisplayed ? "chevron-down" : "chevron-right";
@@ -52,7 +44,7 @@ class ContainerOfUpdatableItemSets extends Component {
 		const title = 
 		<button className="headerButton" onClick={() => this.onTitleClick()}>
 			<h1>
-				{titleChevron}{this.state.title + " " + this.state.numberOfUpdatedItems + "/" + this.state.numberOfItems}
+				{titleChevron}{this.props.title + " " + numberOfSubmittedItems + "/" + numberOfItems}
 			</h1>
 		</button>;
 
@@ -67,26 +59,29 @@ class ContainerOfUpdatableItemSets extends Component {
 				if(setOfInstanceItem === set) itemsInThisSet.push(instanceItem);
 			})
 
-			return React.createElement(UpdatableItemSet, {
-				additionalItemTitle: this.props.additionalItemTitle,
-				genericItemHashAccess: this.props.genericItemHashAccess,
-				genericItemTitleIdentifier: this.props.genericItemTitleIdentifier,
-				instanceItemGenericKey: this.props.instanceItemGenericKey,
-				itemsToUpdate: itemsInThisSet,
-				itemsToUpdateTimestamp: this.props.instanceItemUpdateTimestampIdentifier,
-				key: set,
-				setName: set,
-				updateContainerUpdateCount: this.updateContainerUpdateCount,
-				updatableProperties: this.props.updatableInstanceItemProperties
-			});
+			if(itemsInThisSet.length > 0){
+				return React.createElement(UpdatableItemSet, {
+					additionalItemTitle: this.props.additionalItemTitle,
+					genericItemHashAccess: this.props.genericItemHashAccess,
+					genericItemTitleIdentifier: this.props.genericItemTitleIdentifier,
+					instanceItemGenericKey: this.props.instanceItemGenericKey,
+					instanceItemSubmissionIndicator: this.props.instanceItemSubmissionIndicator,
+					itemsToUpdate: itemsInThisSet,
+					key: set,
+					setName: set,
+					// incrementContainerUpdateCount: this.incrementContainerUpdateCount,
+					updatableProperties: this.props.updatableInstanceItemProperties,
+					updateInstanceItemLists: this.props.updateInstanceItemLists
+				});
+			}
 		})
 
 		const component = 
 		<div>
-		{title}
-		<Collapse isOpen={this.state.isSetListDisplayed}>
-			{content}
-		</Collapse>
+			{title}
+			<Collapse isOpen={this.state.isSetListDisplayed}>
+				{content}
+			</Collapse>
 		</div>;
 
 		return component;
@@ -102,11 +97,12 @@ ContainerOfUpdatableItemSets.propTypes = {
 	instanceItemGenericKey: PropTypes.node,
 	// instanceItemIdentifier: PropTypes.node,
 	instanceItemList: PropTypes.arrayOf(PropTypes.object),
-	instanceItemUpdateTimestampIdentifier: PropTypes.node,
+	instanceItemSubmissionIndicator: PropTypes.node,
 	setIdentifier: PropTypes.node,
 	setList: PropTypes.arrayOf(PropTypes.string),
 	title: PropTypes.string,
-	updatableInstanceItemProperties: PropTypes.arrayOf(PropTypes.node)
+	updatableInstanceItemProperties: PropTypes.arrayOf(PropTypes.node),
+	updateInstanceItemLists: PropTypes.func
 }
 
 export default ContainerOfUpdatableItemSets;

@@ -22,8 +22,7 @@ import './App.css';
 FocusStyleManager.onlyShowFocusOnTabs();
 
 //Todo:
-//-Display period items
-//-Allow period items to be updated
+//-Period items should confirm they have been updated with checkmarks
 //-Display period menu skeleton before it's populated
 //-Grey out impossible weekday tabs depending on the period
 
@@ -42,7 +41,6 @@ class App extends Component {
     isItemInputterUpToDate: false,
     itemHashAccess: null,
     itemList: [],
-    periodItemList: [],
     periodHashAccess: null,
     periodList: [],
     selectedPeriod: null,
@@ -51,7 +49,9 @@ class App extends Component {
     selectedWeekdayMenuText: "Select a Weekday",
   }
 
+  this.generateWasteForm = this.generateWasteForm.bind(this);
   this.onPeriodMenuClick = this.onPeriodMenuClick.bind(this);
+  this.updatePeriodItemLists = this.updatePeriodItemLists.bind(this);
  }
 
  componentDidMount() {
@@ -133,8 +133,10 @@ class App extends Component {
  }
 
  generateWasteForm() {
-  let wasteForm = "";
-
+ 	if(this.state.selectedPeriod === null){
+ 		this.setState({wasteForm: "Select a period"});
+ 		return;
+ 	}
   axios({
     method: 'post',
     url: 'http://localhost:3001',
@@ -153,7 +155,7 @@ class App extends Component {
 
     if(response.status === 200 && response.data.length > 0) {
       let arbitraryIndex = 0;
-      wasteForm = this.state.categoryList.map((set) => {
+      const wasteForm = this.state.categoryList.map((set) => {
         arbitraryIndex++;
         return React.createElement(ContainerOfUpdatableItemSets, {
           additionalItemTitle: 
@@ -181,12 +183,13 @@ class App extends Component {
 	          instanceItemGenericIdentifier: "itemId",
 	          instanceItemGenericKey: "itemId",
 	          instanceItemList: response.data,
-	          instanceItemUpdateTimestampIdentifier: "updatedAt",
+	          instanceItemSubmissionIndicator: "isSubmitted",
 	          key: arbitraryIndex,
 	          setIdentifier: "tag",
 	          setList: set.tags,
 	          title: set.name,
-	          updatableInstanceItemProperties: ["quantity", "price"]
+	          updatableInstanceItemProperties: ["quantity", "price"],
+	          updateInstanceItemLists: this.updatePeriodItemLists
         }) 
       });
 
@@ -200,12 +203,14 @@ class App extends Component {
 
  setWeekday(newId) {
   console.log("Changed to: " + newId);
-  this.setState({selectedWeekday: newId});
+  this.setState({selectedWeekday: newId},
+  	() => this.generateWasteForm());
  }
 
  changeAMPM() {
   const toggledState = !this.state.isAM;
-  this.setState({isAM: toggledState});
+  this.setState({isAM: toggledState}, 
+  	() => this.generateWasteForm());
  }
 
  onPeriodMenuClick(period) {
@@ -232,6 +237,14 @@ class App extends Component {
     selectedWeekday: weekdayEnums[weekday],
     selectedWeekdayMenuText: menuText
   });
+ }
+
+ updatePeriodItemLists(updatedItem) {
+ 	let newPeriodItemHashAccess = this.state.periodHashAccess;
+ 	newPeriodItemHashAccess[updatedItem.id] = updatedItem;
+ 	this.setState({newPeriodItemHashAccess: newPeriodItemHashAccess},
+ 		this.generateWasteForm());
+ 	console.log("Called in: " + this);
  }
 
   render() {

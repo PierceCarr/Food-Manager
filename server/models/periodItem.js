@@ -9,45 +9,49 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
         unique: true
-      },
-	  periodId: {
-        type: DataTypes.INTEGER,
-        references: {model: 'periods', key: 'id'}
-      },
-      itemId: {
-        type: DataTypes.INTEGER,
-        references: {model: 'items', key: 'id'}
-      },
-      day: {
-        type: DataTypes.INTEGER,
-        validate: {
-          min: 1,
-          max: 7
-        }
-      },
-      isAM: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false
-      },
-      quantity: {
-        type: DataTypes.FLOAT,
-        defaultValue: 0.0,
-        validate: {
-          min: 0
-        }
-      },
-      price: {
-        type: DataTypes.DECIMAL(CURRENCY_PRECISION, CURRENCY_SCALE),
-        defaultValue: 0,
-        validate: {
-          min: 0
-        }
-      },
-      createdAt: {
-        type: DataTypes.DATE
-      },
-      updatedAt: {
-        type: DataTypes.DATE
+    },
+    itemId: {
+      type: DataTypes.INTEGER,
+      references: {model: 'items', key: 'id'}
+    },
+    periodId: {
+      type: DataTypes.INTEGER,
+      references: {model: 'periods', key: 'id'}
+    },
+    day: {
+      type: DataTypes.INTEGER,
+      validate: {
+        min: 1,
+        max: 7
       }
+    },
+    isAM: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    isSubmitted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    price: {
+      type: DataTypes.DECIMAL(CURRENCY_PRECISION, CURRENCY_SCALE),
+      defaultValue: 0,
+      validate: {
+        min: 0
+      }
+    },
+    quantity: {
+      type: DataTypes.FLOAT,
+      defaultValue: 0.0,
+      validate: {
+        min: 0
+      }
+    },
+    createdAt: {
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      type: DataTypes.DATE
+    }
 	});
 }

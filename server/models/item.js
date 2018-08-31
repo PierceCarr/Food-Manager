@@ -7,34 +7,20 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-	  name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: "nameUnitConstraint",
-        primaryKey: true
-      },
-      unitOfMeasurement: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: "nameUnitConstraint",
-        primaryKey: true
-      },
       category: {
         type: DataTypes.STRING,
         allowNull: false,
         references: {model: 'category', key: 'name'}
       },
-      tag: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
       },
-      quantity: {
-        type: DataTypes.FLOAT,
-        defaultValue: 0,
-        validate: {
-        	min: 0
-        }
+	  name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: "nameUnitConstraint",
+        primaryKey: true
       },
       price: {
         type: DataTypes.DECIMAL(CURRENCY_PRECISION, CURRENCY_SCALE),
@@ -43,10 +29,24 @@ module.exports = (sequelize, DataTypes) => {
         	min: 0
         }
       },
-      isActive: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
-      }
+      quantity: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0,
+        validate: {
+        	min: 0
+        }
+      },
+      tag: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      unitOfMeasurement: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: "nameUnitConstraint",
+        primaryKey: true
+      },
 	});
 	
 	return Item;

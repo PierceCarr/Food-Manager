@@ -220,13 +220,13 @@ module.exports = {
         autoIncrement: true,
         unique: true
       },
-      periodId: {
-        type: Sequelize.INTEGER,
-        references: {model: 'periods', key: 'id'}
-      },
       itemId: {
         type: Sequelize.INTEGER,
         references: {model: 'items', key: 'id'}
+      },
+      periodId: {
+        type: Sequelize.INTEGER,
+        references: {model: 'periods', key: 'id'}
       },
       day: {
         type: Sequelize.INTEGER,
@@ -239,16 +239,20 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false
       },
-      quantity: {
-        type: Sequelize.FLOAT,
-        defaultValue: 0.0,
-        validate: {
-          min: 0
-        }
+      isSubmitted: {
+          type: Sequelize.BOOLEAN,
+          defaultValue: false
       },
       price: {
         type: Sequelize.DECIMAL(CURRENCY_PRECISION, CURRENCY_SCALE),
         defaultValue: 0,
+        validate: {
+          min: 0
+        }
+      },
+      quantity: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0.0,
         validate: {
           min: 0
         }
@@ -287,6 +291,8 @@ module.exports = {
           pmPeriodItem.price = item.price;
           amPeriodItem.isAM = true;
           pmPeriodItem.isAM = false;
+          amPeriodItem.isSubmitted = false;
+          pmPeriodItem.isSubmitted = false;
           amPeriodItem.createdAt = Sequelize.fn('now');
           pmPeriodItem.createdAt = Sequelize.fn('now');
 
