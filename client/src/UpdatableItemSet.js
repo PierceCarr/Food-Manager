@@ -28,8 +28,32 @@ class UpdatableItemSet extends Component {
 		return answer;
 	}
 
+	getItemTitle(item) {
+		const generic = this.props.genericItemHashAccess[item[this.props.instanceItemGenericKey]];
+		const genericName = generic[this.props.genericItemTitleIdentifier];
+		let itemTitle = genericName;
+
+		this.props.additionalItemTitle.titleAdditions.forEach((addition) => {
+			if(addition.type === "string") {
+				itemTitle += addition.content;
+
+			} else if (addition.type === "node") {
+				let content = "";
+
+				if(addition.isGenericProperty) {
+					content = generic[addition.node];
+
+				} else { //Instance item property
+					content = item[addition.node];
+
+				}
+				itemTitle += content;
+			}
+		})
+		return itemTitle;
+	}
+
 	makeArrayOfItemBars(items) {
-		console.log("Input length: " + items.length);
 		const itemBars = items.map((item) => {
 			const genericReference = item[this.props.instanceItemGenericKey];
 			const generic = this.props.genericItemHashAccess[genericReference];
@@ -67,30 +91,25 @@ class UpdatableItemSet extends Component {
 				updateInstanceItemLists: this.props.updateInstanceItemLists
 			})
 		})
-		console.log("Item bars size: " + itemBars.length);
 		return itemBars;
 	}
 
-	sortItemsAlphabetically(items) {
+	sortItemsAlphabeticallyByTitle(items) {
 		let itemsSortedByName = [].concat(items)
 			.sort((a, b) => {
-				const genericA = this.props.genericItemHashAccess[a[this.props.instanceItemGenericKey]];
-				const genericB = this.props.genericItemHashAccess[b[this.props.instanceItemGenericKey]];
-				const genericAName = genericA[this.props.genericItemTitleIdentifier].toLowerCase(); //To lower isnt generic
-				const genericBName = genericB[this.props.genericItemTitleIdentifier].toLowerCase(); //To lower isnt generic
-				// console.log("Name A: " + genericAName);
-				// console.log("Name B: " + genericBName);
-				if (genericAName > genericBName) return 1;
-				if (genericAName < genericBName) return -1;
+				const aTitle = this.getItemTitle(a).toLowerCase();
+				const bTitle = this.getItemTitle(b).toLowerCase();
+				// console.log("Name A: " + aTitle);
+				// console.log("Name B: " + bTitle);
+				if (aTitle > bTitle) return 1;
+				if (aTitle < bTitle) return -1;
 				return 0;
 			});
-
-		// console.log("Sorted:");
-		// itemsSortedByName.forEach((item) => console.log(this.props.genericItemHashAccess[item.itemId].name))
 
 			return itemsSortedByName;
 	}
 
+	//For debugging
 	logEveryItemByName(items) {
 		items.forEach((item) => {
 			const generic = this.props.genericItemHashAccess[item.itemId];
@@ -110,75 +129,24 @@ class UpdatableItemSet extends Component {
 			<h3><span title={this.props.setName}>{this.props.setName}</span></h3>
 		</div>;
 
-		// let submittedItems = [];
-		// let unsubmittedItems = [];
+		let submittedItems = [];
+		let unsubmittedItems = [];
 
-		// this.props.itemsToUpdate.forEach((item) => {
-		// 	if(item[this.props.instanceItemSubmissionIndicator] === true){
-		// 		submittedItems.push(item);
-		// 	} else {
-		// 		unsubmittedItems.push(item);
-		// 	}
-		// });
-
-		// let sortedSubmittedItems = this.sortItemsAlphabetically(submittedItems);
-		// let sortedUnsubmittedItems = this.sortItemsAlphabetically(submittedItems);
-
-		// let submittedItemBars = this.makeArrayOfItemBars(sortedSubmittedItems);
-		// let unsubmittedItemBars = this.makeArrayOfItemBars(sortedUnsubmittedItems);
-		// // // submittedItemBars = this.sortItemsAlphabetically(submittedItemBars);
-		// // // unsubmittedItemBars = this.sortItemsAlphabetically(unsubmittedItemBars);
-
-		// const allItemBars = unsubmittedItemBars.concat(submittedItemBars);
-		// console.log("Remaining items: ");
-		// this.logEveryItemByName(this.props.itemsToUpdate);
-		// console.log("Submitted items:" );
-		// this.logEveryItemByName(submittedItems);
-		// console.log("Unsubmitted items:" );
-		// this.logEveryItemByName(unsubmittedItems);
-
-		// console.log("Sorted: ");
-		// let sorted = this.sortItemsAlphabetically(this.props.itemsToUpdate);
-		// this.logEveryItemByName(sorted);
-
-
-		const allItemBars = this.props.itemsToUpdate.map((item) => {
-			const genericReference = item[this.props.instanceItemGenericKey];
-			const generic = this.props.genericItemHashAccess[genericReference];
-			let itemTitle = generic[this.props.genericItemTitleIdentifier];
-
-			if(this.props.additionalItemTitle.use) {
-
-				this.props.additionalItemTitle.titleAdditions.forEach((addition) => {
-					if(addition.type === "string") {
-						itemTitle += addition.content;
-
-					} else if (addition.type === "node") {
-						let content = "";
-
-						if(addition.isGenericProperty) {
-							content = generic[addition.node];
-
-						} else { //Instance item property
-							content = item[addition.node];
-
-						}
-						itemTitle += content;
-					}
-				})
+		this.props.itemsToUpdate.forEach((item) => {
+			if(item[this.props.instanceItemSubmissionIndicator]){
+				submittedItems.push(item);
+			} else {
+				unsubmittedItems.push(item);
 			}
+		});
 
-			this.keySeed++;
-			return React.createElement(UpdatableItemBar, {
-				item: item,
-				incrementContainerUpdateCount: this.props.incrementContainerUpdateCount,
-				instanceItemSubmissionIndicator: this.props.instanceItemSubmissionIndicator,
-				key: this.keySeed,
-				title: itemTitle,
-				updatableProperties: this.props.updatableProperties,
-				updateInstanceItemLists: this.props.updateInstanceItemLists
-			})
-		})
+		let sortedSubmittedItems = this.sortItemsAlphabeticallyByTitle(submittedItems);
+		let sortedUnsubmittedItems = this.sortItemsAlphabeticallyByTitle(unsubmittedItems);
+
+		let submittedItemBars = this.makeArrayOfItemBars(sortedSubmittedItems);
+		let unsubmittedItemBars = this.makeArrayOfItemBars(sortedUnsubmittedItems);
+
+		const allItemBars = unsubmittedItemBars.concat(submittedItemBars);
 
 		const itemBarContainer =
 		<div  className="itemBars-container">
