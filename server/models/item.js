@@ -38,8 +38,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       tag: {
         type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
+        defaultValue: 'ect',
+        allowNull: false
       },
       unitOfMeasurement: {
         type: DataTypes.STRING,

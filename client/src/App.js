@@ -22,9 +22,22 @@ import './App.css';
 FocusStyleManager.onlyShowFocusOnTabs();
 
 //Todo:
-//-Period items should confirm they have been updated with checkmarks
+//--High priority:
+//-Critical bug: Submitting a period item places it at the bottom of its
+//tag group, with its form text remaining in the original location now with
+//a different period item (database update is correct however)
+//-Remove impossible weekday menu items depending on the period
+//-Ability to edit/delete generic item classes in client (can currently add)
+//-Produce basic reports on the client
+//-Output excel reports
+//-Accounts and sessions
+
+//--Low priority:
 //-Display period menu skeleton before it's populated
-//-Grey out impossible weekday tabs depending on the period
+//-Replace categories with a 'loading' loop while waste form is generating
+//-Replace check with a 'loading' loop while server is updating database with
+//period item change
+
 
 class App extends Component {
  constructor() {
@@ -33,7 +46,7 @@ class App extends Component {
   this.state = {
     categoryHashAccess: null,
     categoryList: [],
-    wasteForm: "I am content",
+    wasteForm: "",
     isAM: true,
     isCategoryListPopulated: false,
     isDisplayingPeriodItems: false,
@@ -154,7 +167,6 @@ class App extends Component {
   .then((response) => {
 
     if(response.status === 200 && response.data.length > 0) {
-      let arbitraryIndex = 0;
       let containerKey = this.keySeed;
       const wasteForm = this.state.categoryList.map((set) => {
         containerKey++;

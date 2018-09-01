@@ -6,7 +6,8 @@ module.exports = {
     database: process.env.DB_NAME,
     host: "127.0.0.1",
     port: 5432,
-    dialect: "postgres"
+    dialect: "postgres",
+    logging: console.log
   },
   "test": {},
   "production": {}

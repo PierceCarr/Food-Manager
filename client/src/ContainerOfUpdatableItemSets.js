@@ -55,8 +55,9 @@ class ContainerOfUpdatableItemSets extends Component {
 				const genericReference = instanceItem[this.props.instanceItemGenericKey]
 				const generic = this.props.genericItemHashAccess[genericReference];
 				const setOfInstanceItem = generic[this.props.setIdentifier];
+				const itemIsCategoryMember = this.props.title === generic[this.props.genericItemSetKey]
 				
-				if(setOfInstanceItem === set) itemsInThisSet.push(instanceItem);
+				if(setOfInstanceItem === set && itemIsCategoryMember) itemsInThisSet.push(instanceItem);
 			})
 
 			if(itemsInThisSet.length > 0){
@@ -73,6 +74,7 @@ class ContainerOfUpdatableItemSets extends Component {
 					updateInstanceItemLists: this.props.updateInstanceItemLists
 				});
 			}
+			return null;
 		})
 
 		const component = 

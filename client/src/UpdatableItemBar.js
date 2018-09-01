@@ -62,7 +62,7 @@ class UpdatableItemBar extends Component {
 
 	render() {
 		const isSubmitted = this.props.item[this.props.instanceItemSubmissionIndicator];
-		console.log("Is item " + this.props.item["id"] + " submitted: " + this.props.item["isSubmitted"]);
+		// console.log("Is item " + this.props.item["id"] + " submitted: " + this.props.item["isSubmitted"]);
 		const crossTick = (isSubmitted) ? "tick" : "cross";
 		const crossTickColor = (isSubmitted) ? "green" : "red";
 
@@ -97,6 +97,16 @@ class UpdatableItemBar extends Component {
 			{"Update"}
 		</Button>;
 
+		const editButton =
+		<Button className="button-bar">
+			{"Edit"}
+		</Button>;
+
+		const uncheckButton =
+		<Button className="button-bar">
+			{"Uncheck"}
+		</Button>;
+
 		const control =
 			<ControlGroup vertical={false}>
 				{propertyFields}
@@ -110,7 +120,7 @@ class UpdatableItemBar extends Component {
 
 		const uiPortion = 
 		<div className="container container-ui">
-			{control}{submissionButton}
+			{control}{submissionButton}{editButton}{uncheckButton}
 		</div>;
 
 		const bar =

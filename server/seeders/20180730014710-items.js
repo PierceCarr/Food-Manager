@@ -33,29 +33,29 @@ module.exports = {
     await queryInterface.bulkInsert('categories', [
       {
         name: "Breads",
-        tags: ["Bread", "Torts"]
+        tags: ["Bread", "Tortilla", "Etc."]
       },
       {
         name: "Dairy",
-        tags: ["Cheese", "Eggs", "Butter"]
+        tags: ["Cheese", "Eggs", "Butter", "Etc."]
       },
       {
         name: "Desserts",
-        tags: ["Cheesecake", "Ice Cream"]
+        tags: ["Cheesecake", "Ice Cream", "Etc."]
       },
       {
         name: "Frozen",
-        tags: ["Shrimp", "Edamame"]
+        tags: ["Shrimp", "Edamame", "Etc."]
       },
       {
         name: "Meats",
-        tags: ["Back Ribs", "Bacon", "Burgers", "Carapacchio", "Chicken"]
+        tags: ["Back Ribs", "Bacon", "Burgers", "Carapacchio", "Chicken", "Etc."]
       },
       {
         name: "Produce",
         tags: ["Avacado", "Broccoli", "Cabbage", "Garlic", "Herbs", "Lettuce",
           "Mushrooms", "Onions", "Papaya", "Pepper", "Peppers", "Potatoes",
-          "Shallots", "Tomatoes"]
+          "Shallots", "Tomatoes", "Etc."]
       }
       ], {})
 
@@ -141,8 +141,8 @@ module.exports = {
       },
       tag: {
         type: Sequelize.STRING,
-        allowNull: true,
-        defaultValue: null
+        defaultValue: 'ect',
+        allowNull: false
       },
       quantity: {
         type: Sequelize.FLOAT,
@@ -176,19 +176,7 @@ module.exports = {
       name: 'nameUnitConstraint'
     });
 
-    // .then(() => queryInterface.addIndex('nameUnitIndex', ['name', "unitOfMeasurement"]))
     await queryInterface.bulkInsert('items', [
-      {
-        name: "Pumpkin",
-        unitOfMeasurement: "Slice",
-        category: "Desserts",
-        tag: "Cheesecake",
-        quantity: 0.0,
-        price: 2.50,
-        isActive: true,
-        createdAt: Sequelize.fn('now'),
-        updatedAt: Sequelize.fn('now')
-      },
       {
         name: "Chocolate",
         unitOfMeasurement: "Slice",
@@ -196,6 +184,17 @@ module.exports = {
         tag: "Cheesecake",
         quantity: 4,
         price: 3.50,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Pumpkin",
+        unitOfMeasurement: "Slice",
+        category: "Desserts",
+        tag: "Cheesecake",
+        quantity: 0.0,
+        price: 2.50,
         isActive: true,
         createdAt: Sequelize.fn('now'),
         updatedAt: Sequelize.fn('now')
@@ -210,7 +209,150 @@ module.exports = {
         isActive: true,
         createdAt: Sequelize.fn('now'),
         updatedAt: Sequelize.fn('now')
-      }
+      },
+      {
+        name: "Brioche Burger Buns",
+        unitOfMeasurement: "Each",
+        category: "Breads",
+        tag: "Bread",
+        quantity: 0,
+        price: 0.47,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "French",
+        unitOfMeasurement: "Bag",
+        category: "Breads",
+        tag: "Bread",
+        quantity: 0,
+        price: 2.09,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Fruit",
+        unitOfMeasurement: "Each",
+        category: "Breads",
+        tag: "Bread",
+        quantity: 0,
+        price: 13.42,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Fruit",
+        unitOfMeasurement: "Slice",
+        category: "Breads",
+        tag: "Bread",
+        quantity: 0,
+        price: 0.48,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Yellow Corn",
+        unitOfMeasurement: "Pack",
+        category: "Breads",
+        tag: "Tortilla",
+        quantity: 0,
+        price: 2.62,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Red Ribbon",
+        unitOfMeasurement: "Kg.",
+        category: "Breads",
+        tag: "Tortilla",
+        quantity: 0,
+        price: 4.15,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Flat Bread",
+        unitOfMeasurement: "Each",
+        category: "Breads",
+        tag: 'Etc.',
+        quantity: 0,
+        price: 0.77,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Butter - unsalted",
+        unitOfMeasurement: "Each",
+        category: "Dairy",
+        tag: 'Etc.',
+        quantity: 0,
+        price: 3.99,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Aged Cheddar",
+        unitOfMeasurement: "Kg.",
+        category: "Dairy",
+        tag: "Cheese",
+        quantity: 0,
+        price: 9.86,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Feta",
+        unitOfMeasurement: "Tub",
+        category: "Dairy",
+        tag: "Cheese",
+        quantity: 0,
+        price: 109.18,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Goat",
+        unitOfMeasurement: "Kg.",
+        category: "Dairy",
+        tag: "Cheese",
+        quantity: 0,
+        price: 15.23,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Hard Boiled",
+        unitOfMeasurement: "Bag",
+        category: "Dairy",
+        tag: "Eggs",
+        quantity: 0,
+        price: 2.21,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
+      {
+        name: "Liquid Excelle",
+        unitOfMeasurement: "Carton",
+        category: "Dairy",
+        tag: "Eggs",
+        quantity: 0,
+        price: 3.16,
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
+        updatedAt: Sequelize.fn('now')
+      },
     ], {});
 
     await queryInterface.createTable('periodItems', {
