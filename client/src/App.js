@@ -22,22 +22,25 @@ import './App.css';
 FocusStyleManager.onlyShowFocusOnTabs();
 
 //Todo:
+
 //--High priority:
-//-Critical bug: Submitting a period item places it at the bottom of its
-//tag group, with its form text remaining in the original location now with
-//a different period item (database update is correct however)
 //-Remove impossible weekday menu items depending on the period
+//-The server should manage periods automatically, adding and deleting as
+//the date changes
 //-Ability to edit/delete generic item classes in client (can currently add)
 //-Produce basic reports on the client
 //-Output excel reports
 //-Accounts and sessions
+//-Understand how to migrate and backup database remotely
+//-Formal testing
 
 //--Low priority:
 //-Display period menu skeleton before it's populated
 //-Replace categories with a 'loading' loop while waste form is generating
 //-Replace check with a 'loading' loop while server is updating database with
 //period item change
-
+//-Produce descriptive toast on period item updates
+//-Pry out shallow copy from UpdatableItemBar.js
 
 class App extends Component {
  constructor() {
@@ -52,8 +55,10 @@ class App extends Component {
     isDisplayingPeriodItems: false,
     isItemInputterReadyToLoad: false,
     isItemInputterUpToDate: false,
+    isItemPanelOpen: true,
     itemHashAccess: null,
     itemList: [],
+    itemPanelForm: "itemInputter",
     periodHashAccess: null,
     periodList: [],
     selectedPeriod: null,
@@ -68,18 +73,18 @@ class App extends Component {
  }
 
  componentDidMount() {
-  this.loadCategoriesPeriodsAndItems();
+	this.loadCategoriesPeriodsAndItems();
 
-  const timeToLoadItemInputter = 
-    this.state.isCategoryListPopulated === true && 
-    this.state.isItemInputterUpToDate === false;
+	const timeToLoadItemInputter = 
+  	this.state.isCategoryListPopulated === true && 
+  	this.state.isItemInputterUpToDate === false;
 
   if(timeToLoadItemInputter){
     this.setState({
       isItemInputterReadyToLoad: true,
       isItemInputterUpToDate: true
     });
-  }
+	}
  }
 
  componentDidUpdate() {
@@ -251,6 +256,11 @@ class App extends Component {
   }, () => this.generateNewPeriodWasteForm());
  }
 
+ toggleItemPanel() {
+ 	const currentState = this.state.isItemPanelOpen;
+ 	this.setState({isItemPanelOpen: !currentState});
+ }
+
  updatePeriodItemLists(updatedItem) {
  	let newPeriodItemHashAccess = this.state.periodHashAccess;
  	newPeriodItemHashAccess[updatedItem.id] = updatedItem;
@@ -260,13 +270,20 @@ class App extends Component {
 
   render() {
 
+  	let itemPanelForm = null;
+  	if(this.state.isItemPanelOpen === false){}
+  	else if(this.state.itemPanelForm === "itemInputter"){
+  		itemPanelForm = 
+  			<ItemInputter 
+			    className="itemInputter"
+			    isReadyToLoad={this.state.isItemInputterReadyToLoad}
+			    categoryItems={this.state.categoryList}/>
+  	}
+
     const itemPanel = 
       <div className="item-panel">
         <Card elevation={Elevation.TWO} className="panel-card" >
-          <ItemInputter 
-          className="itemInputter"
-          isReadyToLoad={this.state.isItemInputterReadyToLoad}
-          categoryItems={this.state.categoryList}/>
+          {itemPanelForm}
           <p/>
         </Card>
       </div>;
@@ -345,25 +362,19 @@ class App extends Component {
       </ControlGroup>
       </div>;
 
-    // const weekTabs =
-    //   <Tabs 
-    //   id="weekTabs" 
-    //   onChange={(TabId) => this.setWeekday(TabId)} 
-    //   className="bp3-tabs">
-    //     <Tab id="1" title="Monday" className="singleTab"/>
-    //     <Tab id="2" title="Tuesday" className="singleTab"/>
-    //     <Tab id="3" title="Wednesday" className="singleTab"/>
-    //     <Tab id="4" title="Thursday" className="singleTab"/>
-    //     <Tab id="5" title="Friday" className="singleTab"/>
-    //     <Tab id="6" title="Saturday" className="singleTab"/>
-    //     <Tab id="7" title="Sunday" className="singleTab"/>
-    //   </Tabs>;
+    const toggleItemPanelButton =
+    <Button 
+    intent="warning" 
+    icon="menu-closed"
+    className="header-itemPanelButton"
+    onClick={() => this.toggleItemPanel()}>
+    	{"Toggle Ingredient Options Panel"}
+    </Button>
 
-    //weekTabs were under periodSelector
     const contentPanel =
       <div className="content-panel">
         <div className="header">
-          {panelTabs}
+          {toggleItemPanelButton}{panelTabs}
         </div>
         <div className="period-panel">
           {periodSelector}

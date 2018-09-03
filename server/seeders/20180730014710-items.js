@@ -82,6 +82,9 @@ module.exports = {
         },
         unique: "monthWeekConstraint",
       },
+      dayDates: {
+        type: DataTypes.ARRAY(DataTypes.STRING)
+      },
       createdAt: {
         type: Sequelize.DATE
       },

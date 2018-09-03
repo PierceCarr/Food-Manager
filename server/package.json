@@ -7,10 +7,12 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.3.0",
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.4",
     "currency-formatter": "^1.5.1",
+    "date-and-time": "^0.6.2",
     "debug": "~2.6.9",
     "dotenv": "^6.0.0",
     "express": "~4.16.0",

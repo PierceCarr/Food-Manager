@@ -3,6 +3,8 @@ var router = express.Router();
 const bodyParser = require('body-parser');
 const Sequelize = require('sequelize');
 const currencyFormatter = require('currency-formatter');
+const axios = require('axios');
+const dateTime = require('date-and-time');
 
 
 router.use(bodyParser.json());
@@ -13,11 +15,39 @@ const sequelize = new Sequelize(
  	dialect: 'postgres'
 });
 
-sequelize.authenticate().then(() => {
+const postgresPromise = sequelize.authenticate()
+.then(() => {
 	console.log("Connected to Postgres");
-}).catch((err) => {
+})
+.catch((err) => {
 	console.log('Unable to connect to database:');
   	console.log(err);
+});
+
+let dateToday = null;
+const checkDatePromise = axios({
+	method: 'get',
+	url: 'http://api.timezonedb.com/v2.1/get-time-zone?key=F5VB1ZB4EC6C&format=json&by=zone&zone=America/Vancouver',
+	headers: {
+      'Content-Type': 'application/json'
+    },
+})
+.then((response) => {
+	dateToday = response.data.formatted;
+	console.log('assigned date');
+})
+.catch((err) => {
+	console.log('Unable to connect to check date:');
+  	console.log(err);
+});
+
+Promise.all([postgresPromise, checkDatePromise])
+.then(() => {
+	//Make sure next two month's periods exist
+
+	//Assuming Aug 27 is 8.4
+	
+
 });
 
 const Category = sequelize.import("../models/category.js");

@@ -43,6 +43,9 @@ html {
 	width: 100%;
 	flex-direction: column;
 	background-color: #cda153; /*cactus club gold*/
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
 /*	color: white;*/
 }
 
@@ -52,20 +55,28 @@ html {
 	display: flex;
 	flex-direction: row;
 	flex-grow: 1;
-	background-color: #cda153; /*cactus club gold*/
+	background-color: #cda153; /*special gold*/
+}
+
+.header-itemPanelButton {
+/*	align-self: flex-start;*/
+	margin-right: auto;
+}
+
+.header-panelTabs {
 
 }
 
 .panel-card {
 	height: 100%;
-	background-color: #cda153; /*cactus club gold*/
+	background-color: #cda153; /*special gold*/
 	overflow-y: auto;
 }
 
 .period-panel {
 	padding-top: 3px;
 	width: 100%;
-	background-color: #262626; /*cactus club grey*/
+	background-color: #262626; /*special grey*/
 /*	flex-direction: column;
 	display: flex;*/
 }
@@ -86,7 +97,7 @@ html {
 	height: auto;
 	display: flex;
 	justify-content: center;
-
+	margin-right: auto;
 }
 
 .bp3-tab {

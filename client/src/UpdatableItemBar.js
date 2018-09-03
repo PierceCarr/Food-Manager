@@ -11,15 +11,10 @@ class UpdatableItemBar extends Component {
 		this.state = {}
 	}
 
-	componentDidMount() {
-		// this.props.updatableProperties.forEach((property) => {
-		// 	this.setState({[property]: this.props.item[property]});
-		// });
-	}
-
+	//SHALLOW COPY IS NOT GENERALIZABLE! (But it works well for now~)
 	async onUpdateButtonClick() {
-		console.log("Property passed: " + this.props.instanceItemSubmissionIndicator);
-    console.log("Is submitted: " + this.props.item[this.props.instanceItemSubmissionIndicator]);
+		// console.log("Property passed: " + this.props.instanceItemSubmissionIndicator);
+  	// console.log("Is submitted: " + this.props.item[this.props.instanceItemSubmissionIndicator]);
 		const shallowCopy = JSON.parse(JSON.stringify(this.props.item));
 		let propertiesToUpdate = {isSubmitted: true};
 		let newProperties = 0;
@@ -34,9 +29,9 @@ class UpdatableItemBar extends Component {
 		
 		const updatedShallowItem = Object.assign(shallowCopy, propertiesToUpdate);
 
-		console.log("Old item: " + JSON.stringify(this.props.item));
-		console.log("Shallow updated item: " + JSON.stringify(updatedShallowItem));
-		console.log("propertiesToUpdate: " + JSON.stringify(propertiesToUpdate));
+		// console.log("Old item: " + JSON.stringify(this.props.item));
+		// console.log("Shallow updated item: " + JSON.stringify(updatedShallowItem));
+		// console.log("propertiesToUpdate: " + JSON.stringify(propertiesToUpdate));
 
 		const response = await axios({
 			method: 'patch',
@@ -52,7 +47,6 @@ class UpdatableItemBar extends Component {
 		})
 
 		if(response.status === 200) {
-			console.log("worked");
 			this.props.updateInstanceItemLists(response.data);
 		} else {
 			console.log("Problem with submission from UpdatableItemBar");
