@@ -13,8 +13,6 @@ class UpdatableItemBar extends Component {
 
 	//SHALLOW COPY IS NOT GENERALIZABLE! (But it works well for now~)
 	async onUpdateButtonClick() {
-		// console.log("Property passed: " + this.props.instanceItemSubmissionIndicator);
-  	// console.log("Is submitted: " + this.props.item[this.props.instanceItemSubmissionIndicator]);
 		const shallowCopy = JSON.parse(JSON.stringify(this.props.item));
 		let propertiesToUpdate = {isSubmitted: true};
 		let newProperties = 0;
@@ -114,18 +112,22 @@ class UpdatableItemBar extends Component {
 		const submissionButton =
 		<Button 
 		className="button-bar" 
+		intent="primary"
 		onClick={() => this.onUpdateButtonClick()}>
 			{"Update"}
 		</Button>;
 
 		const editButton =
-		<Button className="button-bar">
+		<Button 
+		className="button-bar" 
+		intent="warning">
 			{"Edit"}
 		</Button>;
 
 		const uncheckButton =
 		<Button 
 		className="button-bar"
+		
 		onClick={() => this.handleUncheckButtonClick()}>
 			{"Uncheck"}
 		</Button>;

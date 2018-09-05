@@ -45,7 +45,7 @@ class ItemInputter extends Component {
     	isItemActive: true,
 
     	//Visual state
-      title: "Add new ingredients here:",
+      title: null, //can probably remove this
     	nameUnitChecked: false,
     	formattedItemName: "",
     	displayItemName: "",

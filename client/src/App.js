@@ -16,6 +16,7 @@ import {
   Tab
 } from "@blueprintjs/core";
 import ContainerOfUpdatableItemSets from './ContainerOfUpdatableItemSets.js';
+import FormSelectionCard from './FormSelectionCard.js';
 import ItemInputter from './ItemInputter.js';
 import './App.css';
 
@@ -28,6 +29,7 @@ FocusStyleManager.onlyShowFocusOnTabs();
 //-The server should manage periods automatically, adding and deleting as
 //the date changes
 //-Ability to edit/delete generic item classes in client (can currently add)
+//-Limit form inputs and check them for safety
 //-Produce basic reports on the client
 //-Output excel reports
 //-Accounts and sessions
@@ -40,7 +42,9 @@ FocusStyleManager.onlyShowFocusOnTabs();
 //-Replace check with a 'loading' loop while server is updating database with
 //period item change
 //-Produce descriptive toast on period item updates
-//-Pry out shallow copy from UpdatableItemBar.js
+//-Pry out shallow copy from UpdatableItemBar.js, and make it generalizable
+//-Decouple the options menu and the period menu from the Waste page, and
+//turn them into generalized components
 
 class App extends Component {
  constructor() {
@@ -49,7 +53,6 @@ class App extends Component {
   this.state = {
     categoryHashAccess: null,
     categoryList: [],
-    wasteForm: "",
     isAM: true,
     isCategoryListPopulated: false,
     isDisplayingPeriodItems: false,
@@ -58,13 +61,14 @@ class App extends Component {
     isItemPanelOpen: true,
     itemHashAccess: null,
     itemList: [],
-    itemPanelForm: "itemInputter",
+    itemPanelForm: "Add New Ingredient",
     periodHashAccess: null,
     periodList: [],
     selectedPeriod: null,
     selectedPeriodMenuText: "Select a Period",
     selectedWeekday: 1,
     selectedWeekdayMenuText: "Select a Weekday",
+    wasteForm: "",
   }
   this.keySeed = 0;
   this.generateWasteForm = this.generateWasteForm.bind(this);
@@ -230,6 +234,11 @@ class App extends Component {
   	() => this.generateNewPeriodWasteForm());
  }
 
+ onIngredientOptionRadioClick(event) {
+  console.log("Radio change: " + event.currentTarget.value);
+  this.setState({itemPanelForm: event.currentTarget.value});
+ }
+
  onPeriodMenuClick(period) {
   this.setState({
     selectedPeriod: period,
@@ -272,21 +281,31 @@ class App extends Component {
 
   	let itemPanelForm = null;
   	if(this.state.isItemPanelOpen === false){}
-  	else if(this.state.itemPanelForm === "itemInputter"){
+  	else if(this.state.itemPanelForm === "Add New Ingredient"){
   		itemPanelForm = 
   			<ItemInputter 
-			    className="itemInputter"
-			    isReadyToLoad={this.state.isItemInputterReadyToLoad}
-			    categoryItems={this.state.categoryList}/>
+		    className="itemInputter"
+		    isReadyToLoad={this.state.isItemInputterReadyToLoad}
+		    categoryItems={this.state.categoryList}/>
   	}
 
-    const itemPanel = 
+    const formSelectionCard =
+    <FormSelectionCard
+    changeFunction={(event) => this.onIngredientOptionRadioClick(event)}
+    radioTitles={["Add New Ingredient", "Edit Selected Ingredient"]}
+    selected={this.state.itemPanelForm}
+    title="Ingredient Options:"/>
+
+    let itemPanel = 
       <div className="item-panel">
         <Card elevation={Elevation.TWO} className="panel-card" >
+          {formSelectionCard}
           {itemPanelForm}
           <p/>
         </Card>
       </div>;
+
+    if(this.state.isItemPanelOpen === false) itemPanel = null;
 
     const panelTabs =
       <Tabs
@@ -345,7 +364,6 @@ class App extends Component {
     const periodSelector =
       <div className="period-selector bp3-dark">
       <ControlGroup >
-
         <Popover content={periodMenu} position={Position.BOTTOM}>
           <Button icon="share" text={this.state.selectedPeriodMenuText}/>
         </Popover>
@@ -353,8 +371,7 @@ class App extends Component {
         <RadioGroup
         inline="true"
         onChange={() => this.changeAMPM()}
-        selectedValue={this.state.isAM}
-        >
+        selectedValue={this.state.isAM}>
           <Radio label="AM" value={true}/>
           <Radio label="PM" value={false}/>
         </RadioGroup>
