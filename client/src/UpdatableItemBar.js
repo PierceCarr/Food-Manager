@@ -36,15 +36,15 @@ class UpdatableItemBar extends Component {
 		const response = await axios({
 			method: 'patch',
 			url: 'http://localhost:3001',
-	    headers: {
-	      'Content-Type': 'application/json'
-	    },
-	    data: {
-	    	isUpdateSinglePeriodItem: true,
-	    	originalItem: this.props.item,
-	    	propertiesToUpdate: propertiesToUpdate,
-	    }
-		})
+		    headers: {
+		      'Content-Type': 'application/json'
+		    },
+		    data: {
+		    	isUpdateSinglePeriodItem: true,
+		    	originalItem: this.props.item,
+		    	propertiesToUpdate: propertiesToUpdate,
+		    }
+		});
 
 		if(response.status === 200) {
 			this.props.updateInstanceItemLists(response.data);
@@ -52,6 +52,31 @@ class UpdatableItemBar extends Component {
 			console.log("Problem with submission from UpdatableItemBar");
 		}
 		 
+	}
+
+	async handleUncheckButtonClick() {
+		if(this.props.item.isSubmitted === true) {
+			const uncheck = {isSubmitted: false};
+
+			const response = await axios({
+				method: 'patch',
+				url: 'http://localhost:3001',
+			    headers: {
+			      'Content-Type': 'application/json'
+			    },
+			    data: {
+			    	isUpdateSinglePeriodItem: true,
+			    	originalItem: this.props.item,
+			    	propertiesToUpdate: uncheck
+			    }
+			});
+
+			if(response.status === 200) {
+				this.props.updateInstanceItemLists(response.data);
+			} else {
+				console.log("Problem with uncheck in UpdatableItemBar");
+			}
+		}
 	}
 
 	render() {
@@ -87,7 +112,9 @@ class UpdatableItemBar extends Component {
 		});
 
 		const submissionButton =
-		<Button className="button-bar" onClick={() => this.onUpdateButtonClick()}>
+		<Button 
+		className="button-bar" 
+		onClick={() => this.onUpdateButtonClick()}>
 			{"Update"}
 		</Button>;
 
@@ -97,7 +124,9 @@ class UpdatableItemBar extends Component {
 		</Button>;
 
 		const uncheckButton =
-		<Button className="button-bar">
+		<Button 
+		className="button-bar"
+		onClick={() => this.handleUncheckButtonClick()}>
 			{"Uncheck"}
 		</Button>;
 
