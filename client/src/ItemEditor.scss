@@ -1,0 +1,16 @@
+ $input-width: 300px;
+
+ .wrapper {
+	width: $input-width + 50px;
+	text-align: left;
+	margin-top: 5px;
+}
+
+.selection-button {
+	margin: 0;
+	width: $input-width - 75px !important;
+}
+
+.submit-button {
+	width: $input-width;
+}

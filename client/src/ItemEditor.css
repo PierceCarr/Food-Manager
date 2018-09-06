@@ -1,0 +1,16 @@
+.wrapper {
+  width: 350px;
+  text-align: left;
+  margin-top: 5px;
+}
+
+.selection-button {
+  margin: 0;
+  width: 225px !important;
+}
+
+.submit-button {
+  width: 300px;
+}
+
+/*# sourceMappingURL=ItemEditor.css.map */

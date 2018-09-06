@@ -17,6 +17,7 @@ import {
 } from "@blueprintjs/core";
 import ContainerOfUpdatableItemSets from './ContainerOfUpdatableItemSets.js';
 import FormSelectionCard from './FormSelectionCard.js';
+import ItemEditor from './ItemEditor.js';
 import ItemInputter from './ItemInputter.js';
 import './App.css';
 
@@ -62,6 +63,7 @@ class App extends Component {
     itemHashAccess: null,
     itemList: [],
     itemPanelForm: "Add New Ingredient",
+    itemToEdit: null,
     periodHashAccess: null,
     periodList: [],
     selectedPeriod: null,
@@ -72,6 +74,7 @@ class App extends Component {
   }
   this.keySeed = 0;
   this.generateWasteForm = this.generateWasteForm.bind(this);
+  this.onEditButtonClick = this.onEditButtonClick.bind(this);
   this.onPeriodMenuClick = this.onPeriodMenuClick.bind(this);
   this.updatePeriodItemLists = this.updatePeriodItemLists.bind(this);
  }
@@ -199,6 +202,7 @@ class App extends Component {
 	          		}, 
           		]
           	},
+            editItemClick: this.onEditButtonClick,
 	          genericItemHashAccess: this.state.itemHashAccess,
 	          genericItemSetKey: "category",
 	          genericItemTitleIdentifier: "name",
@@ -232,6 +236,16 @@ class App extends Component {
   const toggledState = !this.state.isAM;
   this.setState({isAM: toggledState}, 
   	() => this.generateNewPeriodWasteForm());
+ }
+
+ onEditButtonClick(item) {
+  const genericItem = this.state.itemHashAccess[item.itemId];
+
+  this.setState({
+    itemToEdit: genericItem,
+    itemPanelForm: "Edit Selected Ingredient",
+    isItemPanelOpen: true
+  })
  }
 
  onIngredientOptionRadioClick(event) {
@@ -280,21 +294,36 @@ class App extends Component {
   render() {
 
   	let itemPanelForm = null;
-  	if(this.state.isItemPanelOpen === false){}
-  	else if(this.state.itemPanelForm === "Add New Ingredient"){
-  		itemPanelForm = 
-  			<ItemInputter 
-		    className="itemInputter"
-		    isReadyToLoad={this.state.isItemInputterReadyToLoad}
-		    categoryItems={this.state.categoryList}/>
-  	}
+  	if(this.state.isItemPanelOpen === true){
+      if(this.state.itemPanelForm === "Add New Ingredient") {
+        itemPanelForm = 
+        <ItemInputter 
+          className="itemInputter"
+          isReadyToLoad={this.state.isItemInputterReadyToLoad}
+          categoryItems={this.state.categoryList} />
+      } 
+      else if (this.state.itemPanelForm === "Edit Selected Ingredient") {
+        const initialCategory = this.state.categoryHashAccess[this.state.itemToEdit.category];
+        
+        itemPanelForm =
+        <ItemEditor
+          category={initialCategory}
+          categoryItems={this.state.categoryList}
+          item={this.state.itemToEdit} 
+          key={this.state.itemToEdit.name} />
+      }
+    } 
+  	
+    let disableItemEdit = ["Edit Selected Ingredient"];
+    if(this.state.itemToEdit !== null) disableItemEdit = [];
 
     const formSelectionCard =
     <FormSelectionCard
-    changeFunction={(event) => this.onIngredientOptionRadioClick(event)}
-    radioTitles={["Add New Ingredient", "Edit Selected Ingredient"]}
-    selected={this.state.itemPanelForm}
-    title="Ingredient Options:"/>
+      changeFunction={(event) => this.onIngredientOptionRadioClick(event)}
+      radiosToDisable={disableItemEdit}
+      radioTitles={["Add New Ingredient", "Edit Selected Ingredient"]}
+      selected={this.state.itemPanelForm}
+      title="Ingredient Options:"/>
 
     let itemPanel = 
       <div className="item-panel">

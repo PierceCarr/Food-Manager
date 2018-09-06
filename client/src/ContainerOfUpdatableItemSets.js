@@ -63,6 +63,7 @@ class ContainerOfUpdatableItemSets extends Component {
 			if(itemsInThisSet.length > 0){
 				return React.createElement(UpdatableItemSet, {
 					additionalItemTitle: this.props.additionalItemTitle,
+					editItemClick: this.props.editItemClick,
 					genericItemHashAccess: this.props.genericItemHashAccess,
 					genericItemTitleIdentifier: this.props.genericItemTitleIdentifier,
 					instanceItemGenericKey: this.props.instanceItemGenericKey,
@@ -91,6 +92,7 @@ class ContainerOfUpdatableItemSets extends Component {
 
 ContainerOfUpdatableItemSets.propTypes = {
 	additionalItemTitle: PropTypes.object,
+	editItemClick: PropTypes.func,
 	genericItemHashAccess: PropTypes.object,
 	genericItemSetKey: PropTypes.node,
 	genericItemTitleIdentifier: PropTypes.node,

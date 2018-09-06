@@ -3,6 +3,7 @@
 .theComponent {
   width: 350px;
   text-align: left;
+  margin-top: 5px;
 }
 
 .bp3-dark {
@@ -10,8 +11,12 @@
   text-align: left;
 }
 
-#name-input {
-  width: 200px;
+#price-input {
+  width: 300px !important;
+}
+
+#quantity-input {
+  width: 300px !important;
 }
 
 .selection-button {
@@ -22,11 +27,7 @@
 .submit {
   margin: auto;
   text-align: center;
-  width: 310px;
+  width: 300px;
 }
-
-/*.nameCheckButton {
-	width
-}*/
 
 /*# sourceMappingURL=ItemInputter.css.map */

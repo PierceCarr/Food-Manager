@@ -1,12 +1,12 @@
  @import "~@blueprintjs/core/lib/css/blueprint.css";
  @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
 
- $input-width: 200px;
+ $input-width: 300px;
 
 .theComponent {
-	width: $input-width + 150px;
-	// margin: auto;
+	width: $input-width + 50px;
 	text-align: left;
+	margin-top: 5px;
 }
 
 .bp3-dark {
@@ -14,21 +14,25 @@
 	text-align: left;
 }
 
-#name-input {
-	width: $input-width;
+#price-input {
+	width: $input-width !important;
 }
+
+#quantity-input {
+	width: $input-width !important;
+}
+
+// #name-input {
+// 	width: $input-width;
+// }
 
 .selection-button {
 	margin: 0;
-	width: $input-width + 25px !important;
+	width: $input-width - 75px !important;
 }
 
 .submit {
 	margin: auto;
 	text-align: center;
-	width: $input-width + 110px;
+	width: $input-width;
 }
-
-/*.nameCheckButton {
-	width
-}*/

@@ -286,8 +286,6 @@ class ItemInputter extends Component {
   	const isSubmitAvailable = this.state.isCategoryChosen;
   	if(!isSubmitAvailable) submitText = "Select a category to submit";
 
-
-
   	const tagsDontExist = 
   		this.state.category !== null && 
   		this.state.tagsFromCategory.length === 0 &&
@@ -354,28 +352,28 @@ class ItemInputter extends Component {
   		</FormGroup>;
 
   	let itemTagSelection = 
-  			<FormGroup 
-  				label="Item Tag:" 
-  				labelFor="name-input" 
-  				labelInfo={optionalText + "(recommended)"} >
-	    		<ControlGroup  vertical={false} >
-				    <Popover content={tagMenu} position={Position.RIGHT} >
-							<Button 
-                className="selection-button"
-								id="name-input" 
-								icon="share" 
-								disabled={!this.state.isCategoryChosen}
-								text={tagMenuText} />
-						</Popover>
-				    <AddToListButton 
-              disabled={!this.state.isCategoryChosen}
-				    	text="Add New"
-				    	label="New Tag: "
-							labelInfo="(unused tags will be deleted on item submission)"
-							placeholder="ex. Cheesecake"
-							onSubmit={(newTag) => this.addNewTag(newTag)}/>
-					</ControlGroup>
-				</FormGroup>;
+			<FormGroup 
+				label="Item Tag:" 
+				labelFor="name-input" 
+				labelInfo={optionalText + "(recommended)"} >
+    		<ControlGroup  vertical={false} >
+			    <Popover content={tagMenu} position={Position.RIGHT} >
+						<Button 
+              className="selection-button"
+							id="name-input" 
+							icon="share" 
+							disabled={!this.state.isCategoryChosen}
+							text={tagMenuText} />
+					</Popover>
+			    <AddToListButton 
+            disabled={!this.state.isCategoryChosen}
+			    	text="Add New"
+			    	label="New Tag: "
+						labelInfo="(unused tags will be deleted on item submission)"
+						placeholder="ex. Cheesecake"
+						onSubmit={(newTag) => this.addNewTag(newTag)}/>
+				</ControlGroup>
+			</FormGroup>;
 
 		
 
@@ -388,6 +386,7 @@ class ItemInputter extends Component {
 						labelFor="price-input"
 						labelInfo={optionalText}>
 						<InputGroup 
+              className="input"
 							id="price-input" 
 							placeholder="$0.00" 
 							ref={this.priceInput}
@@ -424,44 +423,42 @@ class ItemInputter extends Component {
 			let itemInputterClass = 'bp3-skeleton';
       if(this.props.isReadyToLoad === true) itemInputterClass = 'bp3-dark';
 
+      const twoUniqueForm = 
+      <TwoUniqueForm 
+        key={this.state.inputKey}
+        labelOneTitle="Name:"
+        labelOneInfo={requiredText}
+        labelOnePlaceholder="ex. Pumpkin"
+        labelTwoTitle="Unit of Measurement:"
+        labelTwoInfo={requiredText}
+        labelTwoPlaceholder="ex. Slice"
+        formOneFocusValue={this.state.itemName}
+        formOneBlurValue={this.state.displayItemName}
+        updateFormOneFormat={this.state.updateFormOneFormat}
+        formTwoText={this.state.unitOfMeasurement}
+        validationButtonText="Check if Name/UOM Combo Exists"
+        warningMessage="This Item already exists with given UOM"
+        handleFirstInput={(event) => this.handleNameInput(event)}
+        handleSecondInput={(event) => this.handleUnitInput(event)}
+        submitted={this.state.nameUnitChecked}
+        validCombo={this.state.isNameComboValid}
+        validateNameUnitCombo=
+          {(isValid, name, unit) => this.validateNameUnitCombo(isValid, name, unit)}
+      />;
 
-    return(
-    		<div className="theComponent">
-          <h1 style={{"textAlign": "center"}}>{this.state.title}</h1>
-		    	<Card elevation={Elevation.TWO} className={itemInputterClass}>
+      const itemInputter = 
+      <div className="theComponent">
+        <Card elevation={Elevation.TWO} className={itemInputterClass}>
+          {categorySelection}
+          {itemTagSelection}
+          <p/>
+            {twoUniqueForm}
+          <p/>
+          {hiddenPriceSubmitPanel}
+        </Card>
+      </div>;
 
-		    		{categorySelection}
-		    		{itemTagSelection}
-
-		    		<p/>
-			    		<TwoUniqueForm 
-			    			key={this.state.inputKey}
-			    			labelOneTitle="Name:"
-			    			labelOneInfo={requiredText}
-			    			labelOnePlaceholder="ex. Pumpkin"
-			    			labelTwoTitle="Unit of Measurement:"
-			    			labelTwoInfo={requiredText}
-			    			labelTwoPlaceholder="ex. Slice"
-			    			formOneFocusValue={this.state.itemName}
-			    			formOneBlurValue={this.state.displayItemName}
-                updateFormOneFormat={this.state.updateFormOneFormat}
-			    			formTwoText={this.state.unitOfMeasurement}
-			    			validationButtonText="Check if Name/UOM Combo Exists"
-			    			warningMessage="This Item already exists with given UOM"
-			    			handleFirstInput={(event) => this.handleNameInput(event)}
-			    			handleSecondInput={(event) => this.handleUnitInput(event)}
-			    			submitted={this.state.nameUnitChecked}
-			    			validCombo={this.state.isNameComboValid}
-			    			validateNameUnitCombo=
-			    				{(isValid, name, unit) => this.validateNameUnitCombo(isValid, name, unit)}
-			    		/>
-		    		<p/>
-
-		    		{hiddenPriceSubmitPanel}
-
-		  		</Card>
-	  		</div>
-    );
+    return itemInputter;
   }
 }
 

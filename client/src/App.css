@@ -49,36 +49,34 @@ html {
 /*	color: white;*/
 }
 
+.header-itemPanelButton {
+	margin-right: auto;
+}
+
 .item-panel {
 	height: 100%;
 	margin: 0;
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	flex-grow: 1;
-	background-color: #cda153; /*special gold*/
-}
 
-.header-itemPanelButton {
-/*	align-self: flex-start;*/
-	margin-right: auto;
-}
-
-.header-panelTabs {
-
+	/*background-color: #cda153;*/ /*special gold*/
 }
 
 .panel-card {
 	height: 100%;
 	background-color: #cda153; /*special gold*/
-	overflow-y: auto;
+/*	background-color: green; */
+	overflow-y: scroll;
+
+	/*Parent stuff*/
+
 }
 
 .period-panel {
 	padding-top: 3px;
 	width: 100%;
 	background-color: #262626; /*special grey*/
-/*	flex-direction: column;
-	display: flex;*/
 }
 
 .period-selector {
@@ -88,7 +86,6 @@ html {
 	display: flex;
 	justify-content: center;
 }
-
 
 
 /*Blueprintjs classes

@@ -82,6 +82,7 @@ class UpdatableItemSet extends Component {
 
 			this.keySeed++;
 			return React.createElement(UpdatableItemBar, {
+				editItemClick: this.props.editItemClick,
 				item: item,
 				incrementContainerUpdateCount: this.props.incrementContainerUpdateCount,
 				instanceItemSubmissionIndicator: this.props.instanceItemSubmissionIndicator,
@@ -164,6 +165,7 @@ class UpdatableItemSet extends Component {
 
 UpdatableItemSet.propTypes = {
 	additionalItemTitle: PropTypes.object,
+	editItemClick: PropTypes.func,
 	genericItemHashAccess: PropTypes.object,
 	genericItemTitleIdentifier: PropTypes.node,
 	instanceItemGenericKey: PropTypes.node,

@@ -10,7 +10,19 @@ class FromSelectionCard extends Component {
 	render() {
 	
 		const radios = this.props.radioTitles.map((title) => {
-			return <Radio label={title} large={true} value={title}/>;
+			let isDisabled = false;
+			this.props.radiosToDisable.forEach((radio) => {
+				if(title === radio) isDisabled = true;
+			})
+
+			return (
+				<Radio 
+				disabled={isDisabled}
+				key={title}
+				label={title} 
+				large={true} 
+				value={title} />
+			);
 		});
 
 		const formSelectionCard = 
@@ -32,6 +44,7 @@ class FromSelectionCard extends Component {
 
 FromSelectionCard.propTypes = {
 	changeFunction: PropTypes.func,
+	radiosToDisable: PropTypes.arrayOf(PropTypes.string),
 	radioTitles: PropTypes.arrayOf(PropTypes.string),
 	selected: PropTypes.string,
 	title: PropTypes.string

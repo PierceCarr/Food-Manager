@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Card, ControlGroup, FormGroup, Icon, InputGroup} from "@blueprintjs/core";
 import axios from 'axios';
+import {Button, Card, ControlGroup, FormGroup, Icon, InputGroup} from "@blueprintjs/core";
+
 import './UpdatableItemBar.css';
 
 class UpdatableItemBar extends Component {
@@ -120,7 +121,8 @@ class UpdatableItemBar extends Component {
 		const editButton =
 		<Button 
 		className="button-bar" 
-		intent="warning">
+		intent="warning"
+		onClick={() => this.props.editItemClick(this.props.item)}>
 			{"Edit"}
 		</Button>;
 
@@ -158,6 +160,7 @@ class UpdatableItemBar extends Component {
 }
 
 UpdatableItemBar.propTypes = {
+	editItemClick: PropTypes.func,
 	item: PropTypes.object,
 	instanceItemSubmissionIndicator: PropTypes.node,
 	title: PropTypes.string,
