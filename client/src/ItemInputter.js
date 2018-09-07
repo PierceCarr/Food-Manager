@@ -61,8 +61,6 @@ class ItemInputter extends Component {
       updateFormOneFormat: false
     }
 
-    this.priceInput = React.createRef();
-
     this.onCategoryMenuItemClick = this.onCategoryMenuItemClick.bind(this);
     this.handleNameInput = this.handleNameInput.bind(this);
     this.handleUnitInput = this.handleUnitInput.bind(this);
@@ -204,7 +202,6 @@ class ItemInputter extends Component {
   	this.setState({
   		itemPrice: event.target.value,
   		displayPrice: formattedPrice,
-  		isPriceFormatted: false
   	});
   }
 
@@ -280,7 +277,7 @@ class ItemInputter extends Component {
   	const optionalText = "(optional)";
   	const requiredText = "(required)";
   	const inUseExplaination = "Currently in use? If toggled off, the item will be removed from lists but saved for later.";
-  	let isTagListDisabled = false;
+  	// let isTagListDisabled = false;
 
   	let submitText = "Submit";
   	const isSubmitAvailable = this.state.isCategoryChosen;
@@ -297,9 +294,9 @@ class ItemInputter extends Component {
   		tagMenuText = "No tags in chosen category";
   	}
 
-  	if(this.state.tagsFromCategory.length === 0) {
-  		isTagListDisabled = true;
-  	}
+  	// if(this.state.tagsFromCategory.length === 0) {
+  	// 	isTagListDisabled = true;
+  	// }
 
   	let categoryMenu =
   		<Menu>
@@ -389,7 +386,6 @@ class ItemInputter extends Component {
               className="input"
 							id="price-input" 
 							placeholder="$0.00" 
-							ref={this.priceInput}
 							onChange={(event) => this.handlePriceInput(event)}
 							onBlur={() => this.displayFormattedPrice()}
 							value={this.state.itemPrice}/>

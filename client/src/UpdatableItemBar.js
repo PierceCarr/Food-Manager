@@ -12,21 +12,22 @@ class UpdatableItemBar extends Component {
 		this.state = {}
 	}
 
-	//SHALLOW COPY IS NOT GENERALIZABLE! (But it works well for now~)
+	//To generalize: make isSubmitted a general prop
 	async onUpdateButtonClick() {
-		const shallowCopy = JSON.parse(JSON.stringify(this.props.item));
+		//SHALLOW COPY IS NOT GENERALIZABLE! (But it works well for now~)
+		// const shallowCopy = JSON.parse(JSON.stringify(this.props.item));
 		let propertiesToUpdate = {isSubmitted: true};
-		let newProperties = 0;
+		// let newProperties = 0;
 
 		this.props.updatableProperties.forEach((property) => {
 			if(this.state[property] !== this.props.item[property]){
 				const objectWithNewProperty = {[property]: this.state[property]};
 				propertiesToUpdate = Object.assign(objectWithNewProperty, propertiesToUpdate);
-				newProperties++;
+				// newProperties++;
 			}
 		})
 		
-		const updatedShallowItem = Object.assign(shallowCopy, propertiesToUpdate);
+		// const updatedShallowItem = Object.assign(shallowCopy, propertiesToUpdate);
 
 		// console.log("Old item: " + JSON.stringify(this.props.item));
 		// console.log("Shallow updated item: " + JSON.stringify(updatedShallowItem));

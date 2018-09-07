@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import CurrencyFormatter from 'currency-formatter';
 import {
 	Button,
 	Card,
@@ -10,7 +11,9 @@ import {
 	Menu,
 	MenuItem, 
 	Popover,
-	Position} from "@blueprintjs/core";
+	Position,
+	Switch,
+} from "@blueprintjs/core";
 
 import AddToListButton from './AddToListButton.js';
 import './ItemEditor.css';
@@ -21,13 +24,16 @@ class ItemEditor extends Component {
 
 		this.state = {
 			categoryItems: this.props.categoryItems,
+			dataImpactMenuText: "Click Here to Choose a Scheme",
+			displayPrice: CurrencyFormatter.format(this.props.item.price, {code: 'USD'}),
 			isEdited: false,
 
 			//Editable data
 			category: this.props.category,
 			isActive: this.props.item.isActive,
+			isToBeDeleted: false,
 			itemName: this.props.item.name,
-			price: this.props.item.price,
+			price: CurrencyFormatter.format(this.props.item.price, {code: 'USD'}),
 			quantity: this.props.item.quantity,
 			tag: this.props.item.tag,
 			unitOfMeasurement: this.props.item.unitOfMeasurement,
@@ -47,6 +53,47 @@ class ItemEditor extends Component {
   	}
   }
 
+  addNewTag(newTag) {
+  	let noDuplicateTags = true;
+  	this.state.category.tags.forEach((tag) => {
+  		if(tag === newTag) noDuplicateTags = false;
+  	});
+
+  	if(noDuplicateTags) {
+	  	this.state.category.tags.push(newTag);
+	  	this.onTagMenuItemClick(newTag);
+  	}
+  	
+  }
+
+  displayFormattedPrice() {
+  	this.setState({price: this.state.displayPrice})
+  }
+
+  handleNameInput(event) {
+  	this.setState({itemName: event.target.value});
+  }
+
+  handlePriceInput(event) {
+  	const formattedPrice =
+  		CurrencyFormatter.format(event.target.value, {code: 'USD'});
+
+  	this.setState({
+  		displayPrice: formattedPrice,
+  		price: event.target.value
+  	});
+  }
+
+  handleQuantityInput(event) {
+  	this.setState({quantity: event.target.value});
+  }
+
+  handleUnitOfMeasurementInput(event) {
+  	this.setState({unitOfMeasurement: event.target.value});
+  }
+
+  
+
   onCategoryMenuItemClick(chosenCategory) {
   	let tagsInCategory = [];
   	let updateTags = () => {
@@ -61,6 +108,10 @@ class ItemEditor extends Component {
   	}, updateTags());
   }
 
+  onDataImpactMenuClick(selection) {
+  	this.setState({dataImpactMenuText: selection});
+  }
+
   onTagMenuItemClick(chosenTag) {
     
   	this.setState({
@@ -69,8 +120,18 @@ class ItemEditor extends Component {
 
   }
 
+  toggleIsActiveSwitch() {
+  	const oldState = this.state.isActive;
+  	this.setState({isActive: !oldState});
+  }
+
+  toggleDeleteSwitch() {
+  	const oldState = this.state.isToBeDeleted;
+  	this.setState({isToBeDeleted: !oldState});
+  }
+
 	render() {
-		const categoryLabel = "Category:";
+		
 
 		const catArray = 
 			this.state.categoryItems.map((item) => 
@@ -84,6 +145,30 @@ class ItemEditor extends Component {
 		<Menu>
 			{catArray}
 		</Menu>;
+
+		const dataImpactMenu = 
+		<Menu>
+			<MenuItem
+				key={1}
+				onClick={() => this.onDataImpactMenuClick("Every Instance")}
+				text="Every Instance"/>
+			<MenuItem				
+				key={2}
+				onClick={() => this.onDataImpactMenuClick("All Future Instances")}
+				text="All Future Instances"/>
+			<MenuItem				
+				key={3}
+				onClick={() => this.onDataImpactMenuClick("All Future Instances, and Today")}
+				text="All Future Instances, and Today"/>
+			<MenuItem
+				key={4}
+				onClick={() => this.onDataImpactMenuClick("All Past Instances")}
+				text="All Past Instances"/>
+			<MenuItem				
+				key={5}
+				onClick={() => this.onDataImpactMenuClick("All Past Instances, and Today")}
+				text="All Past Instances, and Today"/>
+		</Menu>
 
 		let tagMenu = null;
   	if(this.state.category !== null) {
@@ -101,9 +186,21 @@ class ItemEditor extends Component {
   			</Menu>
   	}
 
+  	const dataImpactSelection =
+  	<FormGroup
+  		label="Data Impact:"
+  		labelInfo="(required)"
+  		labelFor="dataImpact-button">
+  		<Popover content={dataImpactMenu} position={Position.RIGHT}>
+				<Button icon="share" id="dataImpact-button">
+					{this.state.dataImpactMenuText}
+				</Button>
+			</Popover>
+		</FormGroup>;
+
 		const categorySelection = 
 		<FormGroup
-			label={categoryLabel}
+			label="Category:"
 			labelFor="category-input">
   		<ControlGroup vertical={false} >
 				<Popover content={categoryMenu} position={Position.RIGHT} >
@@ -148,6 +245,7 @@ class ItemEditor extends Component {
 				labelFor="name-input">
 				<InputGroup
 					id="name-input"
+					onChange={(event) => this.handleNameInput(event)}
 					value={this.state.itemName}
 					/>
 			</FormGroup>;
@@ -155,9 +253,10 @@ class ItemEditor extends Component {
 		const uomForm = 
 			<FormGroup
 				label="Unit of Measurement:"
-				labelFor="name-input">
+				labelFor="uom-input">
 				<InputGroup
-					id="name-input"
+					id="uom-input"
+					onChange={(event) => this.handleUnitOfMeasurementInput(event)}
 					value={this.state.unitOfMeasurement}
 					/>
 			</FormGroup>;
@@ -165,9 +264,12 @@ class ItemEditor extends Component {
 		const priceForm = 
 			<FormGroup
 				label="Default Price:"
-				labelFor="name-input">
+				labelFor="price-input"
+				labelInfo="(Cannot Affect Past)">
 				<InputGroup
-					id="name-input"
+					id="price-input"
+					onChange={(event) => this.handlePriceInput(event)}
+					onBlur={() => this.displayFormattedPrice()}
 					value={this.state.price}
 					/>
 			</FormGroup>;
@@ -175,29 +277,61 @@ class ItemEditor extends Component {
 		const quantityForm = 
 			<FormGroup
 				label="Default Quantity:"
-				labelFor="name-input">
+				labelFor="quantity-input"
+				labelInfo="(Cannot Affect Past)">
 				<InputGroup
-					id="name-input"
+					id="quantity-input"
+					onChange={(event) => this.handleQuantityInput(event)}
 					value={this.state.quantity}
 					/>
 			</FormGroup>;
 
-		const submitButton =
-			<Button className="submit-button" intent="primary">
+		
+
+		const isActiveSwitch =
+			<Switch
+				checked={this.state.isActive}
+				label="Currently in use? If toggled off the item won't be included in lists affected by this edit, but will continue to be available for future use. Removed instances won't show up in reports or periods, but can be brought back by toggling this switch again."
+				onClick={() => this.toggleIsActiveSwitch()}
+			/>;
+
+		const deleteSwitch = 
+			<Switch
+				checked={this.state.isToBeDeleted}
+				intent="dangerous"
+				label="Delete? If toggled on the item will be deleted from periods affected by this edit upon submission, irrespective of other edits being submitted. This cannot be undone."
+				onClick={() => this.toggleDeleteSwitch()}
+				
+			/>
+
+			let isSubmitDisabled = true;
+			if(this.state.dataImpactMenuText !== "Click Here to Choose a Scheme") {
+				isSubmitDisabled = false;
+			}
+
+			const submitButton =
+			<Button 
+				className="submit-button" 
+				disabled={isSubmitDisabled}
+				intent="primary">
 				Submit
-			</Button>
+			</Button>;
 		
 
 		const itemEditor = 
 		<div className="wrapper">
 			<Card elevation={Elevation.TWO} className="bp3-dark">
+				{dataImpactSelection}
 				{categorySelection}
 				{tagSelection}
 				{nameForm}
 				{uomForm}
 				{priceForm}
 				{quantityForm}
+				{isActiveSwitch}
+				{deleteSwitch}
 				{submitButton}
+				
 			</Card>
 		</div>;
 

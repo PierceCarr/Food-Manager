@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import {Card, Elevation, RadioGroup, Radio} from '@blueprintjs/core';
 
 class FromSelectionCard extends Component {
-	constructor(props) {
-		super(props);
-	}
+	// constructor(props) {
+	// 	super(props);
+	// }
 
 	render() {
 	
