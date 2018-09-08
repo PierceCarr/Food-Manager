@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import Axios from 'axios';
 import CurrencyFormatter from 'currency-formatter';
 import {
 	Button,
@@ -112,12 +113,130 @@ class ItemEditor extends Component {
   	this.setState({dataImpactMenuText: selection});
   }
 
+  onSubmit() {
+
+  	const newItem = {
+  		category: this.state.category.name,
+			isActive: this.state.isActive,
+			name: this.state.itemName,
+			price: CurrencyFormatter.unformat(this.state.price, {code: 'USD'}),
+			quantity: this.state.quantity,
+			tag: this.state.tag,
+			unitOfMeasurement: this.state.unitOfMeasurement,
+  	}
+
+  	if(this.state.isToBeDeleted === true){
+  		// do the deed
+  		console.log("Delete not configured yet");
+  	} else {//update
+	  	
+	  	Axios({
+				method: 'patch',
+				url: 'https://localhost:3001',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				data: {
+					everyInstance: true,
+					id: this.props.item.id,
+					isUpdateItem: true,
+					item: newItem
+				}
+			})
+			.then((response) => console.log(response));
+
+	  	// switch(this.state.dataImpactMenu) {
+	  	// 	case "Every Instance":
+	  	// 		Axios({
+	  	// 			method: 'patch',
+	  	// 			url: 'https://localhost:3001',
+	  	// 			headers: {
+	  	// 				'Content-Type': 'application/json'
+	  	// 			}
+	  	// 			data: {
+	  	// 				everyInstance: true,
+	  	// 				id: this.props.item.id,
+	  	// 				isUpdateItem: true,
+	  	// 				item: newItem
+	  	// 			}
+	  	// 		})
+	  	// 		.then((response) => console.log(response));
+	  	// 		break;
+				// case "All Future Instances":
+				// 	Axios({
+	  	// 			method: 'post',
+	  	// 			url: 'https://localhost:3001',
+	  	// 			headers: {
+	  	// 				'Content-Type': 'application/json'
+	  	// 			}
+	  	// 			data: {
+	  	// 				category: newItem.category,
+	  	// 				isActive: newItem.isActive,
+	  	// 				name: newItem.name,
+	  	// 				price: newItem.price,
+	  	// 				quantity: newItem.quantity,
+	  	// 				tag: newItem.tag,
+	  	// 				unitOfMeasurement: newItem.unitOfMeasurement
+	  	// 			}
+	  	// 		})
+	  	// 		.then((response) => console.log(response));
+				// 	break;
+				// case "All Future Instances, and Today":
+				// 	Axios({
+	  	// 			method: 'patch',
+	  	// 			url: 'https://localhost:3001',
+	  	// 			headers: {
+	  	// 				'Content-Type': 'application/json'
+	  	// 			}
+	  	// 			data: {
+	  	// 				allFutureInstancesAndToday: true,
+	  	// 				isUpdateItem: true,
+	  	// 				item: newItem
+	  	// 			}
+	  	// 		})
+	  	// 		.then((response) => console.log(response));
+				// 	break;
+				// case "All Past Instances":
+				// 	Axios({
+	  	// 			method: 'patch',
+	  	// 			url: 'https://localhost:3001',
+	  	// 			headers: {
+	  	// 				'Content-Type': 'application/json'
+	  	// 			}
+	  	// 			data: {
+	  	// 				allPastInstances: true,
+	  	// 				isUpdateItem: true,
+	  	// 				item: newItem
+	  	// 			}
+	  	// 		})
+	  	// 		.then((response) => console.log(response));
+				// 	break;
+				// case "All Past Instances, and Today":
+				// 	Axios({
+	  	// 			method: 'patch',
+	  	// 			url: 'https://localhost:3001',
+	  	// 			headers: {
+	  	// 				'Content-Type': 'application/json'
+	  	// 			}
+	  	// 			data: {
+	  	// 				allPastInstancesAndToday: true,
+	  	// 				isUpdateItem: true,
+	  	// 				item: newItem
+	  	// 			}
+	  	// 		})
+	  	// 		.then((response) => console.log(response));
+				// 	break;
+				// default:
+				// 	console.log("onSubmit in ItemEditor not functioning.");
+				// 	break;
+	  	// }
+  	}
+  }
+
   onTagMenuItemClick(chosenTag) {
-    
   	this.setState({
       tag: chosenTag,
     });
-
   }
 
   toggleIsActiveSwitch() {

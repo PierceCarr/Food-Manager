@@ -2,7 +2,7 @@ const CURRENCY_PRECISION = 8; //Significant digits on either side of .
 const CURRENCY_SCALE = 2; //Allowable digits to the right of .
 module.exports = (sequelize, DataTypes) => {
 	const Item = sequelize.define('item', {
-	  id: {
+	    id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: true
       },
-	  name: {
+	    name: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: "nameUnitConstraint",

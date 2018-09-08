@@ -111,7 +111,7 @@ router.route('/')
 		}
 
 	} else { //Inserting a record
-		console.log("In else");
+
 		if(req.body.newCategory === true) {
 			//Insert new category
 			console.log("In new category insertion");
@@ -160,6 +160,69 @@ router.route('/')
 			res.json(updatedItem);
 		})
 		.catch(next);
+
+	} else if (req.body.isUpdateItem === true) {
+		const itemId = req.body.id;
+
+		if(req.body.newCategory === true) {
+			//Insert new category
+			console.log("In new category insertion");
+		} 
+
+		if (req.body.everyInstance === true) {
+
+			Item.update(req.body.item, {
+				returning: true,
+				where: {
+					id: itemId,
+				}
+			}).then(([rowsUpdate, [updatedItem]]) => {
+				res.statusCode = 200;
+				res.json(updatedItem);
+			});
+
+		// } else if (req.body.allFutureInstances === true) {
+		// 	//Needs to create a new item based on patched fields
+
+		// 	Item.sync().then(() => {
+		// 		return Item.create ({
+		// 			name: req.body.item.name,
+		// 			unitOfMeasurement: req.body.item.unitOfMeasurement,
+		// 			category: req.body.item.category,
+		// 			tag: req.body.item.tag,
+		// 			quantity: req.body.item.quantity,
+		// 			price: req.body.item.price,
+		// 			isActive: req.body.item.isActive
+		// 		});
+		// 	});
+
+		// 	res.json();
+		
+			// Item.update(req.body.item, {
+			// 	returning: true,
+			// 	where: {
+			// 		id: itemId
+			// 	}
+			// }).then(([rowsUpdate, [updatedItem]]) => {
+			// 	res.statusCode = 200;
+			// 	res.json(updatedItem);
+			// });
+
+		// } else if (req.body.allFutureInstancesAndToday === true) {
+		// 	console.log("Must first impliment auto-periods");
+		// 	res.json("Must first impliment auto-periods");
+		// } else if (req.body.allPastInstance === true) {
+		// 	console.log("Must first impliment auto-periods");
+		// 	res.json("Must first impliment auto-periods");
+		// } else if (req.body.allPastInstancesAndToday === true) {
+		// 	console.log("Must first impliment auto-periods");
+		// 	res.json("Must first impliment auto-periods");
+		// } else {
+		// 	console.log("Cannot find an update item condition");
+		// 	res.statusCode = 404;
+		// 	res.json("Cannot find an update item condition");
+		}
+
 
 	} else {
 		res.statusCode = 404;
