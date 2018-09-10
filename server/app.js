@@ -8,7 +8,22 @@ var logger = require('morgan');
 var cors = require('cors');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+// var itemsRouter = require('./routes/items');
+
+//For local use:
+// const sequelize = new Sequelize(
+// 	process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
+//  	dialect: 'postgres'
+// });
+
+// const postgresPromise = sequelize.authenticate()
+// .then(() => {
+// 	console.log("Connected to Postgres");
+// })
+// .catch((err) => {
+// 	console.log('Unable to connect to database:');
+//   	console.log(err);
+// });
 
 var app = express();
 
@@ -25,7 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// app.use('/items', itemsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

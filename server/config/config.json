@@ -1,8 +1,6 @@
 {
   "development": {
-    "use_env_variable": "DB_PASS",
-    "use_env_variable": "DB_USER",
-    "use_env_variable": "DB_NAME",
+    "use_env_variable": "true",
     "username": "DB_USER",
     "password": "DB_PASS",
     "database": "DB_NAME",

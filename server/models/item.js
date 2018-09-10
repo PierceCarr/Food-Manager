@@ -48,6 +48,15 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true
       },
 	});
+
+  Item.associate = (models) => {
+    Item.hasOne(models.Category, {as: 'category'});
+    Item.belongsToMany(models.periodItem, {
+      through: 'ItemInstance',
+      as: 'periodItems',
+      foreignKey: 'itemId',
+    });
+  }
 	
 	return Item;
 };

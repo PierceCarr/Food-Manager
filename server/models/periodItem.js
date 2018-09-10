@@ -3,7 +3,7 @@ const CURRENCY_PRECISION = 8; //Significant digits on either side of .
 const CURRENCY_SCALE = 2; //Allowable digits to the right of .
 
 module.exports = (sequelize, DataTypes) => {
-	return sequelize.define('periodItems', {
+	const PeriodItem = sequelize.define('periodItems', {
 	  id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -54,4 +54,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE
     }
 	});
+
+  PeriodItem.associate = (models) => {
+    PeriodItem.hasOne(models.Item, {as: 'item'});
+    PeriodItem.hasOne(models.Period, {as: 'period'});
+  }
+
+  return PeriodItem;
 }

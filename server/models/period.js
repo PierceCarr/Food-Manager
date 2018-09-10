@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-	return sequelize.define('period', {
+	const Period = sequelize.define('period', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -22,9 +22,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       unique: "monthWeekConstraint",
     },
-    // dayDates: {
-    //   type: DataTypes.ARRAY(DataTypes.STRING)
-    // },
     createdAt: {
       type: DataTypes.DATE
     },
@@ -32,4 +29,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE
     }
 	});
+
+  Period.associate = (models) => {
+    Period.hasMany(models.PeriodItem, {
+      through: 'PeriodPeriodItem',
+      as: 'periodItems',
+      foreignKey: 'periodId',
+    });
+  }
+
+  return Period;
 };
