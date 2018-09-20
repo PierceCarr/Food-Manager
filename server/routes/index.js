@@ -6,7 +6,26 @@ const currencyFormatter = require('currency-formatter');
 const axios = require('axios');
 const dateTime = require('date-and-time');
 
+const categoryController = require('../controllers').category;
+const itemController = require('../controllers').item;
+const periodItemController = require('../controllers').periodItem;
+
 router.use(bodyParser.json());
+
+router.delete('/category/:name', categoryController.delete);
+router.get('/category', categoryController.list);
+router.get('/category/:name', categoryController.getByName);
+router.post('/category', categoryController.add);
+router.put('/category', categoryController.insertTag);
+
+router.delete('/item/:id', itemController.delete);
+router.get('/item', itemController.list);
+router.get('/item/:id', itemController.getById);
+router.post('/item', itemController.add);
+router.put('/item', itemController.updateItem);
+
+router.get('/periodItem/:periodId', periodItemController.listForPeriod);
+
 
 //For local use:
 // const sequelize = new Sequelize(

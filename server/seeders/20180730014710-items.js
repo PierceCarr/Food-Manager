@@ -33,29 +33,41 @@ module.exports = {
     await queryInterface.bulkInsert('categories', [
       {
         name: "Breads",
-        tags: ["Bread", "Tortilla", "Etc."]
+        tags: ["Bread", "Tortilla", "Etc."],
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
       },
       {
         name: "Dairy",
-        tags: ["Cheese", "Eggs", "Butter", "Etc."]
+        tags: ["Cheese", "Eggs", "Butter", "Etc."],
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
       },
       {
         name: "Desserts",
-        tags: ["Cheesecake", "Ice Cream", "Etc."]
+        tags: ["Cheesecake", "Ice Cream", "Etc."],
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
       },
       {
         name: "Frozen",
-        tags: ["Shrimp", "Edamame", "Etc."]
+        tags: ["Shrimp", "Edamame", "Etc."],
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
       },
       {
         name: "Meats",
-        tags: ["Back Ribs", "Bacon", "Burgers", "Carapacchio", "Chicken", "Etc."]
+        tags: ["Back Ribs", "Bacon", "Burgers", "Carapacchio", "Chicken", "Etc."],
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
       },
       {
         name: "Produce",
         tags: ["Avacado", "Broccoli", "Cabbage", "Garlic", "Herbs", "Lettuce",
           "Mushrooms", "Onions", "Papaya", "Pepper", "Peppers", "Potatoes",
-          "Shallots", "Tomatoes", "Etc."]
+          "Shallots", "Tomatoes", "Etc."],
+        isActive: true,
+        createdAt: Sequelize.fn('now'),
       }
       ], {})
 
