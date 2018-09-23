@@ -22,6 +22,14 @@ module.exports = (sequelize, DataTypes) => {
       },
       unique: "monthWeekConstraint",
     },
+    currentWeekday: {
+      //0: hasn't started yet, 8: period is over, 1-7: weekdays
+      type: DataTypes.INTEGER,
+      validate: {
+        max: 8,
+        min: 0
+      },
+    },
     createdAt: {
       type: DataTypes.DATE
     },

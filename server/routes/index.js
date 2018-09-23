@@ -24,7 +24,9 @@ router.get('/item/:id', itemController.getById);
 router.post('/item', itemController.add);
 router.put('/item', itemController.updateItem);
 
-router.get('/periodItem/:periodId', periodItemController.listForPeriod);
+router.get('/periodItem/:periodId', periodItemController.listPeriodItemsForPeriod);
+router.post('/periodItem', periodItemController.createOustandingPeriodItems);
+router.put('/periodItem', periodItemController.update);
 
 
 //For local use:

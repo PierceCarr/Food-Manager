@@ -94,9 +94,14 @@ module.exports = {
         },
         unique: "monthWeekConstraint",
       },
-      // dayDates: {
-      //   type: DataTypes.ARRAY(DataTypes.STRING)
-      // },
+      currentWeekday: { 
+        //0: hasn't started yet, 8: period is over, 1-7: weekdays
+        type: Sequelize.INTEGER,
+        validate: {
+          max: 8,
+          min: 0
+        }
+      },
       createdAt: {
         type: Sequelize.DATE
       },
@@ -109,24 +114,28 @@ module.exports = {
         {
           month: 1,
           week: 4,
+          currentWeekday: 0,
           createdAt: Sequelize.fn('now'),
           updatedAt: Sequelize.fn('now')
         },
         {
           month: 2,
           week: 2,
+          currentWeekday: 0,
           createdAt: Sequelize.fn('now'),
           updatedAt: Sequelize.fn('now')
         },
         {
           month: 8,
           week: 2,
+          currentWeekday: 0,
           createdAt: Sequelize.fn('now'),
           updatedAt: Sequelize.fn('now')
         },
         {
           month: 8,
           week: 3,
+          currentWeekday: 0,
           createdAt: Sequelize.fn('now'),
           updatedAt: Sequelize.fn('now')
         }

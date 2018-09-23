@@ -5,13 +5,13 @@ module.exports = {
 	add(req, res) {
 		return Item
 			.create({
-				name: req.body.name,
-				unitOfMeasurement: req.body.unitOfMeasurement,
 				category: req.body.category,
-				tag: req.body.tag,
+				isActive: req.body.isActive,
+				name: req.body.name,
 				price: req.body.price,
 				quantity: req.body.quantity,
-				isActive: req.body.isActive
+				tag: req.body.tag,
+				unitOfMeasurement: req.body.unitOfMeasurement,
 			})
 			.then((item) => res.status(201).send(item))
 			.catch((error) => res.status(400).send(error))
