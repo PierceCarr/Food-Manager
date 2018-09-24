@@ -3,11 +3,27 @@ const Period = require('../models').Period;
 const PeriodItem = require('../models').PeriodItem;
 
 module.exports = {
-	listPeriodItemsForPeriod(req, res) {
+
+	// listPeriodItemsForPeriod(req, res) {
+	// 	console.log("It's what you think");
+	// 	return PeriodItem
+	// 		.findAll({
+	// 			where: {
+	// 				periodId: req.params.periodId
+	// 			}
+	// 		})
+	// 		.then((items) => res.status(200).send(items))
+	// 		.catch((error) => res.status(400).send(error));
+	// },
+
+	listForWasteForm(req, res) {
+		console.log("PARAMS: " + req.params);
 		return PeriodItem
 			.findAll({
 				where: {
-					periodId: req.params.periodId
+					day: req.params.day,
+					isAM: req.params.isAM,
+					periodId: req.params.periodId,
 				}
 			})
 			.then((items) => res.status(200).send(items))
@@ -93,13 +109,17 @@ module.exports = {
 		.then((periodItem) => {
 			if(!periodItem) res.status(404).send({message: "PeriodItem Not Found"});
 			var periodItem = periodItem[0];
+			let propertyUpdates = {};
+			const legalProperties = ["isSubmitted", "price", "quantity"];
 
+			req.body.propertiesToUpdate.forEach((propertyTuple) => {
+				if(legalProperties.includes(propertyTuple[0])) {
+					const objectWithNewProperty = {[propertyTuple[0]]: propertyTuple[1]};
+					propertyUpdates = Object.assign(objectWithNewProperty, propertyUpdates);
+				}
+			})
 			return periodItem
-				.update({
-					isSubmitted: req.body.isSubmitted,
-					price: req.body.price,
-					quantity: req.body.quantity
-				})
+ 				.update(propertyUpdates)
 				.then(() => res.status(200).send(periodItem))
 				.catch((error) => res.status(400).send(error));
 		})

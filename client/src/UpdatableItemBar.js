@@ -12,36 +12,26 @@ class UpdatableItemBar extends Component {
 		this.state = {}
 	}
 
-	//To generalize: make isSubmitted a general prop
+	//To generalize: make isSubmitted and id general props
 	async onUpdateButtonClick() {
-		//SHALLOW COPY IS NOT GENERALIZABLE! (But it works well for now~)
-		// const shallowCopy = JSON.parse(JSON.stringify(this.props.item));
-		let propertiesToUpdate = {isSubmitted: true};
-		// let newProperties = 0;
+		let propertiesToUpdate = [["isSubmitted", true]];
 
 		this.props.updatableProperties.forEach((property) => {
-			if(this.state[property] !== this.props.item[property]){
-				const objectWithNewProperty = {[property]: this.state[property]};
-				propertiesToUpdate = Object.assign(objectWithNewProperty, propertiesToUpdate);
-				// newProperties++;
+			if(this.state[property] !== this.props.item[property] 
+				&& this.state[property] !== undefined) {
+				const nextPropertyTuple = [property, this.state[property]];
+				propertiesToUpdate.push(nextPropertyTuple);
 			}
-		})
+		});
 		
-		// const updatedShallowItem = Object.assign(shallowCopy, propertiesToUpdate);
-
-		// console.log("Old item: " + JSON.stringify(this.props.item));
-		// console.log("Shallow updated item: " + JSON.stringify(updatedShallowItem));
-		// console.log("propertiesToUpdate: " + JSON.stringify(propertiesToUpdate));
-
 		const response = await axios({
-			method: 'patch',
-			url: 'http://localhost:3001',
+			method: 'put',
+			url: 'http://localhost:3001/periodItem',
 		    headers: {
 		      'Content-Type': 'application/json'
 		    },
 		    data: {
-		    	isUpdateSinglePeriodItem: true,
-		    	originalItem: this.props.item,
+		    	id: this.props.item.id,
 		    	propertiesToUpdate: propertiesToUpdate,
 		    }
 		});
@@ -81,7 +71,6 @@ class UpdatableItemBar extends Component {
 
 	render() {
 		const isSubmitted = this.props.item[this.props.instanceItemSubmissionIndicator];
-		// console.log("Is item " + this.props.item["id"] + " submitted: " + this.props.item["isSubmitted"]);
 		const crossTick = (isSubmitted) ? "tick" : "cross";
 		const crossTickColor = (isSubmitted) ? "green" : "red";
 

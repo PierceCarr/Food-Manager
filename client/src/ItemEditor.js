@@ -179,29 +179,29 @@ class ItemEditor extends Component {
 			{catArray}
 		</Menu>;
 
-		const dataImpactMenu = 
-		<Menu>
-			<MenuItem
-				key={1}
-				onClick={() => this.onDataImpactMenuClick("Every Instance")}
-				text="Every Instance"/>
-			<MenuItem				
-				key={2}
-				onClick={() => this.onDataImpactMenuClick("All Future Instances")}
-				text="All Future Instances"/>
-			<MenuItem				
-				key={3}
-				onClick={() => this.onDataImpactMenuClick("All Future Instances, and Today")}
-				text="All Future Instances, and Today"/>
-			<MenuItem
-				key={4}
-				onClick={() => this.onDataImpactMenuClick("All Past Instances")}
-				text="All Past Instances"/>
-			<MenuItem				
-				key={5}
-				onClick={() => this.onDataImpactMenuClick("All Past Instances, and Today")}
-				text="All Past Instances, and Today"/>
-		</Menu>
+		// const dataImpactMenu = 
+		// <Menu>
+		// 	<MenuItem
+		// 		key={1}
+		// 		onClick={() => this.onDataImpactMenuClick("Every Instance")}
+		// 		text="Every Instance"/>
+		// 	<MenuItem				
+		// 		key={2}
+		// 		onClick={() => this.onDataImpactMenuClick("All Future Instances")}
+		// 		text="All Future Instances"/>
+		// 	<MenuItem				
+		// 		key={3}
+		// 		onClick={() => this.onDataImpactMenuClick("All Future Instances, and Today")}
+		// 		text="All Future Instances, and Today"/>
+		// 	<MenuItem
+		// 		key={4}
+		// 		onClick={() => this.onDataImpactMenuClick("All Past Instances")}
+		// 		text="All Past Instances"/>
+		// 	<MenuItem				
+		// 		key={5}
+		// 		onClick={() => this.onDataImpactMenuClick("All Past Instances, and Today")}
+		// 		text="All Past Instances, and Today"/>
+		// </Menu>
 
 		let tagMenu = null;
   	if(this.state.category !== null) {
@@ -219,22 +219,23 @@ class ItemEditor extends Component {
   			</Menu>
   	}
 
-  	const dataImpactSelection =
-  	<FormGroup
-  		label="Data Impact:"
-  		labelInfo="(required)"
-  		labelFor="dataImpact-button">
-  		<Popover content={dataImpactMenu} position={Position.RIGHT}>
-				<Button icon="share" id="dataImpact-button">
-					{this.state.dataImpactMenuText}
-				</Button>
-			</Popover>
-		</FormGroup>;
+  // 	const dataImpactSelection =
+  // 	<FormGroup
+  // 		label="Data Impact:"
+  // 		labelInfo="(required)"
+  // 		labelFor="dataImpact-button">
+  // 		<Popover content={dataImpactMenu} position={Position.RIGHT}>
+		// 		<Button icon="share" id="dataImpact-button">
+		// 			{this.state.dataImpactMenuText}
+		// 		</Button>
+		// 	</Popover>
+		// </FormGroup>;
 
 		const categorySelection = 
 		<FormGroup
 			label="Category:"
-			labelFor="category-input">
+			labelFor="category-input"
+			labelInfo="(Affects Past Reports)">
   		<ControlGroup vertical={false} >
 				<Popover content={categoryMenu} position={Position.RIGHT} >
 					<Button 
@@ -275,7 +276,8 @@ class ItemEditor extends Component {
 		const nameForm = 
 			<FormGroup
 				label="Item Name:"
-				labelFor="name-input">
+				labelFor="name-input"
+				labelInfo="(Affects Past Reports)">
 				<InputGroup
 					id="name-input"
 					onChange={(event) => this.handleNameInput(event)}
@@ -286,7 +288,8 @@ class ItemEditor extends Component {
 		const uomForm = 
 			<FormGroup
 				label="Unit of Measurement:"
-				labelFor="uom-input">
+				labelFor="uom-input"
+				labelInfo="(Affects Past Reports)">
 				<InputGroup
 					id="uom-input"
 					onChange={(event) => this.handleUnitOfMeasurementInput(event)}
@@ -297,8 +300,7 @@ class ItemEditor extends Component {
 		const priceForm = 
 			<FormGroup
 				label="Default Price:"
-				labelFor="price-input"
-				labelInfo="(Cannot Affect Past)">
+				labelFor="price-input">
 				<InputGroup
 					id="price-input"
 					onChange={(event) => this.handlePriceInput(event)}
@@ -310,8 +312,7 @@ class ItemEditor extends Component {
 		const quantityForm = 
 			<FormGroup
 				label="Default Quantity:"
-				labelFor="quantity-input"
-				labelInfo="(Cannot Affect Past)">
+				labelFor="quantity-input">
 				<InputGroup
 					id="quantity-input"
 					onChange={(event) => this.handleQuantityInput(event)}
@@ -324,7 +325,7 @@ class ItemEditor extends Component {
 		const isActiveSwitch =
 			<Switch
 				checked={this.state.isActive}
-				label="Currently in use? If toggled off the item won't be included in lists affected by this edit, but will continue to be available for future use. Removed instances won't show up in reports or periods, but can be brought back by toggling this switch again."
+				label="Currently in use? If toggled off the item won't be included the currently selected period."
 				onClick={() => this.toggleIsActiveSwitch()}
 			/>;
 
@@ -332,7 +333,7 @@ class ItemEditor extends Component {
 			<Switch
 				checked={this.state.isToBeDeleted}
 				intent="dangerous"
-				label="Delete? If toggled on the item will be deleted from periods affected by this edit upon submission, irrespective of other edits being submitted. This cannot be undone."
+				label="Delete? If toggled on the item will never be used in future periods."
 				onClick={() => this.toggleDeleteSwitch()}
 				
 			/>
@@ -354,7 +355,6 @@ class ItemEditor extends Component {
 		const itemEditor = 
 		<div className="wrapper">
 			<Card elevation={Elevation.TWO} className="bp3-dark">
-				{dataImpactSelection}
 				{categorySelection}
 				{tagSelection}
 				{nameForm}

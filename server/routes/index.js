@@ -8,6 +8,7 @@ const dateTime = require('date-and-time');
 
 const categoryController = require('../controllers').category;
 const itemController = require('../controllers').item;
+const periodController = require('../controllers').period;
 const periodItemController = require('../controllers').periodItem;
 
 router.use(bodyParser.json());
@@ -24,10 +25,11 @@ router.get('/item/:id', itemController.getById);
 router.post('/item', itemController.add);
 router.put('/item', itemController.updateItem);
 
-router.get('/periodItem/:periodId', periodItemController.listPeriodItemsForPeriod);
+router.get('/period', periodController.list);
+
+router.get('/periodItem/:day&:isAM&:periodId', periodItemController.listForWasteForm);
 router.post('/periodItem', periodItemController.createOustandingPeriodItems);
 router.put('/periodItem', periodItemController.update);
-
 
 //For local use:
 // const sequelize = new Sequelize(

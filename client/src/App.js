@@ -81,30 +81,6 @@ class App extends Component {
 
  componentDidMount() {
 	this.loadCategoriesPeriodsAndItems();
-
-	const timeToLoadItemInputter = 
-  	this.state.isCategoryListPopulated === true && 
-  	this.state.isItemInputterUpToDate === false;
-
-  if(timeToLoadItemInputter){
-    this.setState({
-      isItemInputterReadyToLoad: true,
-      isItemInputterUpToDate: true
-    });
-	}
- }
-
- componentDidUpdate() {
-  const timeToLoadItemInputter = 
-    this.state.isCategoryListPopulated === true && 
-    this.state.isItemInputterUpToDate === false;
-
-  if(timeToLoadItemInputter){
-    this.setState({
-      isItemInputterReadyToLoad: true,
-      isItemInputterUpToDate: true
-    });
-  }
  }
 
  async loadCategoriesPeriodsAndItems() {
@@ -117,29 +93,32 @@ class App extends Component {
   const PeriodHashAccess = {};
   const periodList = [];
 
-  const dataFromServer = await axios({
-    method: 'post',
-    url: 'http://localhost:3001',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    data: {
-      isReceive: true,
-      isReceivingCategoriesPeriodsAndItems: true
-    }
+  const categoryData = await axios({
+    mothod: 'get',
+    url: 'http://localhost:3001/category'
   });
 
-  dataFromServer.data.categories.forEach((category) => {
+  const itemData = await axios({
+    mothod: 'get',
+    url: 'http://localhost:3001/item'
+  })
+
+  const periodData = await axios({
+    mothod: 'get',
+    url: 'http://localhost:3001/period'
+  })
+  
+  categoryData.data.forEach((category) => {
     CategoryHashAccess[category.name] = category;
     categoryList.push(category);
   });
 
-  dataFromServer.data.items.forEach((item) => {
+  itemData.data.forEach((item) => {
     ItemHashAccess[item.id] = item; 
     itemList.push(item);
   });
 
-  dataFromServer.data.periods.forEach((period) => {
+  periodData.data.forEach((period) => {
     PeriodHashAccess[period.id] = period;
     periodList.push(period);
   });
@@ -148,6 +127,7 @@ class App extends Component {
     categoryHashAccess: CategoryHashAccess,
     categoryList: categoryList, 
     isCategoryListPopulated: true,
+    isItemInputterReadyToLoad: true,
     isItemInputterUpToDate: false,
     itemHashAccess: ItemHashAccess,
     itemList: itemList,
@@ -162,22 +142,18 @@ class App extends Component {
  		this.setState({wasteForm: "Select a period"});
  		return;
  	}
+
+  const day = this.state.selectedWeekday;
+  const isAM = this.state.isAM;
+  const period = this.state.selectedPeriod.id;
+
+  const url = 'http://localhost:3001/periodItem/'+day+'&'+isAM+'&'+period;
   axios({
-    method: 'post',
-    url: 'http://localhost:3001',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    data: {
-      day: this.state.selectedWeekday,
-      isAM: this.state.isAM,
-      isReceive: true,
-      isReceivingPeriodItems: true,
-      periodId: this.state.selectedPeriod.id
-    }
+    method: 'get',
+    url: url,
   })
   .then((response) => {
-
+    // console.log("RESPONSE DATA: " + JSON.stringify(response));
     if(response.status === 200 && response.data.length > 0) {
       let containerKey = this.keySeed;
       const wasteForm = this.state.categoryList.map((set) => {
