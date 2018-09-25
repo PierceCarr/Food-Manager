@@ -11,11 +11,7 @@
   text-align: left;
 }
 
-#price-input {
-  width: 300px !important;
-}
-
-#quantity-input {
+.standard-input {
   width: 300px !important;
 }
 

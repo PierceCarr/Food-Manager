@@ -14,7 +14,7 @@ module.exports = {
 				unitOfMeasurement: req.body.unitOfMeasurement,
 			})
 			.then((item) => res.status(201).send(item))
-			.catch((error) => res.status(400).send(error))
+			.catch((error) => res.status(400).send(error));
 	},
 
 	delete(req, res) {
@@ -29,7 +29,7 @@ module.exports = {
 				return item
 					.destroy()
 					.then(() => res.status(204).send())
-					.catch((error) => res.status(400).send(error))
+					.catch((error) => res.status(400).send(error));
 			})
 			.catch((error) => res.status(400).send(error));
 	},

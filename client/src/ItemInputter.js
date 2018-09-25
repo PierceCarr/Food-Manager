@@ -3,11 +3,11 @@ import currencyFormatter from 'currency-formatter';
 import axios from 'axios';
 import AddToListButton from './AddToListButton.js';
 import "./ItemInputter.css";
-import TwoUniqueForm from "./TwoUniqueForm.js";
+// import TwoUniqueForm from "./TwoUniqueForm.js";
 import { 
 	Button, 
 	Card,
-	Collapse,
+  Checkbox,
 	ControlGroup,
 	Elevation,
 	FormGroup, 
@@ -15,13 +15,9 @@ import {
 	Menu,
 	MenuItem, 
 	Popover,
-	Position,   
-	Switch,    
+	Position,     
 	Toaster,  
 } from "@blueprintjs/core";
-
-//Known Bugs:
-//None, they're clever and hiding from my wrath
 
 //Pain points:
 //>If a user accidently selects a tag when they want no tag,
@@ -36,29 +32,31 @@ class ItemInputter extends Component {
 
     this.state = {
     	//Item data to submit
-    	itemName: "",
-    	unitOfMeasurement: "",
     	category: null,
-    	tag: null,
-    	itemPrice: "",
-    	initialQuantity: "",
-    	isItemActive: true,
-
+      initialQuantity: 0,
+      isItemActive: true,
+      itemName: "",
+      itemPrice: "",
+      tag: null,
+    	unitOfMeasurement: "",
+    	
     	//Visual state
-      title: null, //can probably remove this
-    	nameUnitChecked: false,
-    	formattedItemName: "",
-    	displayItemName: "",
-    	categoryItems: this.props.categoryItems,
-    	displayPrice: currencyFormatter.format(0.00, {code: 'USD'}),
-    	tagsFromCategory: [],
-    	isCategoryChosen: false,
+      categoryItems: this.props.categoryItems,
+      categoryMenuText: this.defaultMenuText,
+      displayItemName: "",
+      displayPrice: currencyFormatter.format(0.00, {code: 'USD'}),
+      formattedItemName: "",
       hasCategoryMenuLoaded: false,
-    	isNameComboValid: false,
-    	categoryMenuText: this.defaultMenuText,
-    	tagMenuText: this.defaultMenuText,
-    	inputKey: new Date(),
-      updateFormOneFormat: false
+      inputKey: new Date(),
+      isCategoryChosen: false,
+      isIncludedInCurrentPeriod: true,
+      isNameComboValid: false,
+      nameFormValue: "",
+      nameUnitChecked: false,
+      tagsFromCategory: [],
+      tagMenuText: this.defaultMenuText,
+      // updateFormOneFormat: false
+      // title: null, //can probably remove this
     }
 
     this.onCategoryMenuItemClick = this.onCategoryMenuItemClick.bind(this);
@@ -122,24 +120,22 @@ class ItemInputter extends Component {
   	}, updateTags());
   }
 
-
-
   onTagMenuItemClick(chosenTag) {
-    
+    let formattedName = chosenTag + ' - ' + this.state.itemName;
   	this.setState({
       tag: chosenTag,
       tagMenuText: chosenTag,
-      itemName: "",
-      nameUnitChecked: false,
-      isNameComboValid: false,
-      displayItemName: "",
-      updateFormOneFormat: true,
-      unitOfMeasurement: ""
-    }
-    ,() => {
-      this.setState({updateFormOneFormat: false}, () => console.log('Cleared form'));
-    }
-    );
+      displayItemName: formattedName,
+      formattedItemName: formattedName,
+    });
+  }
+
+  onNameFocus() {
+    this.setState({displayItemName: this.state.itemName});
+  }
+
+  onNameBlur() {
+    this.setState({displayItemName: this.state.formattedItemName});
   }
 
   handleNameInput(event) {
@@ -148,9 +144,10 @@ class ItemInputter extends Component {
   	if(this.state.tag === null) formattedName = trueName;
   	
   	this.setState({
+      displayItemName: trueName,
   		itemName: trueName,
-  		displayItemName: formattedName,
-  		isNameComboValid: false
+  		formattedItemName: formattedName,
+  		// isNameComboValid: false
   	});
   }
 
@@ -224,59 +221,60 @@ class ItemInputter extends Component {
     } else {
       priceCatch = currencyFormatter.unformat(this.state.itemPrice, {code: 'USD'});
     }
+
+    let tagCatch = "Etc.";
+    if(this.state.tag !== null) tagCatch = this.state.tag;
+
+    // let responseStatus = null;
   	
   	axios({
   		method: 'post',
-  		url: 'http://localhost:3001',
+  		url: 'http://localhost:3001/item',
   		headers: {
   			'Content-Type': 'application/json'
   		},
   		data: {
-  			isRecieve: false,
-  			newCategory: false,
-
-  			name: this.state.itemName,
-	  		unitOfMeasurement: this.state.unitOfMeasurement,
 	  		category: this.state.category.name,
-	  		tag: this.state.tag,
-	  		price: priceCatch,
-	  		quantity: this.state.initialQuantity,
-	  		isActive: this.state.isItemActive
+        isActive: this.state.isItemActive,
+        name: this.state.itemName,
+        price: priceCatch,
+        quantity: this.state.initialQuantity,
+	  		tag: tagCatch,
+        unitOfMeasurement: this.state.unitOfMeasurement,
   		}
   	})
     .then((response) => {
-      console.log(response);
+      let toastMessage = null;
+      let intent = null;
+
+      if(response.status === 201) {
+        const newItem = {
+          category: this.state.category,
+          name: this.state.itemName,
+          tag: this.state.tag,
+        }
+
+        let prettyTag = newItem.tag + " - ";
+        if(newItem.tag === null) prettyTag = "";
+        toastMessage = prettyTag + newItem.name + " was added to " + newItem.category.name;
+        intent = "success";
+        this.resetComponent();
+
+      } else if(response.status >= 400){
+        toastMessage = "Something went wrong, and the ingredient wasn't added. Maybe it already exists.";
+        intent = "danger";
+      }
+      const toaster = Toaster.create({position: Position.TOP});
+      toaster.show({message: toastMessage, intent: intent});
+
     });
-
-
-  	const newItem = {
-  		name: this.state.itemName,
-  		unitOfMeasurement: this.state.unitOfMeasurement,
-  		category: this.state.category,
-  		tag: this.state.tag,
-  		price: currencyFormatter.unformat(this.state.itemPrice, {code: 'USD'}),
-  		quantity: this.state.initialQuantity,
-  		isActive: this.state.isItemActive
-  	}
-
-  	console.log(newItem);
-
-  	let prettyTag = newItem.tag + " - ";
-  	if(newItem.tag === null) prettyTag = "";
-  	const toastMessage = 
-  		prettyTag + newItem.name + " was added to " + newItem.category.name;
-  	const toaster = Toaster.create({position: Position.TOP});
-  	toaster.show({message: toastMessage, intent: "success"});
-  	
-    //return state to its default form
-  	this.resetComponent();
   }
 
   render() {
   	const categoryLabel = "Category:";
   	const optionalText = "(optional)";
   	const requiredText = "(required)";
-  	const inUseExplaination = "Currently in use? If toggled off, the item will be removed from lists but saved for later.";
+  	const inUseExplaination = "Include in future periods. If unchecked, the item will not be used but will be saved for later.";
   	// let isTagListDisabled = false;
 
   	let submitText = "Submit";
@@ -293,10 +291,6 @@ class ItemInputter extends Component {
   	if(tagsDontExist) {
   		tagMenuText = "No tags in chosen category";
   	}
-
-  	// if(this.state.tagsFromCategory.length === 0) {
-  	// 	isTagListDisabled = true;
-  	// }
 
   	let categoryMenu =
   		<Menu>
@@ -372,89 +366,144 @@ class ItemInputter extends Component {
 				</ControlGroup>
 			</FormGroup>;
 
-		
+      const nameInput =
+      <FormGroup
+        label="Name:"
+        labelFor="first-input"
+        labelInfo={requiredText}>
+        <InputGroup 
+          id="first-input" 
+          className="standard-input"
+          placeholder="ex. Pumpkin"
+          onChange={(event) => {
+            this.handleNameInput(event);
+          }}
+          value={this.state.displayItemName}
+          onFocus={() => this.onNameFocus()}
+          onBlur={() => this.onNameBlur()}/>
+      </FormGroup>;
 
-		const hiddenPriceSubmitPanel = 
-			<div>
-				<Collapse isOpen={this.state.isNameComboValid}>
+      const unitInput = 
+      <FormGroup
+        label="Unit of Measurement:"
+        labelFor="second-input"
+        labelInfo={requiredText}>
+        <InputGroup 
+          id="second-input" 
+          className="standard-input"
+          placeholder="ex. Slice"
+          onChange={(event) => this.handleUnitInput(event)}
+          value={this.state.unitOfMeasurement}/>
+      </FormGroup>;
 
-					<FormGroup 
-						label={`Default Price Per ${this.state.unitOfMeasurement}:`} 
-						labelFor="price-input"
-						labelInfo={optionalText}>
-						<InputGroup 
-              className="input"
-							id="price-input" 
-							placeholder="$0.00" 
-							onChange={(event) => this.handlePriceInput(event)}
-							onBlur={() => this.displayFormattedPrice()}
-							value={this.state.itemPrice}/>
-					</FormGroup>
+      const priceSubmitPanel = 
+      <div>
+        <FormGroup 
+          label={`Default Price Per ${this.state.unitOfMeasurement}:`} 
+          labelFor="price-input"
+          labelInfo={optionalText}>
+          <InputGroup 
+            className="standard-input"
+            id="price-input" 
+            placeholder="$0.00" 
+            onChange={(event) => this.handlePriceInput(event)}
+            onBlur={() => this.displayFormattedPrice()}
+            value={this.state.itemPrice}/>
+        </FormGroup>
 
-					<FormGroup
-						label="Default Quantity:"
-						labelFor="quantity-input"
-						labelInfo={optionalText}>
-						<InputGroup 
-							id="quantity-input" 
-							placeholder="0" 
-							onChange={(event) => this.handleQuantityInput(event)}
-							value={this.state.initialQuantity}/>
-					</FormGroup>
+        <FormGroup
+          label="Default Quantity:"
+          labelFor="quantity-input"
+          labelInfo={optionalText}>
+          <InputGroup 
+            id="quantity-input" 
+            className="standard-input"
+            placeholder="0" 
+            onChange={(event) => this.handleQuantityInput(event)}
+            value={this.state.initialQuantity}/>
+        </FormGroup>
 
-						<Switch 
-							label={inUseExplaination}
-							checked={this.state.isItemActive} 
-							onChange={() => this.toggleIsItemActive()}/>
-					<Button 
-						className="submit" 
-						onClick={() => this.handleSubmit()}
-						disabled={!isSubmitAvailable}>
-						{submitText}
-					</Button>
+        <Checkbox
+          checked={this.state.isIncludedInCurrentPeriod}
+          disabled={this.props.selectedPeriod === null}
+          label="Include in selected period"
+          onChange={() => this.setState({isIncludedInCurrentPeriod: !this.state.isIncludedInCurrentPeriod})}/>
+        
+        <Checkbox 
+          label={inUseExplaination}
+          checked={this.state.isItemActive} 
+          onChange={() => this.toggleIsItemActive()}/>
+        
+        <Button 
+          className="submit" 
+          onClick={() => this.handleSubmit()}
+          disabled={!isSubmitAvailable}>
+          {submitText}
+        </Button>
+      </div>;
 
-				</Collapse>
-			</div>;
+      // const hiddenPriceSubmitPanel = 
+      // <div>
+      //   <Collapse isOpen={this.state.isNameComboValid}>
+
+      //     {priceSubmitPanel}
+
+      //   </Collapse>
+      // </div>;
 
 			let itemInputterClass = 'bp3-skeleton';
       if(this.props.isReadyToLoad === true) itemInputterClass = 'bp3-dark';
 
-      const twoUniqueForm = 
-      <TwoUniqueForm 
-        key={this.state.inputKey}
-        labelOneTitle="Name:"
-        labelOneInfo={requiredText}
-        labelOnePlaceholder="ex. Pumpkin"
-        labelTwoTitle="Unit of Measurement:"
-        labelTwoInfo={requiredText}
-        labelTwoPlaceholder="ex. Slice"
-        formOneFocusValue={this.state.itemName}
-        formOneBlurValue={this.state.displayItemName}
-        updateFormOneFormat={this.state.updateFormOneFormat}
-        formTwoText={this.state.unitOfMeasurement}
-        validationButtonText="Check if Name/UOM Combo Exists"
-        warningMessage="This Item already exists with given UOM"
-        handleFirstInput={(event) => this.handleNameInput(event)}
-        handleSecondInput={(event) => this.handleUnitInput(event)}
-        submitted={this.state.nameUnitChecked}
-        validCombo={this.state.isNameComboValid}
-        validateNameUnitCombo=
-          {(isValid, name, unit) => this.validateNameUnitCombo(isValid, name, unit)}
-      />;
+      // const twoUniqueForm = 
+      // <TwoUniqueForm 
+      //   key={this.state.inputKey}
+      //   labelOneTitle="Name:"
+      //   labelOneInfo={requiredText}
+      //   labelOnePlaceholder="ex. Pumpkin"
+      //   labelTwoTitle="Unit of Measurement:"
+      //   labelTwoInfo={requiredText}
+      //   labelTwoPlaceholder="ex. Slice"
+      //   formOneFocusValue={this.state.itemName}
+      //   formOneBlurValue={this.state.displayItemName}
+      //   updateFormOneFormat={this.state.updateFormOneFormat}
+      //   formTwoText={this.state.unitOfMeasurement}
+      //   validationButtonText="Check if Name/UOM Combo Exists"
+      //   warningMessage="This Item already exists with given UOM"
+      //   handleFirstInput={(event) => this.handleNameInput(event)}
+      //   handleSecondInput={(event) => this.handleUnitInput(event)}
+      //   submitted={this.state.nameUnitChecked}
+      //   validCombo={this.state.isNameComboValid}
+      //   validateNameUnitCombo=
+      //     {(isValid, name, unit) => this.validateNameUnitCombo(isValid, name, unit)}
+      // />;
 
-      const itemInputter = 
+      // const itemInputter = 
+      // <div className="theComponent">
+      //   <Card elevation={Elevation.TWO} className={itemInputterClass}>
+      //     {categorySelection}
+      //     {itemTagSelection}
+      //     <p/>
+      //       {twoUniqueForm}
+      //     <p/>
+      //     {hiddenPriceSubmitPanel}
+      //   </Card>
+      // </div>;
+
+      const revisedItemInputter =
       <div className="theComponent">
         <Card elevation={Elevation.TWO} className={itemInputterClass}>
           {categorySelection}
           {itemTagSelection}
           <p/>
-            {twoUniqueForm}
+            {nameInput}
+
+            {unitInput}
           <p/>
-          {hiddenPriceSubmitPanel}
+          {priceSubmitPanel}
         </Card>
       </div>;
 
-    return itemInputter;
+    return revisedItemInputter;
   }
 }
 

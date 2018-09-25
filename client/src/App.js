@@ -276,7 +276,8 @@ class App extends Component {
         <ItemInputter 
           className="itemInputter"
           isReadyToLoad={this.state.isItemInputterReadyToLoad}
-          categoryItems={this.state.categoryList} />
+          categoryItems={this.state.categoryList} 
+          selectedPeriod={this.state.selectedPeriod}/>
       } 
       else if (this.state.itemPanelForm === "Edit Selected Ingredient") {
         const initialCategory = this.state.categoryHashAccess[this.state.itemToEdit.category];
