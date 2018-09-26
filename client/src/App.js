@@ -56,9 +56,9 @@ class App extends Component {
     categoryList: [],
     isAM: true,
     isCategoryListPopulated: false,
-    isDisplayingPeriodItems: false,
+    isDisplayingPeriodItems: false, //Could remove?
     isItemInputterReadyToLoad: false,
-    isItemInputterUpToDate: false,
+    isItemInputterUpToDate: false, //Could remove?
     isItemPanelOpen: true,
     itemHashAccess: null,
     itemList: [],
@@ -73,6 +73,7 @@ class App extends Component {
     wasteForm: "",
   }
   this.keySeed = 0;
+  this.loadCategoriesPeriodsAndItems = this.loadCategoriesPeriodsAndItems.bind(this);
   this.generateWasteForm = this.generateWasteForm.bind(this);
   this.onEditButtonClick = this.onEditButtonClick.bind(this);
   this.onPeriodMenuClick = this.onPeriodMenuClick.bind(this);
@@ -262,7 +263,15 @@ class App extends Component {
 
  updatePeriodItemLists(updatedItem) {
  	let newPeriodItemHashAccess = this.state.periodHashAccess;
- 	newPeriodItemHashAccess[updatedItem.id] = updatedItem;
+
+  if(updatedItem.constructor === Array) {
+    updatedItem.forEach((periodItem) => {
+      newPeriodItemHashAccess[periodItem.id] = periodItem;
+    })
+  } else {
+    newPeriodItemHashAccess[updatedItem.id] = updatedItem;
+  }
+
  	this.setState({newPeriodItemHashAccess: newPeriodItemHashAccess},
  		() => this.generateWasteForm());
  }
@@ -275,8 +284,11 @@ class App extends Component {
         itemPanelForm = 
         <ItemInputter 
           className="itemInputter"
-          isReadyToLoad={this.state.isItemInputterReadyToLoad}
           categoryItems={this.state.categoryList} 
+          loadItems={this.loadCategoriesPeriodsAndItems}
+          updatePeriodItemLists={this.updatePeriodItemLists}
+          isReadyToLoad={this.state.isItemInputterReadyToLoad}
+          reloadItems={this.loadCategoriesPeriodsAndItems}
           selectedPeriod={this.state.selectedPeriod}/>
       } 
       else if (this.state.itemPanelForm === "Edit Selected Ingredient") {

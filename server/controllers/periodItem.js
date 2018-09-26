@@ -31,16 +31,21 @@ module.exports = {
 	},
 
 	async createOustandingPeriodItems(req, res) {
+		console.log("CREATING OUTSTANDING PERIOD ITEMS");
 		let period = await Period
 			.findAll({
 				where: {
-					id: req.body.periodId
+					id: req.body.id
 				}
 			})
 			.catch((error) => res.status(400).send(error));
 
 		if(!period) res.status(404).send({message: "Period Not Found"});
+		console.log("RETURNED FROM QUERY: " + JSON.stringify(period));
+
 		period = period[0];
+
+		console.log("WORKING WITH PERIOD: " + JSON.stringify(period));
 
 		const itemList = await Item.findAll({})
 			.catch((error) => res.status(400).send(error));
@@ -48,7 +53,7 @@ module.exports = {
 		const currentPeriodItemList = await PeriodItem
 			.findAll({
 				where: {
-					periodId: req.body.periodId
+					periodId: req.body.id
 				}
 			})
 			.catch((error) => res.status(400).send(error));
@@ -95,7 +100,7 @@ module.exports = {
 			}
 		})
 
-		PeriodItem.bulkCreate(periodItemsToAdd, {returning: true})
+		const addEm = await PeriodItem.bulkCreate(periodItemsToAdd, {returning: true})
 			.then((newPeriodItems) => res.status(200).send(newPeriodItems))
 			.catch((error) => res.status(400).send(error));
 	},

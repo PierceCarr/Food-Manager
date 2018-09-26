@@ -1,20 +1,28 @@
 const Item = require('../models').Item;
+const PeriodItem = require('../models').PeriodItem;
+
+//ADD SHOULD CREATE PERIOD ITEMS WHEN HANDED A POSITIVE FLAG
 
 module.exports = {
 
-	add(req, res) {
-		return Item
+	async add(req, res) {
+		const itemPromise = await Item
 			.create({
 				category: req.body.category,
 				isActive: req.body.isActive,
 				name: req.body.name,
+				// periodToUpdate: req.body.periodToUpdate,
 				price: req.body.price,
 				quantity: req.body.quantity,
 				tag: req.body.tag,
 				unitOfMeasurement: req.body.unitOfMeasurement,
-			})
-			.then((item) => res.status(201).send(item))
+			}, {returning: true})
 			.catch((error) => res.status(400).send(error));
+
+
+		res.status(201).send(itemPromise);
+
+			
 	},
 
 	delete(req, res) {

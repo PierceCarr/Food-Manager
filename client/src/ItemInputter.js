@@ -19,11 +19,6 @@ import {
 	Toaster,  
 } from "@blueprintjs/core";
 
-//Pain points:
-//>If a user accidently selects a tag when they want no tag,
-//they must somehow refresh the entire component and start over to
-//clear the tag slot.
-
 class ItemInputter extends Component {
   constructor(props) {
     super(props);
@@ -88,7 +83,7 @@ class ItemInputter extends Component {
     	category: null,
     	tag: null,
     	itemPrice: "",
-    	initialQuantity: "",
+    	initialQuantity: 0,
     	isItemActive: true,
 
     	//Visual state
@@ -114,10 +109,11 @@ class ItemInputter extends Component {
   	this.setState({
   		categoryMenuText: chosenCategory.name,
   		isCategoryChosen: true,
+      formattedItemName: this.itemName,
   		category: chosenCategory,
   		chosenTag: null,
   		tagMenuText: "Click Here to Select"
-  	}, updateTags());
+  	}, updateTags(), this.onNameFocus());
   }
 
   onTagMenuItemClick(chosenTag) {
@@ -206,7 +202,7 @@ class ItemInputter extends Component {
   	this.setState({initialQuantity: event.target.value});
   }
 
-  handleSubmit() {
+  async handleSubmit() {
   	//Add tag to category if it's newly inputted
   	let isTagNew = true;
   	this.state.category.tags.forEach((tag) => {
@@ -225,9 +221,11 @@ class ItemInputter extends Component {
     let tagCatch = "Etc.";
     if(this.state.tag !== null) tagCatch = this.state.tag;
 
-    // let responseStatus = null;
   	
-  	axios({
+    let toastMessage = null;
+    let intent = null;
+
+  	const itemPromise = await axios({
   		method: 'post',
   		url: 'http://localhost:3001/item',
   		headers: {
@@ -243,31 +241,57 @@ class ItemInputter extends Component {
         unitOfMeasurement: this.state.unitOfMeasurement,
   		}
   	})
-    .then((response) => {
-      let toastMessage = null;
-      let intent = null;
-
-      if(response.status === 201) {
-        const newItem = {
-          category: this.state.category,
-          name: this.state.itemName,
-          tag: this.state.tag,
-        }
-
-        let prettyTag = newItem.tag + " - ";
-        if(newItem.tag === null) prettyTag = "";
-        toastMessage = prettyTag + newItem.name + " was added to " + newItem.category.name;
-        intent = "success";
-        this.resetComponent();
-
-      } else if(response.status >= 400){
-        toastMessage = "Something went wrong, and the ingredient wasn't added. Maybe it already exists.";
-        intent = "danger";
-      }
+    .catch((error) => {
+      toastMessage = "Unexpected response from server, the ingredient may not have been added or already exists.";
+      intent = "danger";
       const toaster = Toaster.create({position: Position.TOP});
       toaster.show({message: toastMessage, intent: intent});
-
     });
+
+    console.log(JSON.stringify(itemPromise));
+
+    if(itemPromise.status === 201) {
+      const newItem = {
+        category: this.state.category,
+        name: this.state.itemName,
+        tag: this.state.tag,
+      }
+
+      let prettyTag = newItem.tag + " - ";
+      if(newItem.tag === null) prettyTag = "";
+      toastMessage = prettyTag + newItem.name + " was added to " + newItem.category.name;
+      intent = "success";
+      this.resetComponent();
+
+    } else {
+      toastMessage = "Unexpected response from server, the ingredient might not have been added and possibly already exists.";
+      intent = "danger";
+    }
+
+    const toaster = Toaster.create({position: Position.TOP});
+    toaster.show({message: toastMessage, intent: intent});
+
+    const isPeriodSelected = !(this.props.selectedPeriod === null);
+      if(isPeriodSelected && this.state.isIncludedInCurrentPeriod && itemPromise !== undefined) {
+        const update = await axios({
+          method: 'post',
+          url: 'http://localhost:3001/periodItem',
+          headers: {
+          'Content-Type': 'application/json'
+          },
+          data: {
+            id: this.props.selectedPeriod.id,
+          }
+        })
+        .catch((error) => console.log("Update error: " + error));
+        console.log("Oustanding response: " + JSON.stringify(update));
+
+        if(update.status === 200 || update.status === 201){
+          const reload = await this.props.loadItems();
+          this.props.updatePeriodItemLists(update.data);
+        }
+      }
+    
   }
 
   render() {
@@ -330,6 +354,7 @@ class ItemInputter extends Component {
 					<Popover content={categoryMenu} position={Position.RIGHT} >
 						<Button 
               id="category-input" 
+              className="selection-button"
               icon="share" 
               text={this.state.categoryMenuText} />
 					</Popover>
