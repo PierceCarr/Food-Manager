@@ -159,25 +159,45 @@ class App extends Component {
       const wasteForm = this.state.categoryList.map((set) => {
         containerKey++;
 
-        //put Etc. tag last, and sort all others
-        let etcSpot;
-        for(let i = 0; i < set.tags.length; i++) {
-          if(set.tags[i] === "Etc.") {
-            etcSpot = i;
-            break;
-          }
-        }
+        // console.log("Tags before sorting: " + JSON.stringify(set.tags));
 
-        set.tags[etcSpot] = null;
+        // //put Etc. tag last, and sort all others
+        // let etcSpot;
+        // for(let i = 0; i < set.tags.length; i++) {
+        //   if(set.tags[i] === "Etc.") {
+        //     etcSpot = i;
+        //     break;
+        //   }
+        // }
 
-        set.tags = set.tags
+        // set.tags[etcSpot] = null;
+
+        // console.log("After nulling: " + JSON.stringify(set.tags) );
+
+        // set.tags = set.tags
+        //   .sort((a, b) => {
+        //     if (a > b) return 1;
+        //     if (a < b) return -1;
+        //     return 0;
+        //   });
+
+        // set.tags[set.tags.length - 1] = "Etc.";
+
+        // console.log("Set Tags: " + JSON.stringify(set.tags)); 
+
+        let tagSortArray = [];
+        set.tags.forEach((tag) => {
+          if(tag !== "Etc.") tagSortArray.push(tag);
+        });
+
+        tagSortArray = tagSortArray
           .sort((a, b) => {
             if (a > b) return 1;
             if (a < b) return -1;
             return 0;
           });
 
-        set.tags[set.tags.length - 1] = "Etc.";
+        tagSortArray.push("Etc.");
 
         return React.createElement(ContainerOfUpdatableItemSets, {
           additionalItemTitle: 
@@ -209,7 +229,7 @@ class App extends Component {
 	          instanceItemSubmissionIndicator: "isSubmitted",
 	          key: containerKey,
 	          setIdentifier: "tag",
-	          setList: set.tags,
+	          setList: tagSortArray,
 	          title: set.name,
 	          updatableInstanceItemProperties: ["quantity", "price"],
 	          updateInstanceItemLists: this.updatePeriodItemLists
