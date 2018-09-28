@@ -15,7 +15,7 @@ module.exports = {
       tags: {
         type: Sequelize.ARRAY({
           type: Sequelize.STRING,
-          unique: true
+          // unique: true
         }),
       },
       isActive: {
@@ -151,12 +151,10 @@ module.exports = {
       name: {
         type: Sequelize.STRING,
         allowNull: false,
-        // primaryKey: "nameUnitConstraint"
       },
       unitOfMeasurement: {
         type: Sequelize.STRING,
         allowNull: false,
-        // primaryKey: "nameUnitConstraint"
       },
       category: {
         type: Sequelize.STRING,

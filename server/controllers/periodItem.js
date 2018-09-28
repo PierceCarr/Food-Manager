@@ -4,18 +4,6 @@ const PeriodItem = require('../models').PeriodItem;
 
 module.exports = {
 
-	// listPeriodItemsForPeriod(req, res) {
-	// 	console.log("It's what you think");
-	// 	return PeriodItem
-	// 		.findAll({
-	// 			where: {
-	// 				periodId: req.params.periodId
-	// 			}
-	// 		})
-	// 		.then((items) => res.status(200).send(items))
-	// 		.catch((error) => res.status(400).send(error));
-	// },
-
 	listForWasteForm(req, res) {
 		console.log("PARAMS: " + req.params);
 		return PeriodItem
@@ -31,21 +19,11 @@ module.exports = {
 	},
 
 	async createOustandingPeriodItems(req, res) {
-		console.log("CREATING OUTSTANDING PERIOD ITEMS");
 		let period = await Period
-			.findAll({
-				where: {
-					id: req.body.id
-				}
-			})
+			.findById(req.body.id, {})
 			.catch((error) => res.status(400).send(error));
 
 		if(!period) res.status(404).send({message: "Period Not Found"});
-		console.log("RETURNED FROM QUERY: " + JSON.stringify(period));
-
-		period = period[0];
-
-		console.log("WORKING WITH PERIOD: " + JSON.stringify(period));
 
 		const itemList = await Item.findAll({})
 			.catch((error) => res.status(400).send(error));
@@ -71,11 +49,11 @@ module.exports = {
 				});
 			}
 
-			if(isAlreadyGenerated === false && item.isActive === true){
+			if(isAlreadyGenerated === false && item.isActive === true) {
 				let weekday = period.currentWeekday;
 				if(period.currentWeekday === 0) weekday = 1;
 
-				for(weekday; weekday <= 7; weekday++){
+				for(weekday; weekday <= 7; weekday++) {
 					const amPeriodItem = {};
 		            const pmPeriodItem = {};
 
@@ -106,29 +84,17 @@ module.exports = {
 	},
 
 	update(req, res) {
-		return PeriodItem.findAll({
-			where: {
-				id: req.body.id
-			}
-		})
-		.then((periodItem) => {
-			if(!periodItem) res.status(404).send({message: "PeriodItem Not Found"});
-			var periodItem = periodItem[0];
-			let propertyUpdates = {};
-			const legalProperties = ["isSubmitted", "price", "quantity"];
+		return PeriodItem
+			.findById(req.body.id, {})
+			.then((periodItem) => {
+				if(!periodItem) res.status(404).send({message: "PeriodItem Not Found"});
 
-			req.body.propertiesToUpdate.forEach((propertyTuple) => {
-				if(legalProperties.includes(propertyTuple[0])) {
-					const objectWithNewProperty = {[propertyTuple[0]]: propertyTuple[1]};
-					propertyUpdates = Object.assign(objectWithNewProperty, propertyUpdates);
-				}
+				return periodItem
+	 				.update(req.body.propertiesToUpdate)
+					.then(() => res.status(200).send(periodItem))
+					.catch((error) => res.status(400).send(error));
 			})
-			return periodItem
- 				.update(propertyUpdates)
-				.then(() => res.status(200).send(periodItem))
-				.catch((error) => res.status(400).send(error));
-		})
-		.catch((error) => res.status(400).send(error));
+			.catch((error) => res.status(400).send(error));
 	},
 
 

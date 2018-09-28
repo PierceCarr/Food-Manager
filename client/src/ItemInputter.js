@@ -221,9 +221,12 @@ class ItemInputter extends Component {
     let tagCatch = "Etc.";
     if(this.state.tag !== null) tagCatch = this.state.tag;
 
-  	
     let toastMessage = null;
     let intent = null;
+
+    const isPeriodSelected = !(this.props.selectedPeriod === null) && this.state.isIncludedInCurrentPeriod;
+    let periodCatch = null;
+    if(isPeriodSelected) periodCatch = this.props.selectedPeriod;
 
   	const itemPromise = await axios({
   		method: 'post',
@@ -235,6 +238,7 @@ class ItemInputter extends Component {
 	  		category: this.state.category.name,
         isActive: this.state.isItemActive,
         name: this.state.itemName,
+        periodToUpdate: periodCatch,
         price: priceCatch,
         quantity: this.state.initialQuantity,
 	  		tag: tagCatch,
@@ -247,8 +251,6 @@ class ItemInputter extends Component {
       const toaster = Toaster.create({position: Position.TOP});
       toaster.show({message: toastMessage, intent: intent});
     });
-
-    console.log(JSON.stringify(itemPromise));
 
     if(itemPromise.status === 201) {
       const newItem = {
@@ -264,34 +266,22 @@ class ItemInputter extends Component {
       this.resetComponent();
 
     } else {
+
       toastMessage = "Unexpected response from server, the ingredient might not have been added and possibly already exists.";
       intent = "danger";
+      
     }
 
     const toaster = Toaster.create({position: Position.TOP});
     toaster.show({message: toastMessage, intent: intent});
 
-    const isPeriodSelected = !(this.props.selectedPeriod === null);
-      if(isPeriodSelected && this.state.isIncludedInCurrentPeriod && itemPromise !== undefined) {
-        const update = await axios({
-          method: 'post',
-          url: 'http://localhost:3001/periodItem',
-          headers: {
-          'Content-Type': 'application/json'
-          },
-          data: {
-            id: this.props.selectedPeriod.id,
-          }
-        })
-        .catch((error) => console.log("Update error: " + error));
-        console.log("Oustanding response: " + JSON.stringify(update));
-
-        if(update.status === 200 || update.status === 201){
-          const reload = await this.props.loadItems();
-          this.props.updatePeriodItemLists(update.data);
-        }
-      }
-    
+    const isCreatingPeriodItems = isPeriodSelected && itemPromise !== undefined;
+    const isItemInputSuccessful = itemPromise.status === 200 || itemPromise.status === 201;
+    if(isItemInputSuccessful && isCreatingPeriodItems) {
+      // eslint-disable-next-line
+      const reload = await this.props.loadItems();
+      this.props.updatePeriodItemLists(itemPromise.data.periodItems);
+    }
   }
 
   render() {

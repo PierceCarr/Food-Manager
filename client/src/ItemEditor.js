@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import Axios from 'axios';
+import axios from 'axios';
 import CurrencyFormatter from 'currency-formatter';
 import {
 	Button,
 	Card,
+	Checkbox,
 	ControlGroup,
 	Elevation,
 	FormGroup,
@@ -13,7 +14,7 @@ import {
 	MenuItem, 
 	Popover,
 	Position,
-	Switch,
+	Toaster,
 } from "@blueprintjs/core";
 
 import AddToListButton from './AddToListButton.js';
@@ -25,7 +26,6 @@ class ItemEditor extends Component {
 
 		this.state = {
 			categoryItems: this.props.categoryItems,
-			dataImpactMenuText: "Click Here to Choose a Scheme",
 			displayPrice: CurrencyFormatter.format(this.props.item.price, {code: 'USD'}),
 			isEdited: false,
 
@@ -33,8 +33,8 @@ class ItemEditor extends Component {
 			category: this.props.category,
 			isActive: this.props.item.isActive,
 			isToBeDeleted: false,
-			itemName: this.props.item.name,
-			price: CurrencyFormatter.format(this.props.item.price, {code: 'USD'}),
+			name: this.props.item.name,
+			price: CurrencyFormatter.unformat(this.props.item.price, {code: 'USD'}),
 			quantity: this.props.item.quantity,
 			tag: this.props.item.tag,
 			unitOfMeasurement: this.props.item.unitOfMeasurement,
@@ -48,7 +48,7 @@ class ItemEditor extends Component {
   	});
 
   	if(noDuplicateCategories) {
-	  	const categoryObject = {name: newCategory, tags: []}
+	  	const categoryObject = {name: newCategory, tags: []};
 	  	this.state.categoryItems.push(categoryObject);
 	  	this.onCategoryMenuItemClick(categoryObject);
   	}
@@ -61,28 +61,29 @@ class ItemEditor extends Component {
   	});
 
   	if(noDuplicateTags) {
-	  	this.state.category.tags.push(newTag);
 	  	this.onTagMenuItemClick(newTag);
   	}
   	
   }
 
-  displayFormattedPrice() {
-  	this.setState({price: this.state.displayPrice})
-  }
-
   handleNameInput(event) {
-  	this.setState({itemName: event.target.value});
+  	this.setState({name: event.target.value});
   }
 
   handlePriceInput(event) {
-  	const formattedPrice =
-  		CurrencyFormatter.format(event.target.value, {code: 'USD'});
-
   	this.setState({
-  		displayPrice: formattedPrice,
+  		displayPrice: event.target.value,
   		price: event.target.value
   	});
+  }
+
+  handlePriceFocus() {
+  	this.setState({displayPrice: this.state.price});
+  }
+
+  handlePriceBlur() {
+  	this.setState({displayPrice: CurrencyFormatter.format(this.state.price, {code: 'USD'})},
+  		() => this.setState({price: CurrencyFormatter.unformat(this.state.displayPrice, {code: 'USD'})}));
   }
 
   handleQuantityInput(event) {
@@ -93,10 +94,9 @@ class ItemEditor extends Component {
   	this.setState({unitOfMeasurement: event.target.value});
   }
 
-  
-
   onCategoryMenuItemClick(chosenCategory) {
   	let tagsInCategory = [];
+  	console.log("Category or string: " + JSON.stringify(chosenCategory));
   	let updateTags = () => {
 	  	chosenCategory.tags.forEach((tag) => tagsInCategory.push(tag));
 	  	this.setState({tagsFromCategory: tagsInCategory});
@@ -109,41 +109,125 @@ class ItemEditor extends Component {
   	}, updateTags());
   }
 
-  onDataImpactMenuClick(selection) {
-  	this.setState({dataImpactMenuText: selection});
-  }
+  async handleSubmitClick() {
 
-  onSubmit() {
-
-  	const newItem = {
-  		category: this.state.category.name,
-			isActive: this.state.isActive,
-			name: this.state.itemName,
-			price: CurrencyFormatter.unformat(this.state.price, {code: 'USD'}),
-			quantity: this.state.quantity,
-			tag: this.state.tag,
-			unitOfMeasurement: this.state.unitOfMeasurement,
-  	}
+  	let toastMessage = "Something unexpected happened, try refreshing.";
+  	let intent = "warning";
+  	const toaster = Toaster.create({position: Position.TOP});
 
   	if(this.state.isToBeDeleted === true){
   		// do the deed
   		console.log("Delete not configured yet");
   	} else {//update
+
+  		const isUsingNewCategory =
+  			this.props.categoryHashAccess[this.state.category.name] === undefined;
+
+  		const isUsingNewTag =
+  			!this.props.categoryHashAccess[this.state.category.name].tags.includes(this.state.tag);
+
+  		console.log("Selected Tag: " + this.state.tag);
+  		console.log("Hash Access: " + JSON.stringify(this.props.categoryHashAccess));
+  		console.log("Category name: " + this.state.category.name);
+  		console.log("Hash tags: " + this.props.categoryHashAccess[this.state.category.name].tags);
+  		console.log("Not included?: " + isUsingNewTag);
+
+  		if(isUsingNewCategory) {
+  			const categoryPromise = await axios({
+  				method: 'post',
+  				url: 'http://localhost:3001/category',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					data: {
+						name: this.state.category.name
+					}
+  			})
+  			.catch((error) => {
+					console.log(error.message);
+					toastMessage = error + ". Your edits might not have gone through, try refreshing.";
+					intent = "danger";
+					toaster.show({message: toastMessage, intent: intent});
+				});
+  		}
+
+  		if(isUsingNewTag) {
+  			const tagPromise = await axios({
+  				method: 'put',
+  				url: 'http://localhost:3001/category',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					data: {
+						categoryName: this.state.category.name,
+						tagName: this.state.tag
+					}
+  			})
+  			.catch((error) => {
+					console.log(error.message);
+					console.log("Tag error: " + JSON.stringify(error));
+					toastMessage = error + ". Your edits might not have gone through, try refreshing.";
+					intent = "danger";
+					toaster.show({message: toastMessage, intent: intent});
+				});
+  		}
+
+  		const fieldsToUpdate = {};
+  	
+			if(this.props.category.name !== this.state.category.name){
+				fieldsToUpdate["category"] = this.state.category.name;
+			}
+
+			const unformattedPropPrice = 
+				CurrencyFormatter.unformat(this.props.item.price, {code: 'USD'});
+
+			if(unformattedPropPrice !== this.state.price) {
+				fieldsToUpdate["price"] = this.state.price;
+			}
+			
+			const remainingUpdatableFields = [
+	  		"isActive", 
+	  		"name",
+	  		"quantity", 
+	  		"tag",
+	  		"unitOfMeasurement"
+			];
 	  	
-	  	Axios({
-				method: 'patch',
-				url: 'https://localhost:3001',
+	  	remainingUpdatableFields.forEach((field) => {
+	  		if(this.props.item[field] !== this.state[field]){
+	  			fieldsToUpdate[field] = this.state[field];
+	  		}
+	  	});
+	  	
+	  	let editPromise = await axios({
+				method: 'put',
+				url: 'http://localhost:3001/item',
 				headers: {
 					'Content-Type': 'application/json'
 				},
 				data: {
-					everyInstance: true,
 					id: this.props.item.id,
-					isUpdateItem: true,
-					item: newItem
+					fieldsToUpdate: fieldsToUpdate
 				}
 			})
-			.then((response) => console.log(response));
+			.catch((error) => {
+				console.log(error.message);
+				toastMessage = error + ". Your edits might not have gone through.";
+				intent = "danger";
+				toaster.show({message: toastMessage, intent: intent});
+			});
+
+			console.log("Edit response: " + JSON.stringify(editPromise));
+
+			if(editPromise.status === 200) {
+				// eslint-disable-next-line
+				const pause = await this.props.loadItems();
+				this.props.generateWasteForm();
+
+				toastMessage = "Edit successful";
+				intent = "success";
+				toaster.show({message: toastMessage, intent: intent});
+			}
   	}
   }
 
@@ -164,44 +248,18 @@ class ItemEditor extends Component {
   }
 
 	render() {
-		
-
 		const catArray = 
 			this.state.categoryItems.map((item) => 
 				<MenuItem 
-				text={item.name} 
-				key={item.name} 
-				onClick={() => this.onCategoryMenuItemClick(item)}/>
+					text={item.name} 
+					key={item.name} 
+					onClick={() => this.onCategoryMenuItemClick(item)}/>
 			)
 
 		const categoryMenu =
 		<Menu>
 			{catArray}
 		</Menu>;
-
-		// const dataImpactMenu = 
-		// <Menu>
-		// 	<MenuItem
-		// 		key={1}
-		// 		onClick={() => this.onDataImpactMenuClick("Every Instance")}
-		// 		text="Every Instance"/>
-		// 	<MenuItem				
-		// 		key={2}
-		// 		onClick={() => this.onDataImpactMenuClick("All Future Instances")}
-		// 		text="All Future Instances"/>
-		// 	<MenuItem				
-		// 		key={3}
-		// 		onClick={() => this.onDataImpactMenuClick("All Future Instances, and Today")}
-		// 		text="All Future Instances, and Today"/>
-		// 	<MenuItem
-		// 		key={4}
-		// 		onClick={() => this.onDataImpactMenuClick("All Past Instances")}
-		// 		text="All Past Instances"/>
-		// 	<MenuItem				
-		// 		key={5}
-		// 		onClick={() => this.onDataImpactMenuClick("All Past Instances, and Today")}
-		// 		text="All Past Instances, and Today"/>
-		// </Menu>
 
 		let tagMenu = null;
   	if(this.state.category !== null) {
@@ -219,18 +277,6 @@ class ItemEditor extends Component {
   			</Menu>
   	}
 
-  // 	const dataImpactSelection =
-  // 	<FormGroup
-  // 		label="Data Impact:"
-  // 		labelInfo="(required)"
-  // 		labelFor="dataImpact-button">
-  // 		<Popover content={dataImpactMenu} position={Position.RIGHT}>
-		// 		<Button icon="share" id="dataImpact-button">
-		// 			{this.state.dataImpactMenuText}
-		// 		</Button>
-		// 	</Popover>
-		// </FormGroup>;
-
 		const categorySelection = 
 		<FormGroup
 			label="Category:"
@@ -240,6 +286,7 @@ class ItemEditor extends Component {
 				<Popover content={categoryMenu} position={Position.RIGHT} >
 					<Button 
             id="category-input" 
+            className="selection-button"
             icon="share" 
             text={this.state.category.name} />
 				</Popover>
@@ -281,7 +328,7 @@ class ItemEditor extends Component {
 				<InputGroup
 					id="name-input"
 					onChange={(event) => this.handleNameInput(event)}
-					value={this.state.itemName}
+					value={this.state.name}
 					/>
 			</FormGroup>;
 
@@ -304,8 +351,9 @@ class ItemEditor extends Component {
 				<InputGroup
 					id="price-input"
 					onChange={(event) => this.handlePriceInput(event)}
-					onBlur={() => this.displayFormattedPrice()}
-					value={this.state.price}
+					onBlur={() => this.handlePriceBlur()}
+					onFocus={() => this.handlePriceFocus()}
+					value={this.state.displayPrice}
 					/>
 			</FormGroup>;
 
@@ -320,19 +368,17 @@ class ItemEditor extends Component {
 					/>
 			</FormGroup>;
 
-		
-
 		const isActiveSwitch =
-			<Switch
+			<Checkbox
 				checked={this.state.isActive}
-				label="Currently in use? If toggled off the item won't be included the currently selected period."
+				label="Use in future periods. If unchecked, item will be added to 'inactive' menu."
 				onClick={() => this.toggleIsActiveSwitch()}
 			/>;
 
 		const deleteSwitch = 
-			<Switch
+			<Checkbox
 				checked={this.state.isToBeDeleted}
-				intent="dangerous"
+				disabled={true}
 				label="Delete? If toggled on the item will never be used in future periods."
 				onClick={() => this.toggleDeleteSwitch()}
 				
@@ -347,11 +393,11 @@ class ItemEditor extends Component {
 			<Button 
 				className="submit-button" 
 				disabled={isSubmitDisabled}
-				intent="primary">
+				intent="primary"
+				onClick={() => this.handleSubmitClick()}>
 				Submit
 			</Button>;
 		
-
 		const itemEditor = 
 		<div className="wrapper">
 			<Card elevation={Elevation.TWO} className="bp3-dark">
@@ -376,6 +422,9 @@ export default ItemEditor;
 
 ItemEditor.propTypes = {
 	category: PropTypes.object,
+	categoryHashAccess: PropTypes.object,
 	categoryItems: PropTypes.arrayOf(PropTypes.object),
+	generateWasteForm: PropTypes.func,
 	item: PropTypes.object,
+	loadItems: PropTypes.func,
 }

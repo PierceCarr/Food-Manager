@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         unique: "nameUnitConstraint",
-        primaryKey: true
       },
       price: {
         type: DataTypes.DECIMAL(CURRENCY_PRECISION, CURRENCY_SCALE),
@@ -38,14 +37,13 @@ module.exports = (sequelize, DataTypes) => {
       },
       tag: {
         type: DataTypes.STRING,
-        defaultValue: 'ect',
+        defaultValue: 'Etc.',
         allowNull: false
       },
       unitOfMeasurement: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: "nameUnitConstraint",
-        primaryKey: true
       },
 	});
 

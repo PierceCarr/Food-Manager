@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       tags: {
         type: DataTypes.ARRAY({
           type: DataTypes.STRING,
-          unique: true
+          // unique: true
         }),
       },
       isActive: {

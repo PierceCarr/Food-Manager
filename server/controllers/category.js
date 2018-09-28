@@ -6,7 +6,8 @@ module.exports = {
 	add(req, res) {
 		return Category
 			.create({
-				name: req.body.name
+				name: req.body.name,
+				tags: [],
 			})
 			.then((category) => res.status(201).send(category))
 			.catch((error) => res.status(400).send(error));
@@ -18,7 +19,7 @@ module.exports = {
 			.then((category) => {
 				if(!category) {
 					return res.status(404).send({
-						message: 'Category Not Found'
+						message: 'Category not found for deletion'
 					});
 				}
 				return category
@@ -50,34 +51,38 @@ module.exports = {
 
 	insertTag(req, res) {
 		return Category
-			.findById(req.params.name, {})
+			.findById(req.body.categoryName, {})
 			.then((category) => {
 				if(!category) {
 					return res.status(404).send({
-						message: "Category Not Found"
+						statusText: "Category not found for tag insertion"
 					});
 				}
 
-				const tagAlreadyExists = category.tags.includes(req.body.tag);
+				const tagAlreadyExists = category.tags.includes(req.body.tagName);
 				if(tagAlreadyExists) return res.status(400).send({
-					message: "Tag Already Exists"
-				})
+					statusText: "Tag Already Exists"
+				});
 
-				category.tags.push(req.body.tag);
+				category.tags.push(req.body.tagName);
 
 				return category
 					.update({
 						tags: category.tags
 					})
 					.then(() => res.status(200).send(category))
-					.catch((error) => res.status(400).send(error));
+					.catch((error) => res.status(400).send({
+						statusText: "Failed during category update of tag insertion"
+					}));
 			})
-			.catch((error) => res.status(400).send(error));
+			.catch((error) => res.status(400).send({
+				statusText: "Failed on outer scope of tag insertion"
+			}));
 	},
 
 	list(req, res) {
 		return Category
-			.findAll({}) //maybe sort here with 'order'
+			.findAll({order: [['name']]}) 
 			.then((categories) => res.status(200).send(categories))
 			.catch((error) => res.status(400).send(error));
 	},

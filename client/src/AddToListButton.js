@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import {Button, Classes, Popover, FormGroup, InputGroup, ControlGroup} from "@blueprintjs/core";
+import {
+	Button, 
+	Classes, 
+	ControlGroup,
+	FormGroup,
+	InputGroup,
+	Popover,   
+} from "@blueprintjs/core";
 import "./AddToListButton.css";
 
 class AddToListButton extends Component {
@@ -20,7 +27,7 @@ class AddToListButton extends Component {
 
 
 	handleSubmit() {
-		if(this.state.userInput.length > 0){
+		if(this.state.userInput.length > 0) {
 			this.props.onSubmit(this.state.userInput);
 			this.setState({userInput: ""});
 		}
@@ -30,22 +37,22 @@ class AddToListButton extends Component {
 
 		const popoverContent = 
 			<div className="popWrapper">
-					<FormGroup
-						label={this.props.label}
-						labelFor="the-form"
-						labelInfo={this.props.labelInfo}>
-						<ControlGroup vertical={false}>
-							<InputGroup
-								id="the-form" 
-								placeholder={this.props.placeholder}
-								onChange={(event) => this.handleUserInput(event)}/>
-							<Button 
-								className={Classes.POPOVER_DISMISS}
-								onClick={() => this.handleSubmit()}>
-								Add
-							</Button>
-						</ControlGroup>
-					</FormGroup>
+				<FormGroup
+					label={this.props.label}
+					labelFor="the-form"
+					labelInfo={this.props.labelInfo}>
+					<ControlGroup vertical={false}>
+						<InputGroup
+							id="the-form" 
+							placeholder={this.props.placeholder}
+							onChange={(event) => this.handleUserInput(event)}/>
+						<Button 
+							className={Classes.POPOVER_DISMISS}
+							onClick={() => this.handleSubmit()}>
+							Add
+						</Button>
+					</ControlGroup>
+				</FormGroup>
 			</div>;
 
 		return(

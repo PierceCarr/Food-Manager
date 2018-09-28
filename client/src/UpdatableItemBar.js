@@ -14,13 +14,12 @@ class UpdatableItemBar extends Component {
 
 	//To generalize: make isSubmitted and id general props
 	async onUpdateButtonClick() {
-		let propertiesToUpdate = [["isSubmitted", true]];
+		const propertiesToUpdate = {"isSubmitted": true};
 
 		this.props.updatableProperties.forEach((property) => {
 			if(this.state[property] !== this.props.item[property] 
 				&& this.state[property] !== undefined) {
-				const nextPropertyTuple = [property, this.state[property]];
-				propertiesToUpdate.push(nextPropertyTuple);
+				propertiesToUpdate[property] = this.state[property];
 			}
 		});
 		
@@ -46,18 +45,16 @@ class UpdatableItemBar extends Component {
 
 	async handleUncheckButtonClick() {
 		if(this.props.item.isSubmitted === true) {
-			const uncheck = {isSubmitted: false};
 
 			const response = await axios({
-				method: 'patch',
-				url: 'http://localhost:3001',
+				method: 'put',
+				url: 'http://localhost:3001/periodItem',
 			    headers: {
 			      'Content-Type': 'application/json'
 			    },
 			    data: {
-			    	isUpdateSinglePeriodItem: true,
-			    	originalItem: this.props.item,
-			    	propertiesToUpdate: uncheck
+			    	id: this.props.item.id,
+			    	propertiesToUpdate: {isSubmitted: false}
 			    }
 			});
 

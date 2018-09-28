@@ -100,8 +100,6 @@ class UpdatableItemSet extends Component {
 			.sort((a, b) => {
 				const aTitle = this.getItemTitle(a).toLowerCase();
 				const bTitle = this.getItemTitle(b).toLowerCase();
-				// console.log("Name A: " + aTitle);
-				// console.log("Name B: " + bTitle);
 				if (aTitle > bTitle) return 1;
 				if (aTitle < bTitle) return -1;
 				return 0;
