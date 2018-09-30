@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import currencyFormatter from 'currency-formatter';
 import axios from 'axios';
 import AddToListButton from './AddToListButton.js';
-import "./ItemInputter.css";
+import "./OptionsPanel.css";
 // import TwoUniqueForm from "./TwoUniqueForm.js";
 import { 
 	Button, 

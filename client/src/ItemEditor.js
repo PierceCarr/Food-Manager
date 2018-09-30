@@ -18,7 +18,7 @@ import {
 } from "@blueprintjs/core";
 
 import AddToListButton from './AddToListButton.js';
-import './ItemEditor.css';
+import './OptionsPanel.css';
 
 class ItemEditor extends Component {
 	constructor(props){
@@ -43,7 +43,7 @@ class ItemEditor extends Component {
 
 	addNewCategory(newCategory) {
   	let noDuplicateCategories = true;
-  	console.log("This is newCategory: " + JSON.stringify(newCategory));
+
   	this.state.categoryItems.forEach((cat) => {
   		if(cat.name === newCategory) noDuplicateCategories = false;
   	});
@@ -98,7 +98,7 @@ class ItemEditor extends Component {
 
   onCategoryMenuItemClick(chosenCategory) {
   	let tagsInCategory = [];
-  	console.log("Category or string: " + JSON.stringify(chosenCategory));
+
   	let updateTags = () => {
 	  	chosenCategory.tags.forEach((tag) => tagsInCategory.push(tag));
 	  	this.setState({tagsFromCategory: tagsInCategory});

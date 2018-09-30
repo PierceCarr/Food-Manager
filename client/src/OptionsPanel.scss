@@ -1,0 +1,40 @@
+ @import "~@blueprintjs/core/lib/css/blueprint.css";
+ @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+
+ $input-width: 300px;
+
+.selection-button {
+	margin: 0;
+	width: $input-width - 75px !important;
+}
+
+.submit-button {
+	width: $input-width;
+}
+
+ .wrapper {
+	width: $input-width + 50px;
+	text-align: left;
+	margin-top: 5px;
+}
+
+.theComponent {
+	width: $input-width + 50px;
+	text-align: left;
+	margin-top: 5px;
+}
+
+.bp3-dark {
+	margin: auto;
+	text-align: left;
+}
+
+.standard-input {
+	width: $input-width !important;
+}
+
+.submit {
+	margin: auto;
+	text-align: center;
+	width: $input-width;
+}
