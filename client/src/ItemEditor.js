@@ -43,14 +43,16 @@ class ItemEditor extends Component {
 
 	addNewCategory(newCategory) {
   	let noDuplicateCategories = true;
+  	console.log("This is newCategory: " + JSON.stringify(newCategory));
   	this.state.categoryItems.forEach((cat) => {
   		if(cat.name === newCategory) noDuplicateCategories = false;
   	});
 
   	if(noDuplicateCategories) {
-	  	const categoryObject = {name: newCategory, tags: []};
+	  	const categoryObject = {name: newCategory, tags: ["Etc."]};
 	  	this.state.categoryItems.push(categoryObject);
 	  	this.onCategoryMenuItemClick(categoryObject);
+	  	this.setState({tag: "Etc."});
   	}
   }
 
@@ -123,14 +125,11 @@ class ItemEditor extends Component {
   		const isUsingNewCategory =
   			this.props.categoryHashAccess[this.state.category.name] === undefined;
 
-  		const isUsingNewTag =
-  			!this.props.categoryHashAccess[this.state.category.name].tags.includes(this.state.tag);
-
-  		console.log("Selected Tag: " + this.state.tag);
-  		console.log("Hash Access: " + JSON.stringify(this.props.categoryHashAccess));
-  		console.log("Category name: " + this.state.category.name);
-  		console.log("Hash tags: " + this.props.categoryHashAccess[this.state.category.name].tags);
-  		console.log("Not included?: " + isUsingNewTag);
+  		let isUsingNewTag = false;
+  		if(!isUsingNewCategory){
+  			isUsingNewTag =
+  				!this.props.categoryHashAccess[this.state.category.name].tags.includes(this.state.tag);
+  		}
 
   		if(isUsingNewCategory) {
   			const categoryPromise = await axios({
@@ -145,7 +144,27 @@ class ItemEditor extends Component {
   			})
   			.catch((error) => {
 					console.log(error.message);
-					toastMessage = error + ". Your edits might not have gone through, try refreshing.";
+					toastMessage = error + ". Failed to create new category. " 
+						+ "Your edits might not have gone through, try refreshing.";
+					intent = "danger";
+					toaster.show({message: toastMessage, intent: intent});
+				});
+
+				const itemPromise = await axios({
+					method: 'put',
+  				url: 'http://localhost:3001/item',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					data: {
+						id: this.props.item.id,
+						fieldsToUpdate: [{category: this.state.category.name}]
+					}
+				})
+				.catch((error) => {
+					console.log(error.message);
+					toastMessage = error + ". Failed to transfer the ingredient to your new category. " 
+						+ "Your edits might not have gone through, try refreshing.";
 					intent = "danger";
 					toaster.show({message: toastMessage, intent: intent});
 				});
@@ -166,7 +185,8 @@ class ItemEditor extends Component {
   			.catch((error) => {
 					console.log(error.message);
 					console.log("Tag error: " + JSON.stringify(error));
-					toastMessage = error + ". Your edits might not have gone through, try refreshing.";
+					toastMessage = error + ". Failed to create new tag. " 
+						+ "Your edits might not have gone through, try refreshing.";
 					intent = "danger";
 					toaster.show({message: toastMessage, intent: intent});
 				});
@@ -212,7 +232,7 @@ class ItemEditor extends Component {
 			})
 			.catch((error) => {
 				console.log(error.message);
-				toastMessage = error + ". Your edits might not have gone through.";
+				toastMessage = error + ". Failed to update the ingredient. Try refreshing.";
 				intent = "danger";
 				toaster.show({message: toastMessage, intent: intent});
 			});
@@ -427,4 +447,4 @@ ItemEditor.propTypes = {
 	generateWasteForm: PropTypes.func,
 	item: PropTypes.object,
 	loadItems: PropTypes.func,
-}
+};

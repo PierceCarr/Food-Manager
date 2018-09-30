@@ -4,10 +4,12 @@ const Category = require('../models').Category;
 module.exports = {
 	
 	add(req, res) {
+		let tags = ["Etc."];
+		if(req.body.tags !== undefined) tags = req.body.tags; 
 		return Category
 			.create({
 				name: req.body.name,
-				tags: [],
+				tags: tags,
 			})
 			.then((category) => res.status(201).send(category))
 			.catch((error) => res.status(400).send(error));
@@ -66,9 +68,25 @@ module.exports = {
 
 				category.tags.push(req.body.tagName);
 
+				let tagSortArray = [];
+				category.tags.forEach((tag) => {
+          			if(tag !== "Etc.") tagSortArray.push(tag);
+        		});
+
+        		tagSortArray = tagSortArray
+		          .sort((a, b) => {
+		            if (a > b) return 1;
+		            if (a < b) return -1;
+		            return 0;
+		          });
+
+       			 tagSortArray.push("Etc.");
+
+       			 // category.tags = tagSortArray;
+
 				return category
 					.update({
-						tags: category.tags
+						tags: tagSortArray
 					})
 					.then(() => res.status(200).send(category))
 					.catch((error) => res.status(400).send({

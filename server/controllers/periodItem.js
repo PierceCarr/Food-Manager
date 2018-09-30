@@ -27,7 +27,7 @@ module.exports = {
 
 		const itemList = await Item.findAll({})
 			.catch((error) => res.status(400).send(error));
-		
+
 		const currentPeriodItemList = await PeriodItem
 			.findAll({
 				where: {
