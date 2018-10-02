@@ -274,7 +274,7 @@ class ItemEditor extends Component {
 					text={item.name} 
 					key={item.name} 
 					onClick={() => this.onCategoryMenuItemClick(item)}/>
-			)
+			);
 
 		const categoryMenu =
 		<Menu>

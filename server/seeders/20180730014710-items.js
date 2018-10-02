@@ -206,7 +206,7 @@ module.exports = {
         tag: "Cheesecake",
         quantity: 4,
         price: 3.50,
-        isActive: true,
+        isActive: false,
         createdAt: Sequelize.fn('now'),
         updatedAt: Sequelize.fn('now')
       },
@@ -261,7 +261,7 @@ module.exports = {
         tag: "Bread",
         quantity: 0,
         price: 13.42,
-        isActive: true,
+        isActive: false,
         createdAt: Sequelize.fn('now'),
         updatedAt: Sequelize.fn('now')
       },
@@ -272,7 +272,7 @@ module.exports = {
         tag: "Bread",
         quantity: 0,
         price: 0.48,
-        isActive: true,
+        isActive: false,
         createdAt: Sequelize.fn('now'),
         updatedAt: Sequelize.fn('now')
       },

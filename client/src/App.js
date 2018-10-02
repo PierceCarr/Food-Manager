@@ -19,6 +19,7 @@ import ContainerOfUpdatableItemSets from './ContainerOfUpdatableItemSets.js';
 import FormSelectionCard from './FormSelectionCard.js';
 import ItemEditor from './ItemEditor.js';
 import ItemInputter from './ItemInputter.js';
+import InactiveItemManager from './InactiveItemManager.js';
 import './App.css';
 
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -29,7 +30,6 @@ FocusStyleManager.onlyShowFocusOnTabs();
 //-Remove impossible weekday menu items depending on the period
 //-The server should manage periods automatically, adding and deleting as
 //the date changes
-//-Ability to edit/delete generic item classes in client (can currently add)
 //-Limit form inputs and check them for safety
 //-Produce basic reports on the client
 //-Output excel reports
@@ -38,7 +38,6 @@ FocusStyleManager.onlyShowFocusOnTabs();
 //-Formal testing
 
 //--Low priority:
-//-Display period menu skeleton before it's populated
 //-Replace categories with a 'loading' loop while waste form is generating
 //-Replace check with a 'loading' loop while server is updating database with
 //period item change
@@ -216,13 +215,16 @@ class App extends Component {
  }
 
  onEditButtonClick(item) {
-  const genericItem = this.state.itemHashAccess[item.itemId];
+  let genericItem = item;
+  if(item.itemId !== undefined) { //Edit button in period item only knows id
+    genericItem = this.state.itemHashAccess[item.itemId];
+  }
 
   this.setState({
     itemToEdit: genericItem,
     itemPanelForm: "Edit Selected Ingredient",
     isItemPanelOpen: true
-  })
+  });
  }
 
  onIngredientOptionRadioClick(event) {
@@ -282,40 +284,53 @@ class App extends Component {
   	if(this.state.isItemPanelOpen === true){
       if(this.state.itemPanelForm === "Add New Ingredient") {
         itemPanelForm = 
-        <ItemInputter 
-          className="itemInputter"
-          categoryItems={this.state.categoryList} 
-          isReadyToLoad={this.state.isItemInputterReadyToLoad}
-          loadItems={this.loadCategoriesPeriodsAndItems}
-          selectedPeriod={this.state.selectedPeriod}
-          updatePeriodItemLists={this.updatePeriodItemLists} />
+          <ItemInputter 
+            className="itemInputter"
+            categoryItems={this.state.categoryList} 
+            isReadyToLoad={this.state.isItemInputterReadyToLoad}
+            loadItems={this.loadCategoriesPeriodsAndItems}
+            selectedPeriod={this.state.selectedPeriod}
+            updatePeriodItemLists={this.updatePeriodItemLists} />
       } 
       else if (this.state.itemPanelForm === "Edit Selected Ingredient") {
         const initialCategory = this.state.categoryHashAccess[this.state.itemToEdit.category];
-        
+        console.log("INITIAL EDIT CATEGORY: " + JSON.stringify(initialCategory));
         itemPanelForm =
-        <ItemEditor
-          category={initialCategory}
-          categoryHashAccess={this.state.categoryHashAccess}
-          categoryItems={this.state.categoryList}
-          generateWasteForm={this.generateWasteForm}
-          item={this.state.itemToEdit} 
-          key={this.state.itemToEdit.name}
-          loadItems={this.loadCategoriesPeriodsAndItems}
-          selectedPeriod={this.state.selectedPeriod} />
+          <ItemEditor
+            category={initialCategory}
+            categoryHashAccess={this.state.categoryHashAccess}
+            categoryItems={this.state.categoryList}
+            generateWasteForm={this.generateWasteForm}
+            item={this.state.itemToEdit} 
+            key={this.state.itemToEdit.name}
+            loadItems={this.loadCategoriesPeriodsAndItems}
+            selectedPeriod={this.state.selectedPeriod} />
+      }
+      else if (this.state.itemPanelForm === "Manage Ingredients Not Included In Selected Period") {
+        itemPanelForm = 
+          <InactiveItemManager 
+            itemList={this.state.itemList}
+            categoryList={this.state.categoryList}
+            onEditButtonClick={this.onEditButtonClick}
+            selectedPeriod={this.state.selectedPeriod} />
       }
     } 
-  	
-    let disableItemEdit = ["Edit Selected Ingredient"];
-    if(this.state.itemToEdit !== null) disableItemEdit = [];
+
+    const radiosToDisable = [];
+    if(this.state.itemToEdit === null) radiosToDisable.push("Edit Selected Ingredient");
+    if(this.state.selectedPeriod === null) radiosToDisable.push("Manage Ingredients Not Included In Selected Period");
 
     const formSelectionCard =
-    <FormSelectionCard
-      changeFunction={(event) => this.onIngredientOptionRadioClick(event)}
-      radiosToDisable={disableItemEdit}
-      radioTitles={["Add New Ingredient", "Edit Selected Ingredient"]}
-      selected={this.state.itemPanelForm}
-      title="Ingredient Options:"/>
+      <FormSelectionCard
+        changeFunction={(event) => this.onIngredientOptionRadioClick(event)}
+        radiosToDisable={radiosToDisable}
+        radioTitles={[
+          "Add New Ingredient", 
+          "Edit Selected Ingredient", 
+          "Manage Ingredients Not Included In Selected Period"
+        ]}
+        selected={this.state.itemPanelForm}
+        title="Ingredient Options:" />
 
     let itemPanel = 
       <div className="item-panel">
