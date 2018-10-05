@@ -35,7 +35,7 @@ class ContainerOfUpdatableItemSets extends Component {
 			}
 		});
 
-		const chevronSize = 50;
+		const chevronSize = 38;
 		const chevronDirection = 
 			this.state.isSetListDisplayed ? "chevron-down" : "chevron-right";
 		const titleChevron = 
@@ -43,7 +43,7 @@ class ContainerOfUpdatableItemSets extends Component {
 
 		const title = 
 		<button className="headerButton" onClick={() => this.onTitleClick()}>
-			<h1>
+			<h1 className="title">
 				{titleChevron}{this.props.title + " " + numberOfSubmittedItems + "/" + numberOfItems}
 			</h1>
 		</button>;
@@ -79,7 +79,7 @@ class ContainerOfUpdatableItemSets extends Component {
 		})
 
 		const component = 
-		<div>
+		<div className="divWrapper">
 			{title}
 			<Collapse isOpen={this.state.isSetListDisplayed}>
 				{content}

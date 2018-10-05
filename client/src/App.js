@@ -64,6 +64,7 @@ class App extends Component {
     itemPanelForm: "Add New Ingredient",
     itemToEdit: null,
     periodHashAccess: null,
+    periodItemsForSelectedPeriod: null,
     periodList: [],
     selectedPeriod: null,
     selectedPeriodMenuText: "Select a Period",
@@ -101,12 +102,12 @@ class App extends Component {
   const itemData = await axios({
     mothod: 'get',
     url: 'http://localhost:3001/item'
-  })
+  });
 
   const periodData = await axios({
     mothod: 'get',
     url: 'http://localhost:3001/period'
-  })
+  });
   
   categoryData.data.forEach((category) => {
     CategoryHashAccess[category.name] = category;
@@ -143,14 +144,11 @@ class App extends Component {
  		return;
  	}
 
-  const day = this.state.selectedWeekday;
-  const isAM = this.state.isAM;
   const period = this.state.selectedPeriod.id;
 
-  const url = 'http://localhost:3001/periodItem/'+day+'&'+isAM+'&'+period;
   axios({
     method: 'get',
-    url: url,
+    url: 'http://localhost:3001/periodItem/' + period,
   })
   .then((response) => {
     if(response.status === 200 && response.data.length > 0) {
@@ -195,7 +193,7 @@ class App extends Component {
         }) 
       });
 
-      this.setState({wasteForm: wasteForm});
+      this.setState({wasteForm: wasteForm, periodItemsForSelectedPeriod: response.data});
     } else {
       this.setState({wasteForm: "No items found for that period."});
     }
@@ -232,11 +230,35 @@ class App extends Component {
   this.setState({itemPanelForm: event.currentTarget.value});
  }
 
- onPeriodMenuClick(period) {
+ onPeriodMenuClick(periodTitle) {
+  const periodLocation = periodTitle.indexOf('.');
+  const firstSpace = periodTitle.indexOf(' ');
+
+  const primaryPeriod = Number(periodTitle.substr(0, periodLocation));
+  const quarterPeriod = Number(periodTitle[periodLocation + 1]);
+
+  let desiredPeriod = undefined;
+  this.state.periodList.forEach((period) => {
+    const isDesiredAM = period.isAM === this.state.isAM;
+    const isDesiredDay = period.day === this.state.selectedWeekday;
+    const isDesiredPrimary = primaryPeriod === period.primaryPeriod;
+    const isDesiredQuarter = quarterPeriod === period.quarterPeriod;
+
+    if(isDesiredAM && isDesiredDay && isDesiredPrimary && isDesiredQuarter) {
+      desiredPeriod = period;
+    }
+  });
+  
+  if(desiredPeriod === undefined){
+    console.log("The period finding algorithm in onPeriodMenuClick is bunk.");
+  }
+
   this.setState({
-    selectedPeriod: period,
-    selectedPeriodMenuText: "Selected Period: " + period.month + "." + period.week
-  }, () => this.generateNewPeriodWasteForm());
+    selectedPeriod: desiredPeriod,
+    selectedPeriodMenuText: "Selected Period: " + primaryPeriod + "." + quarterPeriod
+  }, 
+  // () => this.generateNewPeriodWasteForm()
+  );
  }
 
  onWeekdayMenuClick(weekday) {
@@ -264,17 +286,17 @@ class App extends Component {
  }
 
  updatePeriodItemLists(updatedItem) {
- 	let newPeriodItemHashAccess = this.state.periodHashAccess;
+ 	let newPeriodItemList = this.state.periodItemsForSelectedPeriod;
 
   if(updatedItem.constructor === Array) {
     updatedItem.forEach((periodItem) => {
-      newPeriodItemHashAccess[periodItem.id] = periodItem;
+      newPeriodItemList.push(periodItem);
     })
   } else {
-    newPeriodItemHashAccess[updatedItem.id] = updatedItem;
+    newPeriodItemList.push(updatedItem);
   }
 
- 	this.setState({newPeriodItemHashAccess: newPeriodItemHashAccess},
+ 	this.setState({periodItemsForSelectedPeriod: newPeriodItemList},
  		() => this.generateWasteForm());
  }
 
@@ -309,9 +331,11 @@ class App extends Component {
       else if (this.state.itemPanelForm === "Manage Ingredients Not Included In Selected Period") {
         itemPanelForm = 
           <InactiveItemManager 
-            itemList={this.state.itemList}
             categoryList={this.state.categoryList}
+            itemList={this.state.itemList}
+            loadItems={this.loadCategoriesPeriodsAndItems}
             onEditButtonClick={this.onEditButtonClick}
+            periodItemsForSelectedPeriod={this.state.periodItemsForSelectedPeriod}
             selectedPeriod={this.state.selectedPeriod} />
       }
     } 
@@ -350,7 +374,7 @@ class App extends Component {
         <Tab id="waste" title="Waste" className="singleTab"/>
         <Tab id="reports" title="Reports" className="singleTab"/>
         <Tab id="admin" title="Admin" className="singleTab"/>
-      </Tabs> ;
+      </Tabs>;
 
     const weekdayMenu =
       <Menu>
@@ -384,14 +408,24 @@ class App extends Component {
         </Button>
       </Popover>;
 
+    const periodMenuOptions = [];
+    this.state.periodList.forEach((period) => {
+      const menuTitle = 
+        period.primaryPeriod + '.' + period.quarterPeriod + ' - ' + period.year; 
+
+      if(periodMenuOptions.includes(menuTitle) === false) {
+        periodMenuOptions.push(menuTitle);
+      }
+    });
+
     const periodMenu =
       <Menu>
         {
-          this.state.periodList.map((period) => 
+          periodMenuOptions.map((periodTitle) => 
             <MenuItem
-            text={period.month + "." + period.week}
-            key={period.id}
-            onClick={() => this.onPeriodMenuClick(period)}
+              text={periodTitle}
+              key={periodTitle}
+              onClick={() => this.onPeriodMenuClick(periodTitle)}
             />
           )
         }
@@ -405,9 +439,9 @@ class App extends Component {
         </Popover>
         <Button text="Add Period"/>
         <RadioGroup
-        inline="true"
-        onChange={() => this.changeAMPM()}
-        selectedValue={this.state.isAM}>
+          inline="true"
+          onChange={() => this.changeAMPM()}
+          selectedValue={this.state.isAM}>
           <Radio label="AM" value={true}/>
           <Radio label="PM" value={false}/>
         </RadioGroup>
@@ -417,10 +451,10 @@ class App extends Component {
 
     const toggleItemPanelButton =
     <Button 
-    intent="warning" 
-    icon="menu-closed"
-    className="header-itemPanelButton"
-    onClick={() => this.toggleItemPanel()}>
+      intent="warning" 
+      icon="menu-closed"
+      className="header-itemPanelButton"
+      onClick={() => this.toggleItemPanel()}>
     	{"Toggle Ingredient Options Panel"}
     </Button>
 

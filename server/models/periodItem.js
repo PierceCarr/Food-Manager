@@ -10,28 +10,18 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         unique: true
     },
+
     itemId: {
       type: DataTypes.INTEGER,
       references: {model: 'items', key: 'id'}
     },
-    periodId: {
-      type: DataTypes.INTEGER,
-      references: {model: 'periods', key: 'id'}
-    },
-    day: {
-      type: DataTypes.INTEGER,
-      validate: {
-        min: 1,
-        max: 7
-      }
-    },
-    isAM: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false
-    },
     isSubmitted: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    periodId: {
+      type: DataTypes.INTEGER,
+      references: {model: 'periods', key: 'id'}
     },
     price: {
       type: DataTypes.DECIMAL(CURRENCY_PRECISION, CURRENCY_SCALE),
@@ -47,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
         min: 0
       }
     },
+
     createdAt: {
       type: DataTypes.DATE
     },

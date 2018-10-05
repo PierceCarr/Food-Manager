@@ -18,7 +18,6 @@ import './OptionsPanel.css';
 //TODO:
 //-Add items that do not have period items in selected period
 //-AddToPeriod button should create a period item for selected period
-//-Reactivate button should update an item's isActive property to 'true'
 
 class InactiveItemManager extends Component {
 	constructor(props) {
@@ -36,7 +35,6 @@ class InactiveItemManager extends Component {
 			categoryMenuText: this.defaultMenuText,
 			itemMenuText: this.defaultMenuText,
 			tagMenuText: this.defaultMenuText,
-
 		};
 	}
 
@@ -49,13 +47,6 @@ class InactiveItemManager extends Component {
 		});
 	}
 
-	onTagMenuItemClick(chosenTag) {
-		this.setState({
-			tag: chosenTag,
-			tagMenuText: chosenTag
-		});
-	}
-
 	onItemMenuItemClick(chosenItem, menuText) {
 		this.setState({
 			item: chosenItem,
@@ -63,9 +54,55 @@ class InactiveItemManager extends Component {
 		});
 	}
 
+	onTagMenuItemClick(chosenTag) {
+		this.setState({
+			tag: chosenTag,
+			tagMenuText: chosenTag
+		});
+	}
+
+	async onReactivateClick() {
+		let toastMessage = "Something unexpected occured when activiating ingredient. Try refreshing.";
+		let intent = "warning";
+		const toaster = Toaster.create({postion: Position.TOP});
+
+		const updatePromise = await axios({
+			method: 'put',
+			url: 'http://localhost:3001/item',
+  			headers: {
+  				'Content-Type': 'application/json'
+  			},
+  			data: {
+  				id: this.state.item.id,
+  				fieldsToUpdate: {"isActive": true}
+  			}
+		})
+		.catch((error) => {
+			const toastMessage = error 
+				+ ". Something went wrong when attempting to reactivate the ingredient. Try refreshing.";
+
+			intent = "danger";
+			toaster.show({message: toastMessage, intent: intent});
+			return;
+		});
+
+		if(updatePromise.status === 200){
+			this.props.loadItems();
+
+			toastMessage = "Activated ingredient";
+			intent = "success";
+			toaster.show({message: toastMessage, intent: intent});
+			return;
+		}
+		toaster.show({message: toastMessage, intent: intent});
+	}
+
+
+
 	render(){
 		const categoryMenuArray = [];
 		const inactiveCountByTagHash = {};
+		let itemsToModify = [];
 
 		if(this.state.category !== null) {
 			this.state.category.tags.forEach((tag) => {
@@ -77,11 +114,42 @@ class InactiveItemManager extends Component {
 
 			let numberOfInactiveItemsInCategory = 0;
 			this.props.itemList.forEach((item) => {
+
 				if(item.category === category.name && item.isActive === false) {
 					numberOfInactiveItemsInCategory++;
 					
 					if(inactiveCountByTagHash[item.tag] !== undefined){
 						inactiveCountByTagHash[item.tag]++;
+					}
+
+				} else if(this.props.periodItemsForSelectedPeriod !== null) {
+					const isThereAnInstanceOfItemInSelectedPeriod = () => {
+						let isAnInstance = true;
+
+						for(let instanceNumber = 0; 
+							instanceNumber < this.props.periodItemsForSelectedPeriod.length;
+							instanceNumber++) {
+							if(this.props.periodItemsForSelectedPeriod[instanceNumber].itemId 
+								=== item.id) {
+								isAnInstance = false;
+								break;
+							}
+						}
+
+						return isAnInstance;
+					}
+
+					const noInstancesOfItemInSelectedPeriod = 
+						!isThereAnInstanceOfItemInSelectedPeriod();
+
+					if(noInstancesOfItemInSelectedPeriod){
+						numberOfInactiveItemsInCategory++;
+
+						if(inactiveCountByTagHash[item.tag] !== undefined){
+							inactiveCountByTagHash[item.tag]++;
+						}
+
+						itemsToModify.push(item);
 					}
 				}
 			});
@@ -114,7 +182,7 @@ class InactiveItemManager extends Component {
 			})
 		}
 
-		let itemsToModify = [];
+		
 		const itemMenuArray = [];
 		if(this.state.category !== null) {
 			const sortConditions = (item) => {
@@ -221,6 +289,7 @@ class InactiveItemManager extends Component {
 				className="standard-input"
 				disabled={this.state.item === null}
 				intent="primary"
+				onClick={() => this.onReactivateClick()}
 				text="Reactivate"/>;
 
 		const inactiveItemManager = 
@@ -244,6 +313,7 @@ export default InactiveItemManager;
 InactiveItemManager.propTypes = {
 	itemList: PropTypes.arrayOf(PropTypes.object),
 	categoryList: PropTypes.arrayOf(PropTypes.object),
+	periodItemsForSelectedPeriod: PropTypes.arrayOf(PropTypes.object),
 	onEditButtonClick: PropTypes.func,
 	selectedPeriod: PropTypes.object
 };

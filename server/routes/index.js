@@ -27,8 +27,8 @@ router.put('/item', itemController.updateItem);
 
 router.get('/period', periodController.list);
 
-router.get('/periodItem/:day&:isAM&:periodId', periodItemController.listForWasteForm);
-router.post('/periodItem', periodItemController.createOustandingPeriodItems);
+router.get('/periodItem/:periodId', periodItemController.listForWasteForm);
+// router.post('/periodItem', periodItemController.createOustandingPeriodItems);
 router.put('/periodItem', periodItemController.update);
 
 //For local use:

@@ -1,5 +1,15 @@
+.divWrapper {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
 .headerButton {
 	outline: 0;
 	border: 0px solid #999;
 	background-color: white;
+}
+
+.title {
+	display: flex;
 }

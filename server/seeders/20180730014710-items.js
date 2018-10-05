@@ -78,30 +78,56 @@ module.exports = {
         autoIncrement: true,
         unique: true
       },
+
+      day: {
+        type: Sequelize.INTEGER,
+        validate: {
+          min: 1,
+          max: 7
+        }
+      },
+      endDay: {
+        type: Sequelize.INTEGER,
+        validate: {
+          max: 31,
+          min: 1
+        }
+      },
+      isAM: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false
+      },
       month: {
         type: Sequelize.INTEGER,
         validate: {
           max: 12,
           min: 1
         },
-        unique: "monthWeekConstraint",
       },
-      week: {
+      primaryPeriod: {
+        type: Sequelize.INTEGER,
+        unique: "yearPrimaryQuarterConstraint",
+      },
+      quarterPeriod: {
         type: Sequelize.INTEGER,
         validate: {
           max: 4,
           min: 1
         },
-        unique: "monthWeekConstraint",
+        unique: "yearPrimaryQuarterConstraint",
       },
-      currentWeekday: { 
-        //0: hasn't started yet, 8: period is over, 1-7: weekdays
+      startDay: {
         type: Sequelize.INTEGER,
         validate: {
-          max: 8,
-          min: 0
+          max: 31,
+          min: 1
         }
       },
+      year: {
+        type:Sequelize.INTEGER,
+        unique: "yearPrimaryQuarterConstraint",
+      },
+
       createdAt: {
         type: Sequelize.DATE
       },
@@ -110,36 +136,75 @@ module.exports = {
       }
     });
 
-    await queryInterface.bulkInsert('periods', [
-        {
-          month: 1,
-          week: 4,
-          currentWeekday: 0,
-          createdAt: Sequelize.fn('now'),
-          updatedAt: Sequelize.fn('now')
-        },
-        {
-          month: 2,
-          week: 2,
-          currentWeekday: 0,
-          createdAt: Sequelize.fn('now'),
-          updatedAt: Sequelize.fn('now')
-        },
-        {
-          month: 8,
-          week: 2,
-          currentWeekday: 0,
-          createdAt: Sequelize.fn('now'),
-          updatedAt: Sequelize.fn('now')
-        },
-        {
-          month: 8,
-          week: 3,
-          currentWeekday: 0,
-          createdAt: Sequelize.fn('now'),
-          updatedAt: Sequelize.fn('now')
+    const periodTuples = [[1,4],[2,2],[8,1],[8,2],[8,3],[8,4]];
+    const periodsToInsert = [];
+
+    const arbitraryEndDay = 31;
+    const arbitraryMonth = 1;
+    const arbitraryStartDay = 24;
+    const arbitraryYear = 2018;
+
+    periodTuples.forEach((periodTuple) => {
+      
+      for(let weekday = 0; weekday < 14; weekday++){
+
+        let isAM = true;
+        if((weekday / 7) >= 1) {
+          isAM = false;
+        } else {
+          isAM = true;
         }
-    ]);
+        
+        const periodInstance = {
+          
+          day: (weekday % 7) + 1,
+          endDay: arbitraryEndDay,
+          isAM: isAM,
+          month: arbitraryMonth,
+          primaryPeriod: periodTuple[0],
+          quarterPeriod: periodTuple[1],
+          startDay: arbitraryStartDay,
+          year: arbitraryYear,
+
+          createdAt: Sequelize.fn('now'),
+        }
+
+        periodsToInsert.push(periodInstance);
+      }
+    });
+    
+    await queryInterface.bulkInsert('periods', periodsToInsert
+    //   [
+    //     {
+    //       month: 1,
+    //       week: 4,
+    //       currentWeekday: 0,
+    //       createdAt: Sequelize.fn('now'),
+    //       updatedAt: Sequelize.fn('now')
+    //     },
+    //     {
+    //       month: 2,
+    //       week: 2,
+    //       currentWeekday: 0,
+    //       createdAt: Sequelize.fn('now'),
+    //       updatedAt: Sequelize.fn('now')
+    //     },
+    //     {
+    //       month: 8,
+    //       week: 2,
+    //       currentWeekday: 0,
+    //       createdAt: Sequelize.fn('now'),
+    //       updatedAt: Sequelize.fn('now')
+    //     },
+    //     {
+    //       month: 8,
+    //       week: 3,
+    //       currentWeekday: 0,
+    //       createdAt: Sequelize.fn('now'),
+    //       updatedAt: Sequelize.fn('now')
+    //     }
+    // ]
+    );
 
     await queryInterface.createTable('items', {
       id: {
@@ -148,6 +213,7 @@ module.exports = {
         autoIncrement: true,
         unique: true
       },
+
       name: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -184,6 +250,7 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: true
       },
+
       createdAt: {
         type: Sequelize.DATE
       },
@@ -384,29 +451,30 @@ module.exports = {
         autoIncrement: true,
         unique: true
       },
+
       itemId: {
         type: Sequelize.INTEGER,
         references: {model: 'items', key: 'id'}
-      },
-      periodId: {
-        type: Sequelize.INTEGER,
-        references: {model: 'periods', key: 'id'}
-      },
-      day: {
-        type: Sequelize.INTEGER,
-        validate: {
-          min: 1,
-          max: 7
-        }
-      },
-      isAM: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false
       },
       isSubmitted: {
           type: Sequelize.BOOLEAN,
           defaultValue: false
       },
+      periodId: {
+        type: Sequelize.INTEGER,
+        references: {model: 'periods', key: 'id'}
+      },
+      // day: {
+      //   type: Sequelize.INTEGER,
+      //   validate: {
+      //     min: 1,
+      //     max: 7
+      //   }
+      // },
+      // isAM: {
+      //   type: Sequelize.BOOLEAN,
+      //   allowNull: false
+      // },
       price: {
         type: Sequelize.DECIMAL(CURRENCY_PRECISION, CURRENCY_SCALE),
         defaultValue: 0,
@@ -421,6 +489,7 @@ module.exports = {
           min: 0
         }
       },
+
       createdAt: {
         type: Sequelize.DATE
       },
@@ -439,30 +508,41 @@ module.exports = {
 
     periods.forEach((period) => {
       items.forEach((item) => {
-        for(let weekday = 1; weekday <= 7; weekday++){
-          const amPeriodItem = {};
-          const pmPeriodItem = {};
+        // for(let weekday = 1; weekday <= 7; weekday++){
+        //   const amPeriodItem = {};
+        //   const pmPeriodItem = {};
 
-          amPeriodItem.periodId = period.id;
-          pmPeriodItem.periodId = period.id;
-          amPeriodItem.itemId = item.id;
-          pmPeriodItem.itemId = item.id;
-          amPeriodItem.day = weekday;
-          pmPeriodItem.day = weekday;
-          amPeriodItem.quantity = item.quantity;
-          pmPeriodItem.quantity = item.quantity;
-          amPeriodItem.price = item.price;
-          pmPeriodItem.price = item.price;
-          amPeriodItem.isAM = true;
-          pmPeriodItem.isAM = false;
-          amPeriodItem.isSubmitted = false;
-          pmPeriodItem.isSubmitted = false;
-          amPeriodItem.createdAt = Sequelize.fn('now');
-          pmPeriodItem.createdAt = Sequelize.fn('now');
+        //   amPeriodItem.periodId = period.id;
+        //   pmPeriodItem.periodId = period.id;
+        //   amPeriodItem.itemId = item.id;
+        //   pmPeriodItem.itemId = item.id;
+        //   amPeriodItem.day = weekday;
+        //   pmPeriodItem.day = weekday;
+        //   amPeriodItem.quantity = item.quantity;
+        //   pmPeriodItem.quantity = item.quantity;
+        //   amPeriodItem.price = item.price;
+        //   pmPeriodItem.price = item.price;
+        //   amPeriodItem.isAM = true;
+        //   pmPeriodItem.isAM = false;
+        //   amPeriodItem.isSubmitted = false;
+        //   pmPeriodItem.isSubmitted = false;
+        //   amPeriodItem.createdAt = Sequelize.fn('now');
+        //   pmPeriodItem.createdAt = Sequelize.fn('now');
 
-          periodItemsToAdd.push(amPeriodItem);
-          periodItemsToAdd.push(pmPeriodItem);
-        }
+        //   periodItemsToAdd.push(amPeriodItem);
+        //   periodItemsToAdd.push(pmPeriodItem);
+        // }
+
+        const itemInstance = {};
+
+        itemInstance.itemId = item.id;
+        itemInstance.periodId = period.id;
+        itemInstance.quantity = item.quantity;
+        itemInstance.price = item.price;
+        itemInstance.isSubmitted = false;
+        itemInstance.createdAt = Sequelize.fn('now')
+
+        periodItemsToAdd.push(itemInstance);
       })
     })
 

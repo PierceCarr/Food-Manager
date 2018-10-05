@@ -44,6 +44,7 @@ class ItemInputter extends Component {
       hasCategoryMenuLoaded: false,
       inputKey: new Date(),
       isCategoryChosen: false,
+      isEveryInputValid: true,
       isIncludedInCurrentPeriod: true,
       isNameComboValid: false,
       nameFormValue: "",
@@ -293,7 +294,7 @@ class ItemInputter extends Component {
 
   	let submitText = "Submit";
   	const isSubmitAvailable = this.state.isCategoryChosen;
-  	if(!isSubmitAvailable) submitText = "Select a category to submit";
+  	if(isSubmitAvailable === false) submitText = "Select a category to submit";
 
   	const tagsDontExist = 
   		this.state.category !== null && 
@@ -452,7 +453,7 @@ class ItemInputter extends Component {
         <Button 
           className="submit" 
           onClick={() => this.handleSubmit()}
-          disabled={!isSubmitAvailable}>
+          disabled={isSubmitAvailable === false || this.state.isEveryInputValid === false}>
           {submitText}
         </Button>
       </div>;
