@@ -17,11 +17,11 @@ class FromSelectionCard extends Component {
 
 			return (
 				<Radio 
-				disabled={isDisabled}
-				key={title}
-				label={title} 
-				large={true} 
-				value={title} />
+					disabled={isDisabled}
+					key={title}
+					label={title} 
+					large={true} 
+					value={title} />
 			);
 		});
 
@@ -31,9 +31,9 @@ class FromSelectionCard extends Component {
 	        {this.props.title}
 	      </h3>
 	      <RadioGroup 
-	      onChange={(event) => this.props.changeFunction(event)}
-	      selectedValue={this.props.selected}
-	      vertical={true}>
+		      onChange={(event) => this.props.changeFunction(event)}
+		      selectedValue={this.props.selected}
+		      vertical={true}>
 	        {radios}
 	      </RadioGroup>
 	    </Card>;

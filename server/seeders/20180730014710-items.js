@@ -136,7 +136,7 @@ module.exports = {
       }
     });
 
-    const periodTuples = [[1,4],[2,2],[8,1],[8,2],[8,3],[8,4]];
+    const periodTuples = [[1,4],[2,2],[8,1],[8,2],[8,3],[8,4], [12,3]];
     const periodsToInsert = [];
 
     const arbitraryEndDay = 31;

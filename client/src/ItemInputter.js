@@ -15,7 +15,9 @@ import {
 	Menu,
 	MenuItem, 
 	Popover,
-	Position,     
+	Position,  
+  Radio,
+  RadioGroup,   
 	Toaster,  
 } from "@blueprintjs/core";
 
@@ -24,6 +26,10 @@ class ItemInputter extends Component {
     super(props);
 
     this.defaultMenuText = "Click Here to Select";
+    this.justInsertInSelectedDefaultText 
+      = "Only include in selected day + AM/PM of selected period";
+    this.insertInAllOfPeriodDefaultText
+      = "Include in every day + AM/PM of selected period";
 
     this.state = {
     	//Item data to submit
@@ -49,10 +55,9 @@ class ItemInputter extends Component {
       isNameComboValid: false,
       nameFormValue: "",
       nameUnitChecked: false,
+      periodInsertionOption: "just selected",
       tagsFromCategory: [],
       tagMenuText: this.defaultMenuText,
-      // updateFormOneFormat: false
-      // title: null, //can probably remove this
     }
 
     this.onCategoryMenuItemClick = this.onCategoryMenuItemClick.bind(this);
@@ -96,7 +101,8 @@ class ItemInputter extends Component {
     	isNameComboValid: false,
     	categoryMenuText: this.defaultMenuText,
     	tagMenuText: this.defaultMenuText,
-    	inputKey: new Date()
+    	inputKey: new Date(),
+      periodInsertionOption: "one",
   	});
   }
 
@@ -188,6 +194,10 @@ class ItemInputter extends Component {
 	  	this.onTagMenuItemClick(newTag);
   	}
   	
+  }
+
+  handlePeriodInsertionChange(event) {
+    this.setState({periodInsertionOption: event.target.value});
   }
 
   handlePriceInput(event) {
@@ -439,12 +449,31 @@ class ItemInputter extends Component {
             value={this.state.initialQuantity}/>
         </FormGroup>
 
-        <Checkbox
-          checked={this.state.isIncludedInCurrentPeriod}
-          disabled={this.props.selectedPeriod === null}
-          label="Include in selected period"
-          onChange={() => this.setState({isIncludedInCurrentPeriod: !this.state.isIncludedInCurrentPeriod})}/>
-        
+        <Card>
+          <Checkbox
+            checked={this.state.isIncludedInCurrentPeriod}
+            disabled={this.props.selectedPeriod === null}
+            label="Include in selected period"
+            onChange={() => this.setState({
+              isIncludedInCurrentPeriod: !this.state.isIncludedInCurrentPeriod
+            })}/>
+          
+          <RadioGroup
+            disabled={
+              this.props.selectedPeriod === null 
+              || this.state.isIncludedInCurrentPeriod === false
+            }
+            onChange={(event) => this.handlePeriodInsertionChange(event)}
+            selectedValue={this.state.periodInsertionOption}>
+            <Radio 
+              label={this.justInsertInSelectedDefaultText} 
+              value={this.justInsertInSelectedDefaultText}/>
+            <Radio 
+              label={this.insertInAllOfPeriodDefaultText} 
+              value={this.insertInAllOfPeriodDefaultText}/>
+          </RadioGroup>
+        </Card>
+
         <Checkbox 
           label={inUseExplaination}
           checked={this.state.isItemActive} 
@@ -458,52 +487,8 @@ class ItemInputter extends Component {
         </Button>
       </div>;
 
-      // const hiddenPriceSubmitPanel = 
-      // <div>
-      //   <Collapse isOpen={this.state.isNameComboValid}>
-
-      //     {priceSubmitPanel}
-
-      //   </Collapse>
-      // </div>;
-
 			let itemInputterClass = 'bp3-skeleton';
       if(this.props.isReadyToLoad === true) itemInputterClass = 'bp3-dark';
-
-      // const twoUniqueForm = 
-      // <TwoUniqueForm 
-      //   key={this.state.inputKey}
-      //   labelOneTitle="Name:"
-      //   labelOneInfo={requiredText}
-      //   labelOnePlaceholder="ex. Pumpkin"
-      //   labelTwoTitle="Unit of Measurement:"
-      //   labelTwoInfo={requiredText}
-      //   labelTwoPlaceholder="ex. Slice"
-      //   formOneFocusValue={this.state.itemName}
-      //   formOneBlurValue={this.state.displayItemName}
-      //   updateFormOneFormat={this.state.updateFormOneFormat}
-      //   formTwoText={this.state.unitOfMeasurement}
-      //   validationButtonText="Check if Name/UOM Combo Exists"
-      //   warningMessage="This Item already exists with given UOM"
-      //   handleFirstInput={(event) => this.handleNameInput(event)}
-      //   handleSecondInput={(event) => this.handleUnitInput(event)}
-      //   submitted={this.state.nameUnitChecked}
-      //   validCombo={this.state.isNameComboValid}
-      //   validateNameUnitCombo=
-      //     {(isValid, name, unit) => this.validateNameUnitCombo(isValid, name, unit)}
-      // />;
-
-      // const itemInputter = 
-      // <div className="theComponent">
-      //   <Card elevation={Elevation.TWO} className={itemInputterClass}>
-      //     {categorySelection}
-      //     {itemTagSelection}
-      //     <p/>
-      //       {twoUniqueForm}
-      //     <p/>
-      //     {hiddenPriceSubmitPanel}
-      //   </Card>
-      // </div>;
 
       const revisedItemInputter =
       <div className="theComponent">

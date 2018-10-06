@@ -54,10 +54,7 @@ class App extends Component {
     categoryHashAccess: null,
     categoryList: [],
     isAM: true,
-    isCategoryListPopulated: false,
-    isDisplayingPeriodItems: false, //Could remove?
     isItemInputterReadyToLoad: false,
-    isItemInputterUpToDate: false, //Could remove?
     isItemPanelOpen: true,
     itemHashAccess: null,
     itemList: [],
@@ -69,7 +66,7 @@ class App extends Component {
     selectedPeriod: null,
     selectedPeriodMenuText: "Select a Period",
     selectedWeekday: 1,
-    selectedWeekdayMenuText: "Select a Weekday",
+    selectedWeekdayMenuText: "Selected Weekday: Monday",
     wasteForm: "",
   }
   this.keySeed = 0;
@@ -127,9 +124,7 @@ class App extends Component {
   this.setState({
     categoryHashAccess: CategoryHashAccess,
     categoryList: categoryList, 
-    isCategoryListPopulated: true,
     isItemInputterReadyToLoad: true,
-    isItemInputterUpToDate: false,
     itemHashAccess: ItemHashAccess,
     itemList: itemList,
     periodHashAccess: PeriodHashAccess,
@@ -139,8 +134,8 @@ class App extends Component {
  }
 
  generateWasteForm() {
- 	if(this.state.selectedPeriod === null){
- 		this.setState({wasteForm: "Select a period"});
+ 	if(this.state.selectedPeriod === null || this.state.selectedWeekday === null){
+ 		this.setState({wasteForm: "Select a period & weekday"});
  		return;
  	}
 
@@ -209,7 +204,7 @@ class App extends Component {
  changeAMPM() {
   const toggledState = !this.state.isAM;
   this.setState({isAM: toggledState}, 
-  	() => this.generateNewPeriodWasteForm());
+  	() => this.updateSelectedPeriod());
  }
 
  onEditButtonClick(item) {
@@ -226,7 +221,6 @@ class App extends Component {
  }
 
  onIngredientOptionRadioClick(event) {
-  console.log("Radio change: " + event.currentTarget.value);
   this.setState({itemPanelForm: event.currentTarget.value});
  }
 
@@ -237,28 +231,10 @@ class App extends Component {
   const primaryPeriod = Number(periodTitle.substr(0, periodLocation));
   const quarterPeriod = Number(periodTitle[periodLocation + 1]);
 
-  let desiredPeriod = undefined;
-  this.state.periodList.forEach((period) => {
-    const isDesiredAM = period.isAM === this.state.isAM;
-    const isDesiredDay = period.day === this.state.selectedWeekday;
-    const isDesiredPrimary = primaryPeriod === period.primaryPeriod;
-    const isDesiredQuarter = quarterPeriod === period.quarterPeriod;
-
-    if(isDesiredAM && isDesiredDay && isDesiredPrimary && isDesiredQuarter) {
-      desiredPeriod = period;
-    }
-  });
-  
-  if(desiredPeriod === undefined){
-    console.log("The period finding algorithm in onPeriodMenuClick is bunk.");
-  }
-
   this.setState({
-    selectedPeriod: desiredPeriod,
-    selectedPeriodMenuText: "Selected Period: " + primaryPeriod + "." + quarterPeriod
-  }, 
-  // () => this.generateNewPeriodWasteForm()
-  );
+    selectedPeriodMenuText: "Selected Period: " + primaryPeriod + "." + quarterPeriod,
+  }, () => this.updateSelectedPeriod());
+  
  }
 
  onWeekdayMenuClick(weekday) {
@@ -277,7 +253,7 @@ class App extends Component {
   this.setState({
     selectedWeekday: weekdayEnums[weekday],
     selectedWeekdayMenuText: menuText
-  }, () => this.generateNewPeriodWasteForm());
+  }, () => this.updateSelectedPeriod());
  }
 
  toggleItemPanel() {
@@ -298,6 +274,44 @@ class App extends Component {
 
  	this.setState({periodItemsForSelectedPeriod: newPeriodItemList},
  		() => this.generateWasteForm());
+ }
+
+ updateSelectedPeriod() {
+  if(this.state.selectedPeriodMenuText === "Select a Period"
+     || this.state.selectedWeekday === null) {
+    return;
+  }
+
+  const periodLocation = this.state.selectedPeriodMenuText.indexOf('.');
+  const colonLocation = this.state.selectedPeriodMenuText.indexOf(':');
+
+  const primaryStart = colonLocation + 2;
+
+  const primaryPeriod = Number(this.state.selectedPeriodMenuText.slice(primaryStart, periodLocation));
+  const quarterPeriod = Number(this.state.selectedPeriodMenuText[periodLocation + 1]);
+
+  console.log("Primary: " + primaryPeriod);
+  console.log("Quarter: " + quarterPeriod);
+
+  let desiredPeriod = undefined;
+  this.state.periodList.forEach((period) => {
+    const isDesiredAM = period.isAM === this.state.isAM;
+    const isDesiredDay = period.day === this.state.selectedWeekday;
+    const isDesiredPrimary = primaryPeriod === period.primaryPeriod;
+    const isDesiredQuarter = quarterPeriod === period.quarterPeriod;
+  
+
+    if(isDesiredAM && isDesiredDay && isDesiredPrimary && isDesiredQuarter) {
+      desiredPeriod = period;
+    }
+  });
+  
+  if(desiredPeriod === undefined) {
+    console.log("The period finding algorithm in onPeriodMenuClick is bunk.");
+  } else {
+    this.setState({selectedPeriod: desiredPeriod},
+      () => this.generateNewPeriodWasteForm());
+  }
  }
 
   render() {
@@ -456,7 +470,7 @@ class App extends Component {
       className="header-itemPanelButton"
       onClick={() => this.toggleItemPanel()}>
     	{"Toggle Ingredient Options Panel"}
-    </Button>
+    </Button>;
 
     const contentPanel =
       <div className="content-panel">
