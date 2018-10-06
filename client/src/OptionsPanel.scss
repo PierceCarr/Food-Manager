@@ -3,30 +3,18 @@
 
  $input-width: 300px;
 
-.selection-button {
-	margin: 0;
-	width: $input-width - 75px !important;
-}
-
-.submit-button {
-	width: $input-width;
-}
-
- .wrapper {
-	width: $input-width + 50px;
-	text-align: left;
-	margin-top: 5px;
-}
-
-.theComponent {
-	width: $input-width + 50px;
-	text-align: left;
-	margin-top: 5px;
+.card-includePeriod {
+	margin-bottom: 15px;
 }
 
 .bp3-dark {
 	margin: auto;
 	text-align: left;
+}
+
+.selection-button {
+	margin: 0;
+	width: $input-width - 75px !important;
 }
 
 .standard-input {
@@ -38,3 +26,21 @@
 	text-align: center;
 	width: $input-width;
 }
+
+.submit-button {
+	width: $input-width;
+}
+
+.theComponent {
+	width: $input-width + 50px;
+	text-align: left;
+	margin-top: 5px;
+}
+
+
+.wrapper {
+	width: $input-width + 50px;
+	text-align: left;
+	margin-top: 5px;
+}
+

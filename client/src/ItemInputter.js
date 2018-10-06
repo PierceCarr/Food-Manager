@@ -55,7 +55,7 @@ class ItemInputter extends Component {
       isNameComboValid: false,
       nameFormValue: "",
       nameUnitChecked: false,
-      periodInsertionOption: "just selected",
+      periodInsertionOption: this.justInsertInSelectedDefaultText,
       tagsFromCategory: [],
       tagMenuText: this.defaultMenuText,
     }
@@ -102,7 +102,7 @@ class ItemInputter extends Component {
     	categoryMenuText: this.defaultMenuText,
     	tagMenuText: this.defaultMenuText,
     	inputKey: new Date(),
-      periodInsertionOption: "one",
+      periodInsertionOption: this.justInsertInSelectedDefaultText,
   	});
   }
 
@@ -239,6 +239,12 @@ class ItemInputter extends Component {
     let periodCatch = null;
     if(isPeriodSelected) periodCatch = this.props.selectedPeriod;
 
+    let isUpdatingAllOfPeriod = 
+      isPeriodSelected === true 
+      && this.state.periodInsertionOption === this.insertInAllOfPeriodDefaultText;
+
+    console.log("isUpdatingAllOfPeriod: " + isUpdatingAllOfPeriod);
+
   	const itemPromise = await axios({
   		method: 'post',
   		url: 'http://localhost:3001/item',
@@ -248,6 +254,7 @@ class ItemInputter extends Component {
   		data: {
 	  		category: this.state.category.name,
         isActive: this.state.isItemActive,
+        isUpdatingAllOfPeriod: isUpdatingAllOfPeriod,
         name: this.state.itemName,
         periodToUpdate: periodCatch,
         price: priceCatch,
@@ -449,7 +456,7 @@ class ItemInputter extends Component {
             value={this.state.initialQuantity}/>
         </FormGroup>
 
-        <Card>
+        <Card className="card-includePeriod">
           <Checkbox
             checked={this.state.isIncludedInCurrentPeriod}
             disabled={this.props.selectedPeriod === null}
@@ -497,7 +504,6 @@ class ItemInputter extends Component {
           {itemTagSelection}
           <p/>
             {nameInput}
-
             {unitInput}
           <p/>
           {priceSubmitPanel}

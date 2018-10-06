@@ -20,7 +20,8 @@ module.exports = {
 		if(req.body.periodToUpdate !== null || req.body.periodToUpdate !== undefined) {
 			const item = itemPromise;
 
-			if(req.body.updateAllOfPeriod === true) {
+			if(req.body.isUpdatingAllOfPeriod === true) {
+				console.log("UPDATING ALL OF PERIOD");
 
 				let periods = await Period
 					.findAll({
@@ -29,9 +30,12 @@ module.exports = {
 							quarterPeriod: req.body.periodToUpdate.quarterPeriod,
 							year: req.body.periodToUpdate.year
 						}
-					});
+					})
+					.catch((error) => res.status(400).send(error));
 
 				if(!periods) res.status(404).send({message: "Periods Not Found"});
+
+				console.log("FOUND " + periods.length + " PERIODS");
 
 				const periodItemsToAdd = [];
 				periods.forEach((period) => {
@@ -48,7 +52,16 @@ module.exports = {
 				const periodItemCallback = await PeriodItem.bulkCreate(periodItemsToAdd, {returning: true})
 					.catch((error) => res.status(400).send(error));
 
+				const newItemAndInstances = {
+					item: item,
+					periodItems: periodItemCallback
+				}
+
+				res.status(201).send(newItemAndInstances);
+
 			} else {
+
+				console.log("JUST UPDATING SELECTED PERIOD");
 
 				let period = await Period
 					.findById(req.body.periodToUpdate.id)
@@ -64,8 +77,8 @@ module.exports = {
 					isSubmitted: false
 				}
 
-				const periodItemCallback = await PeriodItem.
-					.create(newPeriodItem {returning: true})
+				const periodItemCallback = await PeriodItem
+					.create(newPeriodItem, {returning: true})
 					.catch((error) => res.status(400).send(error));
 
 				const newItemAndInstances = {
