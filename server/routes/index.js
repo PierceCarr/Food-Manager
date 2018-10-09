@@ -26,6 +26,7 @@ router.post('/item', itemController.add);
 router.put('/item', itemController.updateItem);
 
 router.get('/period', periodController.list);
+router.get('/period/check', periodController.checkUpToDate);
 
 router.get('/periodItem/:periodId', periodItemController.listForWasteForm);
 // router.post('/periodItem', periodItemController.createOustandingPeriodItems);

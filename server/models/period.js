@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
         min: 1
       }
     },
+    generation: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     isAM: {
       type: DataTypes.BOOLEAN,
       allowNull: false

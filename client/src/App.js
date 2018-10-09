@@ -77,8 +77,23 @@ class App extends Component {
   this.updatePeriodItemLists = this.updatePeriodItemLists.bind(this);
  }
 
- componentDidMount() {
-	this.loadCategoriesPeriodsAndItems();
+ async componentDidMount() {
+  await this.checkForNewPeriods();
+	await this.loadCategoriesPeriodsAndItems();
+ }
+
+ changeAMPM() {
+  const toggledState = !this.state.isAM;
+  this.setState({isAM: toggledState}, 
+    () => this.updateSelectedPeriod());
+ }
+
+ async checkForNewPeriods() {
+  const periodPromise = await axios({
+    method: 'get',
+    url: 'http://localhost:3001/period/check'
+  })
+  .catch((error) => console.log(error));
  }
 
  async loadCategoriesPeriodsAndItems() {
@@ -94,17 +109,20 @@ class App extends Component {
   const categoryData = await axios({
     mothod: 'get',
     url: 'http://localhost:3001/category'
-  });
+  })
+  .catch((error) => console.log(error));
 
   const itemData = await axios({
     mothod: 'get',
     url: 'http://localhost:3001/item'
-  });
+  })
+  .catch((error) => console.log(error));
 
   const periodData = await axios({
     mothod: 'get',
     url: 'http://localhost:3001/period'
-  });
+  })
+  .catch((error) => console.log(error));
   
   categoryData.data.forEach((category) => {
     CategoryHashAccess[category.name] = category;
@@ -201,11 +219,7 @@ class App extends Component {
  	this.generateWasteForm();
  }
 
- changeAMPM() {
-  const toggledState = !this.state.isAM;
-  this.setState({isAM: toggledState}, 
-  	() => this.updateSelectedPeriod());
- }
+ 
 
  onEditButtonClick(item) {
   let genericItem = item;
@@ -451,7 +465,7 @@ class App extends Component {
         <Popover content={periodMenu} position={Position.BOTTOM}>
           <Button icon="share" text={this.state.selectedPeriodMenuText}/>
         </Popover>
-        <Button text="Add Period"/>
+        <Button text="Check For Updates" icon="refresh"/>
         <RadioGroup
           inline="true"
           onChange={() => this.changeAMPM()}

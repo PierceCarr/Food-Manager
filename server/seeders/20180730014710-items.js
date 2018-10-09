@@ -93,6 +93,10 @@ module.exports = {
           min: 1
         }
       },
+      generation: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
       isAM: {
         type: Sequelize.BOOLEAN,
         allowNull: false
@@ -136,7 +140,7 @@ module.exports = {
       }
     });
 
-    const periodTuples = [[1,4],[2,2],[8,1],[8,2],[8,3],[8,4], [12,3]];
+    const periodTuples = [[1,4],[2,2],[8,1],[8,2],[8,3],[8,4], [11,3]];
     const periodsToInsert = [];
 
     const arbitraryEndDay = 31;
@@ -159,6 +163,7 @@ module.exports = {
           
           day: (weekday % 7) + 1,
           endDay: arbitraryEndDay,
+          generation: 0,
           isAM: isAM,
           month: arbitraryMonth,
           primaryPeriod: periodTuple[0],
